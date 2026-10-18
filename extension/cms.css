@@ -149,6 +149,17 @@
     & .table-condensed > thead > tr > th, & .table-condensed > tbody > tr > th, & .table-condensed > tbody > tr > td { padding-left: 12px !important; padding-right: 12px !important; }
     & .table-responsive { overflow-x: auto; }
     & .table > tbody > tr > td[colspan]:only-child { padding: 40px 16px !important; text-align: center; color: var(--bs-muted) !important; font-weight: 500; background: transparent !important; }
+    /* ---------- Table polish: no stray gap inside cards, link style, status text ---------- */
+    & .table-responsive .table, & .table-responsive table { margin-bottom: 0 !important; }
+    & .table td a:not(.btn) { font-weight: 600; text-decoration: none; }
+    & .table td a:not(.btn):hover { text-decoration: underline; text-underline-offset: 3px; }
+    & .table td[data-bs-status] { font-weight: 700; color: var(--tone) !important; white-space: nowrap; }
+    & .table td[data-bs-status]::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 7px; border-radius: 50%; background: var(--tone); vertical-align: 1px; }
+    & .table td[data-bs-status="ok"] { --tone: var(--bs-ok); }
+    & .table td[data-bs-status="warn"] { --tone: var(--bs-warn); }
+    & .table td[data-bs-status="bad"] { --tone: var(--bs-bad); }
+    & .table > tbody > tr > td:empty::after { content: "\2014"; color: var(--bs-muted); opacity: .5; }
+
     & .table-hover > tbody > tr:hover > td { background: color-mix(in srgb, var(--bs-accent) 5%, var(--bs-surface)) !important; }
     & .table-striped > tbody > tr:nth-of-type(odd) > td { background: color-mix(in srgb, var(--bs-soft) 45%, transparent) !important; }
     & .table-bordered > thead > tr > th, & .table-bordered > tbody > tr > td { border-left: 0 !important; border-right: 0 !important; }

@@ -274,6 +274,21 @@
     mark(document.documentElement, 'data-bs-tt');
     if (store && store.local) store.local.get(VIEW_KEY).then(d => { if (d[VIEW_KEY] === 'week' || d[VIEW_KEY] === 'list') { wrap.dataset.view = d[VIEW_KEY]; Object.entries(buttons).forEach(([k, n]) => n.setAttribute('aria-pressed', String(k === d[VIEW_KEY]))); } }).catch(() => {});
   }
+  // Plain-text statuses in table cells (Verified, Paid, Pending...) get a colour and a dot; the text itself is untouched.
+  const STATUS = [
+    ['ok', /^(verified|paid|approved|completed|complete|accepted|active|submitted|registered|cleared|passed|pass|yes)$/i],
+    ['warn', /^(pending|in progress|processing|under review|partial|partially paid|waiting|n\/a pending)$/i],
+    ['bad', /^(unpaid|rejected|failed|fail|overdue|declined|cancelled|canceled|not verified|defaulter|withheld)$/i]
+  ];
+  function statuses() {
+    document.querySelectorAll('#pageContent table td').forEach(td => {
+      if (td.children.length || td.hasAttribute('data-bs-status')) return;
+      const text = td.textContent.trim();
+      if (!text || text.length > 18) return;
+      const hit = STATUS.find(([, re]) => re.test(text));
+      if (hit) mark(td, 'data-bs-status', hit[0]);
+    });
+  }
   function mount() {
     const root = document.documentElement;
     if (!document.body) return;
@@ -281,6 +296,7 @@
     document.querySelectorAll('#pageAlerts_up .alert').forEach(a => mark(a, 'role', 'alert'));
     mountResizer();
     attendance();
+    statuses();
     timetable();
     landing();
     emblem();
