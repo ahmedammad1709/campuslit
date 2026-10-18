@@ -1,0 +1,11 @@
+import http from 'node:http';
+import {readFile} from 'node:fs/promises';
+import path from 'node:path';
+const base=path.resolve('.');
+const mock=`const listeners=[];let preferences={theme:'classic',font:'inter'};globalThis.chrome={runtime:{getURL:p=>location.origin+'/extension/'+p},storage:{local:{get:async()=>({bahriaStudioPreferences:preferences}),set:async data=>{preferences=data.bahriaStudioPreferences;listeners.forEach(fn=>fn({bahriaStudioPreferences:{newValue:preferences}},'local'))}},onChanged:{addListener:fn=>listeners.push(fn)}}};window.fixtureSettings=s=>chrome.storage.local.set({bahriaStudioPreferences:s});`;
+const server=http.createServer(async(req,res)=>{
+  const url=new URL(req.url,'http://localhost');
+  if(url.pathname==='/mock-api.js'){res.setHeader('Content-Type','text/javascript');res.end(mock);return;}
+  if(url.pathname==='/campus-fixture.svg'){res.setHeader('Content-Type','image/svg+xml');res.end('<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000"><defs><linearGradient id="sky" x2="1" y2="1"><stop stop-color="#d9bfa7"/><stop offset=".6" stop-color="#7193aa"/><stop offset="1" stop-color="#4b6b6b"/></linearGradient><filter id="blur"><feGaussianBlur stdDeviation="9"/></filter><pattern id="windows" width="65" height="78" patternUnits="userSpaceOnUse"><rect width="65" height="78" fill="#ccbea7"/><rect x="14" y="15" width="23" height="40" fill="#555e61"/></pattern></defs><path fill="url(#sky)" d="M0 0h1600v1000H0z"/><g filter="url(#blur)"><path d="m0 500 230-140 210 60 230-220 300 160 300-120 330 180v580H0" fill="#668392"/><path d="M0 720Q500 520 1600 640v360H0" fill="#73856d"/><path d="M260 540h1080v460H260" fill="url(#windows)"/><path d="M220 520h1160v35H220" fill="#c6af89"/></g></svg>');return;}
+  try{const target=url.pathname==='/Logins/Student/Login.aspx'?path.join(base,'tests/fixtures/login.html'):path.resolve(base,'.'+decodeURIComponent(url.pathname));if(!target.startsWith(base+path.sep))throw Error();const data=await readFile(target);res.setHeader('Content-Type',target.endsWith('.css')?'text/css':target.endsWith('.js')?'text/javascript':target.endsWith('.woff2')?'font/woff2':'text/html');res.end(data);}catch{res.writeHead(404);res.end();}
+});server.listen(4174,'127.0.0.1',()=>console.log('Login structural fixture listening on 4174; contains no real student data.'));

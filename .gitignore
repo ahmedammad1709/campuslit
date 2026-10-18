@@ -1,0 +1,23 @@
+# build output and local scratch
+dist/
+artifacts/
+node_modules/
+*.zip
+*.log
+
+# private: pages saved from a signed-in session, and browser profiles/screenshots made while testing
+html_pages/
+*.png.private
+chrome-profile*/
+
+# third-party material downloaded for local previews (the portals' own stylesheets, scripts and images)
+scripts/*/vendor/
+
+# third-party skill copies used only as development reference; not part of this project
+skills/
+
+# editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
