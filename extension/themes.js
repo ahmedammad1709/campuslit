@@ -8,7 +8,7 @@
     sage: { name: 'Grove', description: 'A breath of fresh air', bg: '#f5f8f6', surface: '#ffffff', soft: '#e5f1eb', ink: '#253b31', muted: '#607366', line: '#dce7df', nav: '#f0f5f2', navInk: '#466151', accent: '#2d7c5b', gold: '#2d7c5b', dark: false },
     rose: { name: 'Bloom', description: 'A softer point of view', bg: '#fcf7fa', surface: '#ffffff', soft: '#f9e8f1', ink: '#422d3c', muted: '#826578', line: '#eddee7', nav: '#fcf0f6', navInk: '#76506a', accent: '#b73c7d', gold: '#b73c7d', dark: false }
   };
-  const defaults = { enabled: true, cms: true, lms: true, theme: 'navy', mode: 'preset', accent: '', font: 'jakarta', fontSize: 15, density: 'comfortable', radius: 10, motion: true, cleanBackground: true };
+  const defaults = { enabled: true, cms: true, lms: true, theme: 'navy', mode: 'preset', accent: '', font: 'jakarta', fontSize: 15, density: 'comfortable', radius: 10, motion: true, cleanBackground: false };
   const fonts = { jakarta: '"Bahria Jakarta", "Plus Jakarta Sans", "Segoe UI", sans-serif', manrope: '"Bahria Manrope", Manrope, "Segoe UI", sans-serif', sora: '"Bahria Sora", Sora, "Segoe UI", sans-serif', inter: '"Bahria Inter", Inter, Arial, sans-serif', system: '"Segoe UI", system-ui, sans-serif', humanist: '"Trebuchet MS", "Segoe UI", sans-serif', serif: 'Georgia, "Times New Roman", serif' };
   function normalize(input) {
     const value = input && typeof input === 'object' ? input : {};
@@ -43,5 +43,14 @@
     element.dataset.bsDark = String(p.dark);
   }
   const fontFiles = { jakarta: ['Bahria Jakarta', 'fonts/jakarta-latin.woff2'], manrope: ['Bahria Manrope', 'fonts/manrope-latin.woff2'], sora: ['Bahria Sora', 'fonts/sora-latin.woff2'], inter: ['Bahria Inter', 'fonts/inter-latin.woff2'] };
-  root.BahriaStudio = { fontFiles, themes, defaults, normalize, palette, apply, ratio, fonts };
+  // Master switch with two children. Master on/off forces both portals on/off; a portal switch changes only that portal,
+  // and the master follows: on while at least one portal is on.
+  function power(current, key, value) {
+    const s = normalize(current), on = Boolean(value);
+    if (key === 'enabled') return { ...s, enabled: on, cms: on, lms: on };
+    const next = { ...s, [key]: on };
+    next.enabled = next.cms || next.lms;
+    return next;
+  }
+  root.BahriaStudio = { power, fontFiles, themes, defaults, normalize, palette, apply, ratio, fonts };
 })(globalThis);

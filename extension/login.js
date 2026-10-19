@@ -29,13 +29,16 @@
     current = null;
   }
   function mount() {
-    if (!document.body || !/^\/Logins\/Student\/Login\.aspx\/?$/i.test(location.pathname)) return;
+    if (!document.body || !/^\/Logins\/[A-Za-z]+\/Login\.aspx\/?$/i.test(location.pathname)) return;
     if (current?.panel.isConnected && current.password.isConnected) return;
     if (current) disable();
     const password = document.querySelector('input[type="password"]');
     if (!password || !password.form) return;
     const panel = password.closest('.panel, .card, .login-box, .login-panel');
-    if (!panel || !panel.querySelector('select') || !panel.querySelector('input[type="submit"],button[type="submit"],.btn-primary,a.btn')) return;
+    if (!panel || !panel.querySelector('input[type="submit"],button[type="submit"],.btn-primary,a.btn')) return;
+    const role = (/^\/Logins\/([A-Za-z]+)\//i.exec(location.pathname) || [])[1] || 'student';
+    const oldTitle = panel.querySelector('.panel-title, .card-title, h3, h4');
+    const title = (oldTitle && oldTitle.textContent.trim()) || (role.charAt(0).toUpperCase() + role.slice(1) + ' sign in');
     const root = document.documentElement;
     // Capture only public background styling before our theme overrides it.
     const active = root.getAttribute('data-bahria-studio');
@@ -52,7 +55,7 @@
     panel.querySelectorAll('.panel-heading,.card-header').forEach(node => tag(node, 'data-bs-login-old-heading'));
     // Hide only the superseded page title and its empty visual strip.
     document.querySelectorAll('h1,h2').forEach(heading => {
-      if (panel.contains(heading) || heading.textContent.trim().toLowerCase() !== 'student') return;
+      if (panel.contains(heading) || heading.textContent.replace(/\s+/g, '').toLowerCase() !== role.toLowerCase()) return;
       const parent = heading.parentElement;
       tag(parent && parent.children.length === 1 && !parent.contains(panel) && parent !== document.body ? parent : heading, 'data-bs-login-old-heading');
     });
@@ -67,19 +70,11 @@
     const icon = document.querySelector('link[rel="apple-touch-icon"][sizes="180x180"]') || document.querySelector('link[rel="apple-touch-icon"]');
     if (icon && icon.href) { const img = make('img', 'bs-login-emblem'); img.src = icon.href; img.alt = ''; monogram.textContent = ''; monogram.append(img); }
     const name = make('span', 'bs-login-brand-name', 'Bahria University');
-    name.append(make('small', '', 'Student portal')); brand.append(monogram, name);
+    name.append(make('small', '', role.toLowerCase() === 'student' ? 'Student portal' : 'Campus portal')); brand.append(monogram, name);
     const actions = make('div', 'bs-login-header-actions');
-    const original = make('button', 'bs-login-original', 'Original view'); original.type = 'button';
-    original.addEventListener('click', async () => {
-      original.disabled = true;
-      try {
-        const data = await api.storage.local.get('bahriaStudioPreferences');
-        await api.storage.local.set({bahriaStudioPreferences: {...BahriaStudio.normalize(data.bahriaStudioPreferences), cms:false}});
-      } catch { original.disabled = false; original.textContent = 'Try original view again'; }
-    });
-    actions.append(original); header.append(brand,actions); document.body.prepend(header);
+    header.append(brand,actions); document.body.prepend(header);
     const heading = make('div', 'bs-login-heading');
-    heading.append(make('h1','','Student sign in'), make('p','','Use your enrollment number and CMS password.'));
+    heading.append(make('h1','', title.replace(/sign in/i, 'sign in')), make('p','', role.toLowerCase() === 'student' ? 'Use your enrollment number and CMS password.' : 'Enter your details to continue.'));
     panel.prepend(heading);
     const group = password.closest('.input-group') || password.parentElement;
     tag(group, 'data-bs-password-group');

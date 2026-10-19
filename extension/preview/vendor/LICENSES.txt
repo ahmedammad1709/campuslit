@@ -1,0 +1,17 @@
+Third-party files used only by the sample pages in the settings preview (extension/preview/). They are not injected
+into any website.
+
+Bootstrap v3.3.7 (css/bootstrap.min.css, fonts/glyphicons-halflings-regular.woff2)
+  Copyright 2011-2016 Twitter, Inc. Licensed under the MIT License. https://github.com/twbs/bootstrap
+
+AdminLTE v2.4.18 (css/AdminLTE.min.css, css/skin-yellow-light.min.css)
+  Copyright (c) Abdullah Almsaeed / Colorlib. Licensed under the MIT License. https://github.com/ColorlibHQ/AdminLTE
+
+Font Awesome 4.7.0 (css/font-awesome.min.css, fonts/fontawesome-webfont.woff2)
+  By Dave Gandy. Font: SIL OFL 1.1; CSS: MIT. https://fontawesome.com/v4/license/
+
+Font Awesome Free 5.15.4, solid font (fonts/fa-solid-900.woff2)
+  Copyright Fonticons, Inc. Icons: CC BY 4.0; font files: SIL OFL 1.1; code: MIT. https://fontawesome.com/license/free
+
+The sample pages' names, courses, schedule and numbers are invented. The round badge in the LMS sample is a neutral
+placeholder, not the university's emblem.

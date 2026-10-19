@@ -1,0 +1,9 @@
+/* Shared base for the sample pages shown in the settings preview. These pages mimic the structure of the real
+   portals so the real lms.css / cms.css apply unchanged; everything here only matters when Campuslit is switched
+   off for that portal (an approximation of the original look) or for loading fonts. */
+@font-face { font-family: 'Bahria Jakarta'; src: url('../fonts/jakarta-latin.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: 'Bahria Manrope'; src: url('../fonts/manrope-latin.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: 'Bahria Sora'; src: url('../fonts/sora-latin.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: 'Bahria Inter'; src: url('../fonts/inter-latin.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
+html { scrollbar-width: thin; }
+a { cursor: default; }

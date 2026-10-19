@@ -30,33 +30,73 @@ function render() {
 }
 function preview() {
   BahriaStudio.apply($('portal-preview'), settings, system.matches);
+  sendToPreview();
   $('size-output').textContent = settings.fontSize + ' px'; $('radius-output').textContent = settings.radius + ' px';
   $('preview-theme-name').textContent = BahriaStudio.palette(settings, system.matches).name + (settings.accent ? ' · Personalized' : '');
-  document.querySelector('.preview-column').classList.toggle('is-paused', !settings.enabled || !settings[previewSite]);
+  const off = !settings.enabled || !settings[previewSite];
+  $('preview-off').hidden = !off;
+  $('preview-off-text').textContent = !settings.enabled ? 'Campuslit is switched off. This is roughly how the original looks.' : 'Campuslit is switched off for the ' + previewSite.toUpperCase() + '. This is roughly how the original looks.';
+  document.querySelector('.preview-column').classList.toggle('is-paused', off);
   $('type-specimen').style.fontFamily = BahriaStudio.fonts[settings.font];
   const accent = BahriaStudio.palette(settings, system.matches).accent;
   document.querySelectorAll('[data-accent]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.accent.toLowerCase() === accent.toLowerCase())));
 }
 document.querySelectorAll('[data-accent]').forEach(button => button.addEventListener('click', () => { settings.accent = button.dataset.accent; $('accent').value = settings.accent; preview(); dirty(); }));
 function dirty() { $('save-label').textContent = 'Save appearance'; status(JSON.stringify(settings) === baseline ? 'Your saved appearance.' : 'Preview updated. Save to apply to your portals.'); }
-for (const key of ['enabled', 'cms', 'lms', 'cleanBackground', 'motion']) $(key).addEventListener('change', e => { settings[key] = e.target.checked; preview(); dirty(); });
+for (const key of ['cleanBackground', 'motion']) $(key).addEventListener('change', e => { settings[key] = e.target.checked; preview(); dirty(); });
+for (const key of ['enabled', 'cms', 'lms']) $(key).addEventListener('change', e => { Object.assign(settings, BahriaStudio.power(settings, key, e.target.checked)); for (const k of ['enabled', 'cms', 'lms']) $(k).checked = settings[k]; preview(); dirty(); });
 for (const key of ['font', 'density']) $(key).addEventListener('change', e => { settings[key] = e.target.value; preview(); dirty(); });
 for (const key of ['fontSize', 'radius']) $(key).addEventListener('input', e => { settings[key] = Number(e.target.value); preview(); dirty(); });
 $('accent').addEventListener('input', e => { settings.accent = e.target.value; preview(); dirty(); });
 $('reset-accent').addEventListener('click', () => { settings.accent = ''; render(); dirty(); });
 $('system').addEventListener('change', e => { settings.mode = e.target.checked ? 'system' : 'preset'; render(); dirty(); });
 system.addEventListener('change', render);
-document.querySelectorAll('[data-preview]').forEach(button => button.addEventListener('click', () => {
-  previewSite = button.dataset.preview;
-  document.querySelectorAll('[data-preview]').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
+// ---- live preview: real sample pages in an iframe, styled by the real portal stylesheets ----
+const PREVIEW_PAGES = { cms: [['dashboard', 'Dashboard'], ['timetable', 'Time table']], lms: [['dashboard', 'Dashboard'], ['assignments', 'Assignments']] };
+let previewPage = 'dashboard';
+const frame = () => $('preview-frame');
+function sendToPreview() {
+  const target = frame().contentWindow;
+  if (target) target.postMessage({ type: 'campuslit-settings', settings }, location.origin);
+}
+function loadPreview() {
+  const src = 'preview/' + previewSite + '/' + previewPage + '.html';
   $('preview-url').textContent = previewSite + '.bahria.edu.pk';
-  $('stat-label').textContent = previewSite === 'cms' ? 'Overall attendance' : 'Course resources';
-  $('stat-value').innerHTML = previewSite === 'cms' ? '94<span>%</span> <small>Looking good</small>' : '24 <small>Ready to explore</small>';
-  $('preview-column-title').textContent = previewSite === 'cms' ? 'Attendance' : 'Resources';
-  document.querySelectorAll('.mini-pill').forEach((pill, i) => { pill.textContent = (previewSite === 'cms' ? ['100%', '92%', '90%'] : ['8 files', '10 files', '6 files'])[i]; });
-  preview();
+  let here = ''; try { here = frame().contentWindow.location.pathname; } catch { /* not loaded yet */ }
+  if (!here.endsWith('/' + src)) frame().src = src; else sendToPreview();
+}
+const PREVIEW_WIDTH = 1000;   // the preview always lays out like a 1000px-wide browser, scaled down when the column is narrower
+function fitPreview() {
+  const wrap = frame().parentElement, width = wrap.clientWidth;
+  if (!width) return;
+  const height = Math.round(Math.min(640, Math.max(420, innerHeight * .68)));
+  const scale = Math.min(1, width / PREVIEW_WIDTH);
+  wrap.style.height = height + 'px';
+  frame().style.width = (scale < 1 ? PREVIEW_WIDTH : width) + 'px';
+  frame().style.height = Math.round(height / scale) + 'px';
+  frame().style.transform = scale < 1 ? 'scale(' + scale.toFixed(4) + ')' : '';
+}
+new ResizeObserver(fitPreview).observe(frame().parentElement);
+addEventListener('resize', fitPreview);
+fitPreview();
+frame().addEventListener('load', () => {
+  // The sample page can navigate itself (its sidebar links); keep the switches in step with where it ended up.
+  try {
+    const match = /\/preview\/(cms|lms)\/([a-z]+)\.html$/.exec(frame().contentWindow.location.pathname);
+    if (match && (match[1] !== previewSite || match[2] !== previewPage)) {
+      previewSite = match[1]; previewPage = match[2];
+      document.querySelectorAll('[data-preview]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.preview === previewSite)));
+      $('preview-url').textContent = previewSite + '.bahria.edu.pk'; preview();
+    }
+  } catch { /* cross-origin should not happen; ignore */ }
+  sendToPreview();
+});
+addEventListener('message', event => { if (event.origin === location.origin && event.source === frame().contentWindow && event.data && event.data.type === 'campuslit-ready') sendToPreview(); });
+document.querySelectorAll('[data-preview]').forEach(button => button.addEventListener('click', () => {
+  previewSite = button.dataset.preview; previewPage = 'dashboard';
+  document.querySelectorAll('[data-preview]').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
+  loadPreview(); preview();
 }));
-$('preview-action').addEventListener('click', () => { $('personalize').scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'}); $('accent').focus({preventScroll:true}); });
 $('save').addEventListener('click', async () => {
   if (busy) return; busy = true; $('save').disabled = true;
   $('save-label').textContent = 'Saving…';
@@ -83,13 +123,13 @@ $('import-file').addEventListener('change', async e => {
 $('reset').addEventListener('click', () => $('reset-dialog').showModal());
 $('cancel-reset').addEventListener('click', () => $('reset-dialog').close());
 $('confirm-reset').addEventListener('click', async () => {
-  try { await StudioStorage.clear(); settings = BahriaStudio.normalize({}); baseline = JSON.stringify(settings); render(); $('reset-dialog').close(); status('Preferences removed. Crystal restored.'); }
+  try { await StudioStorage.clear(); settings = BahriaStudio.normalize({}); baseline = JSON.stringify(settings); render(); $('reset-dialog').close(); status('Preferences removed. Bahria theme restored.'); }
   catch { $('reset-dialog').close(); status('Could not reset preferences. Please try again.'); }
 });
 StudioStorage.subscribe(value => {
   if (busy) return;
   if (JSON.stringify(settings) !== baseline) { status('Settings changed in another window. Save here to keep your current preview.'); return; }
-  settings = value; baseline = JSON.stringify(value); render(); status('Updated from your other Studio window.');
+  settings = value; baseline = JSON.stringify(value); render(); status('Updated from your other settings window.');
 });
 addEventListener('beforeunload', e => { if (JSON.stringify(settings) !== baseline) { e.preventDefault(); e.returnValue = ''; } });
 (async () => {

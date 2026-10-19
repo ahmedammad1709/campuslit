@@ -19,3 +19,7 @@ node scripts/browser-check.mjs
 ```
 
 Set `STUDIO_CHROME` to another compatible Chromium executable if needed. The script keeps its isolated browser profiles and screenshots under ignored `artifacts/`. An optional `STUDIO_WS` path can point to an installed `ws` package entry point; the default uses Node's WebSocket implementation.
+
+## Settings page (v0.3)
+
+`scripts/browser-check.mjs` drives headless Chrome against the preview server and checks, inside the live-preview iframe: all six themes apply the real `cms.css`/`lms.css` variables, the CMS dashboard and time table and the LMS dashboard and assignments render, text size, corner radius, spacing, font and accent (with contrast) reach both portals, system dark mode switches to Midnight, the per-portal and master switches, plain-background and motion flags, save/reload persistence, export contents, the reset dialog, five desktop widths plus 390 px, the popup, the privacy page, and no runtime exceptions or external requests. Not covered: running it as an installed extension (it uses `localStorage` in the dev server), Firefox, and the file-picker import.

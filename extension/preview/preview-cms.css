@@ -1,0 +1,57 @@
+/* Minimal stand-in for the university's "Aspire" CMS theme: its layout rules (fixed header and sidebar, content offset)
+   plus an approximation of its original sage-green and grey look, visible only when Campuslit is off for the CMS
+   in the preview. Icons use the free Font Awesome 5 solid font. */
+@font-face { font-family: 'Font Awesome 5 Free'; font-style: normal; font-weight: 900; font-display: block; src: url('vendor/fonts/fa-solid-900.woff2') format('woff2'); }
+.fa, .fas { display: inline-block; font-family: 'Font Awesome 5 Free'; font-weight: 900; font-style: normal; line-height: 1; -webkit-font-smoothing: antialiased; }
+.fa-desktop:before { content: "\f108"; } .fa-bell:before { content: "\f0f3"; } .fa-caret-down:before { content: "\f0d7"; } .fa-caret-right:before { content: "\f0da"; }
+
+body.Army { margin: 0; line-height: 1.6; font-size: 13px; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; min-width: 320px; }
+body.Army > form#form1 { padding: 0; margin: 0; }
+body.Army > form#form1 > div#pageContainer { padding: 42px 0 0 0; width: 100%; margin: 0 auto 25px 0; }
+body.Army > form#form1 > div#pageContainer > header#header { height: 42px; min-height: 42px; border: 0; margin: 0; color: #fff; background: #7a8c74; }
+header#header a.navbar-brand { color: inherit; height: 42px; padding: 10px; font-family: Georgia, 'Times New Roman', serif; font-size: 20px; }
+header#header a#aSideBar { padding: 10px 15px; cursor: pointer; }
+header#header #AccountsNavbar > ul { background: #616161; margin: 0; }
+header#header #AccountsNavbar > ul > li > a { display: block; height: 42px; padding: 0 15px; line-height: 42px; color: #fff; }
+header#header #AccountsNavbar img.avatar { width: 32px; height: 32px; margin-top: 5px; border-radius: 50%; background: #fff; }
+header#header #AccountsNavbar .name { margin-left: 6px; vertical-align: top; }
+body.Army > form#form1 > div#pageContainer > aside#sideBar { position: fixed; top: 42px; bottom: 0; width: 250px; padding: 0; border-right: 1px solid #7a8c74; overflow-y: auto; }
+aside#sideBar div#sideMenuList { min-height: 100%; border: 0; border-radius: 0; background: #616161; color: #fff; margin: 0; }
+aside#sideBar div#sideMenuList a { display: block; background: #616161; color: #fff; border-radius: 0; border-width: 0 0 1px 0; border-color: #7a8c74; padding: 8px 10px; margin: 0; }
+aside#sideBar div#sideMenuList a:hover { background: #888; }
+aside#sideBar div#sideMenuList a > i { float: right; margin: 3px 0; }
+aside#sideBar div#sideMenuList a.list-group-item.collapsed > i.fa-caret-down, aside#sideBar div#sideMenuList a.list-group-item > i.fa-caret-right { display: none; }
+aside#sideBar div#sideMenuList a.list-group-item.collapsed > i.fa-caret-right { display: inline-block; }
+aside#sideBar div#sideMenuList a.list-group-item > i.fa-caret-down { display: inline-block; }
+aside#sideBar div#sideMenuList div.list-group-subMenu { margin: 0 0 0 10px; }
+body.Army > form#form1 > div#pageContainer > aside#sideBar + div#pageContent { margin: 0 0 0 250px; }
+body.Army > form#form1 > div#pageContainer.HideSideBar > aside#sideBar { display: none; }
+body.Army > form#form1 > div#pageContainer.HideSideBar > div#pageContent { margin: 0 !important; }
+div#pageContent > div#breadCrumb { background: #f0f0f0; border-bottom: 1px solid #e5e5e5; }
+div#pageContent > div#breadCrumb > ol.breadcrumb { background: inherit; margin: 0; padding: 2px 10px; }
+div#pageContent > div#pageHeading { padding: 10px; margin: 0 0 15px; background: #f9f9f9; border-bottom: 1px solid #e5e5e5; }
+div#pageContent > div#pageHeading > h1 { color: #333; font-size: 32px; font-weight: bold; margin: 0; padding: 0; line-height: 100%; }
+div#pageContent > div#pageHeading > h1 > span { color: #7a8c74; }
+body.Army > form#form1 > footer#footer { position: absolute; right: 0; bottom: 0; left: 250px; padding: 0 10px; border-top: 1px solid #eee; min-height: 25px; }
+body.Army > form#form1 > div#pageContainer.HideSideBar + footer#footer { left: 0; }
+
+/* dashboard widgets as on the real page */
+.notification-container, .attendance-container { width: 100%; height: 400px; overflow: hidden; position: relative; background: #f8f9fa; }
+.scroll-container { height: 100%; overflow: hidden; padding: 0 10px; }
+#scroll-text { display: flex; flex-direction: column; gap: 10px; padding-top: 10px; }
+.card { width: 100%; padding: 10px; background: #fff; box-shadow: 2px 2px 5px rgba(0, 0, 0, .1); border-radius: 5px; }
+.notification-heading { font-weight: bold; padding: 5px; margin: 0 0 5px; font-family: Georgia, serif; }
+.attendance-body { height: calc(100% - 42px); padding: 10px; }
+.attendance-canvas-wrapper { position: relative; width: 100%; height: 200px; }
+.margin-bottom-15 { margin-bottom: 15px; }
+#timeTable { width: 100%; background: #fff; }
+#timeTable caption { font-weight: bold; }
+@media (max-width: 767px) {
+  body.Army > form#form1 > div#pageContainer > aside#sideBar { position: static; width: 100%; }
+  body.Army > form#form1 > div#pageContainer > aside#sideBar + div#pageContent { margin: 0; }
+  body.Army > form#form1 > footer#footer { left: 0; }
+}
+
+header#header a#brandShortName, header#header a#brandAlias { display: none !important; }
+@media (max-width: 991px) { header#header a#brandName { display: none !important; } header#header a#brandShortName { display: flex !important; } }
+@media (max-width: 767px) { header#header a#brandShortName { display: none !important; } header#header a#brandAlias { display: flex !important; } }

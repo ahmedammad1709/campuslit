@@ -11,7 +11,8 @@ A cleaner, calmer look for the Bahria University student **CMS** and **LMS**, as
 - **LMS** (`lms.bahria.edu.pk`): redesigned header, resizable sidebar that marks the page you are on, filter bars, tables, status pills and dropdowns; a dashboard with your courses as cards; tap-or-keyboard popovers instead of hover-only comments.
 - **CMS** (`cms.bahria.edu.pk`): a unified header and sidebar with icons, tidier tables, forms and modals, clear error alerts, a role-card landing page and a one-screen student sign-in.
 - **Dashboard attendance** drawn as readable per-course rows, and a **Time Table** as a compact day board or a one-page week calendar with a "next class" card.
-- **Six themes** (Bahria, Crystal, Midnight, Linen, Grove, Bloom), custom accent, bundled fonts (Plus Jakarta Sans, Manrope, Sora, Inter), text size, spacing and corner radius. Everything can be switched off per portal, or with one click on "Original view".
+- **A settings page with a live preview** built from real-structure CMS and LMS sample pages (invented data), drawn by the very stylesheets the portals get, so what you pick is exactly what you see.
+- **Six themes** (Bahria, Crystal, Midnight, Linen, Grove, Bloom), custom accent, bundled fonts (Plus Jakarta Sans, Manrope, Sora, Inter), text size, spacing and corner radius. One master switch plus a CMS and an LMS switch in the popup turn everything, or just one portal, on or off.
 
 ## Install (development)
 
@@ -32,7 +33,10 @@ No analytics, no accounts, no remote code or fonts, no network requests from the
 | --- | --- |
 | `extension/` | The extension: `themes.js` (palettes), `content.js` (per-site switch), `lms.*`, `cms.*`, `login.*` (portal redesigns), `portal.css` (fallback styles), `options.*` and `popup.*` (settings UI), `fonts/`, `icons/` |
 | `brand/` | Logo (`logo.svg`, `logo-512.png`); regenerate with `python scripts/make-logo.py` |
+| `extension/preview/` | Sample CMS and LMS pages for the settings preview; regenerate with `python scripts/make-preview-pages.py` |
+| `site/` | The marketing site (static HTML/CSS, no build step, deploys as-is, e.g. Vercel with root directory `site`). Preview: `node scripts/site-tools.mjs serve`; screenshots: `node scripts/make-site-shots.mjs`; share image: `node scripts/site-tools.mjs og` |
 | `scripts/build.mjs` | Builds `dist/chrome` and `dist/firefox` |
+| `scripts/browser-check.mjs` | Headless-Chrome check of the settings page, popup and preview (`npm run preview`, then `node scripts/browser-check.mjs`) |
 | `tests/` | `npm test` (Node's built-in runner) |
 | `docs/` | Design notes, coverage matrix, validation and release checklists |
 | `scripts/lms-preview`, `scripts/cms-preview` | Optional local harnesses to screenshot the redesign against pages you saved yourself (see below) |
@@ -49,4 +53,4 @@ MIT, see `LICENSE`. The bundled fonts keep their own SIL Open Font Licence. The 
 
 ## Credits
 
-Plus Jakarta Sans, Manrope, Sora and Inter are bundled under the SIL Open Font License (see `extension/fonts/`).
+Plus Jakarta Sans, Manrope, Sora and Inter are bundled under the SIL Open Font License (see `extension/fonts/`). The settings preview also bundles Bootstrap 3, AdminLTE 2 and Font Awesome for its sample pages; notices are in `extension/preview/vendor/LICENSES.txt`.

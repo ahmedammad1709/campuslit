@@ -116,11 +116,11 @@
   function mount() {
     const root = document.documentElement;
     if (!document.body) return;
-    const route = (location.pathname.split('/').pop() || 'index').replace(/\.php$/i, '').toLowerCase();
+    const route = (location.pathname.split('/').pop() || 'index').replace(/\.(php|html)$/i, '').toLowerCase();
     if (root.dataset.bsRoute !== route) root.dataset.bsRoute = route;
     // The portal hard-codes Dashboard as the active item on every page; mark the real current page instead.
     const items = [...document.querySelectorAll('.sidebar-menu > li')];
-    const current = items.find(li => { const a = li.querySelector(':scope > a'); const href = a ? (a.getAttribute('href') || '') : ''; return href.split('?')[0].split('/').pop().replace(/\.php$/i, '').toLowerCase() === route; });
+    const current = items.find(li => { const a = li.querySelector(':scope > a'); const href = a ? (a.getAttribute('href') || '') : ''; return href.split('?')[0].split('/').pop().replace(/\.(php|html)$/i, '').toLowerCase() === route; });
     if (current) {
       items.forEach(li => { if (li !== current && li.classList.contains('active')) mark(li, 'data-bs-demote'); });
       mark(current, 'data-bs-current'); const link = current.querySelector(':scope > a'); if (link) mark(link, 'aria-current', 'page');

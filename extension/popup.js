@@ -3,7 +3,7 @@ let settings = BahriaStudio.normalize({});
 let saving = false;
 const status = document.getElementById('status');
 function render() {
-  document.getElementById('enabled').checked = settings.enabled;
+  for (const k of ['enabled', 'cms', 'lms']) document.getElementById(k).checked = settings[k];
   document.getElementById('system').checked = settings.mode === 'system';
   const grid = document.getElementById('themes'); grid.replaceChildren();
   for (const [id, theme] of Object.entries(BahriaStudio.themes)) {
@@ -18,11 +18,11 @@ async function save(patch) {
   if (saving) return; saving = true;
   const focusedId = document.activeElement?.id;
   document.querySelectorAll('button,input').forEach(el => el.disabled = true);
-  try { settings = await StudioStorage.write({...settings, ...patch}); status.textContent = StudioStorage.isExtension ? 'Saved. Your portals update automatically.' : 'Saved in browser preview only.'; }
+  try { settings = await StudioStorage.write(patch.power ? BahriaStudio.power(settings, patch.power[0], patch.power[1]) : {...settings, ...patch}); status.textContent = StudioStorage.isExtension ? 'Saved. Your portals update automatically.' : 'Saved in browser preview only.'; }
   catch { status.textContent = 'Could not save. Please try again.'; }
   finally { saving = false; render(); document.querySelectorAll('button,input').forEach(el => el.disabled = false); if (focusedId) document.getElementById(focusedId)?.focus(); else document.querySelector('.theme-card[aria-pressed="true"]')?.focus(); }
 }
-document.getElementById('enabled').addEventListener('change', e => save({enabled:e.target.checked}));
+for (const k of ['enabled', 'cms', 'lms']) document.getElementById(k).addEventListener('change', e => save({power: [k, e.target.checked]}));
 document.getElementById('system').addEventListener('change', e => save({mode:e.target.checked ? 'system' : 'preset'}));
 document.getElementById('customize').addEventListener('click', () => StudioStorage.openOptions());
 StudioStorage.subscribe(value => { if (!saving) { settings = value; render(); } });

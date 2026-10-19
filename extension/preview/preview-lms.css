@@ -1,0 +1,11 @@
+/* Approximation of the school's own LMS styling (orange header, yellow filter bar, grey page title).
+   Only visible when Campuslit is switched off for the LMS in the preview. */
+body { font-family: 'Source Sans Pro', 'Segoe UI', Arial, sans-serif; }
+.skin-yellow-light .main-header .navbar { background: #f39c12; }
+.skin-yellow-light .main-header .logo { background: #f39c12; color: #fff; }
+.box-header { background: #ffc857; padding: 14px; }
+.content-header > h1 { text-transform: uppercase; box-shadow: 0 4px 8px rgba(0, 0, 0, .2); padding: 16px 24px !important; font-weight: 700; }
+.content-header > h1.bg-gray { background: #d2d6de !important; }
+.sidebar-menu > li.active > a { background: linear-gradient(#ffb340, #f39c12) !important; color: #fff; }
+.main-header .logo img { height: 36px; width: 36px; margin-right: 8px; }
+.user-image { width: 28px; height: 28px; }

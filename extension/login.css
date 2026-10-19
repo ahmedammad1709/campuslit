@@ -163,3 +163,12 @@
 @media screen {
   html[data-bahria-studio][data-bs-login] [data-bs-login-card] [data-bs-login-input-group] select { padding-top: 0 !important; padding-bottom: 0 !important; line-height: normal !important; }
 }
+@media screen {
+  html[data-bahria-studio][data-bs-login][data-bs-clean="true"] .overlay::before { display: none; }
+  html[data-bahria-studio][data-bs-login][data-bs-clean="true"] body::before { background-image: radial-gradient(900px 520px at 12% 8%, color-mix(in srgb, var(--bs-accent) 34%, transparent), transparent 62%), radial-gradient(700px 420px at 92% 96%, color-mix(in srgb, var(--bs-gold) 14%, transparent), transparent 60%), linear-gradient(#08142e, #08142e) !important; }
+}
+@media screen {
+  html[data-bahria-studio][data-bs-login] [data-bs-login-card] .panel-body > :not([data-bs-login-field]):not([data-bs-login-submit]):not(.bs-caps):not(.text-danger) { font-size: 13px; line-height: 1.6; color: var(--bs-muted); }
+  html[data-bahria-studio][data-bs-login] [data-bs-login-card] .panel-body > :not([data-bs-login-field]) a:not([data-bs-login-submit]) { display: inline-block; margin: 2px 14px 2px 0; font-size: 13px !important; font-weight: 600 !important; }
+  html[data-bahria-studio][data-bs-login] [data-bs-login-card] .panel-body > :not([data-bs-login-field]):not([data-bs-login-submit]) + :not([data-bs-login-field]):not([data-bs-login-submit]) { margin-top: 2px; }
+}
