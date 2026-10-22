@@ -14,11 +14,11 @@
 
   // theme gallery
   const shot = document.getElementById('theme-shot');
-  const names = { bahria: 'Bahria', crystal: 'Crystal', midnight: 'Midnight', linen: 'Linen', grove: 'Grove', bloom: 'Bloom' };
+  const names = { bahria: 'Bahria', crystal: 'Crystal', midnight: 'Midnight', linen: 'Linen', grove: 'Grove', bloom: 'Bloom', custom: 'a custom' };
   document.querySelectorAll('.chip').forEach(chip => chip.addEventListener('click', () => {
     document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', String(c === chip)));
     const id = chip.dataset.theme;
     shot.src = 'assets/shots/lms-' + id + '.webp';
-    shot.alt = 'The LMS dashboard in the ' + names[id] + ' theme.';
+    shot.alt = id === 'custom' ? 'The LMS dashboard in a custom theme made in the Studio: dark rose.' : 'The LMS dashboard in the ' + names[id] + ' theme.';
   }));
 })();

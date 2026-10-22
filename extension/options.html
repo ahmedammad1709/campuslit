@@ -1,48 +1,218 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#f8f9fc"><title>Appearance · Campuslit</title><link rel="icon" href="icons/icon-32.png"><link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="studio.css"><script src="icons.js" defer></script><script src="themes.js" defer></script><script src="storage.js" defer></script><script src="options.js" defer></script></head>
-<body class="editor-page">
-<a class="skip-link" href="#appearance">Skip to appearance editor</a>
-<header class="app-header">
-  <a class="brand" href="options.html" aria-label="Campuslit home"><img class="brand-mark" src="icons/icon-48.png" width="30" height="30" alt=""><span>campus<span class="brand-light">lit</span><span class="beta-tag">BETA</span></span></a>
-  <nav class="app-nav" aria-label="Campuslit navigation"><a class="selected" href="#appearance" aria-current="page">Appearance</a><a href="privacy.html">Privacy & trust</a></nav>
-  <label class="switch-label"><span class="enabled-label">Extension enabled</span><input id="enabled" name="enabled" aria-label="Enable extension" type="checkbox" role="switch" checked><span class="switch-track" aria-hidden="true"></span></label>
-<button id="save" class="primary" type="button"><span data-icon="check"></span><span id="save-label">Save appearance</span></button>
-</header>
-<main class="workspace" id="appearance">
-  <section class="intro"><div><div class="workspace-label"><span data-icon="sliders"></span>Your personal workspace</div><h1>Your portal, reimagined.</h1><p>Give your everyday portal a fresh perspective.</p></div><div class="intro-note"><span data-icon="shield"></span><span>Your preferences stay<br><strong>right here, in your browser.</strong></span></div></section>
-  <div class="editor-grid">
-    <section class="preview-column" aria-label="Theme preview">
-      <section class="theme-section" aria-labelledby="theme-title"><div class="theme-section-heading"><div><h2 id="theme-title">Find your atmosphere</h2><p>Considered palettes. A whole different feeling.</p></div><span class="collection-label">The essentials collection <span>06</span></span></div><div id="themes" class="theme-grid" role="group" aria-label="Theme presets"></div></section>
-      <div class="preview-heading"><div class="segmented" role="group" aria-label="Preview portal"><button type="button" data-preview="cms" aria-pressed="true">Campus portal <span>CMS</span></button><button type="button" data-preview="lms" aria-pressed="false">Learning portal <span>LMS</span></button></div><span class="live-label"><i></i> Live preview</span></div>
-      <div class="preview-stage">
-        <div id="portal-preview" class="portal-preview">
-          <div class="preview-browser">
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f5f7fb">
+<title>Settings · Campuslit</title>
+<link rel="icon" href="icons/icon-32.png">
+<link rel="preload" href="fonts/jakarta-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="studio.css">
+<script src="icons.js" defer></script>
+<script src="themes.js" defer></script>
+<script src="storage.js" defer></script>
+<script src="studio.js" defer></script>
+<script src="options.js" defer></script>
+</head>
+<body class="settings">
+<a class="skip-link" href="#main">Skip to settings</a>
+
+<div class="shell">
+  <aside class="side">
+    <a class="brand" href="options.html" aria-label="Campuslit settings"><img class="brand-mark" src="icons/icon-48.png" width="30" height="30" alt=""><span>campus<span class="brand-light">lit</span></span></a>
+    <nav class="side-nav" aria-label="Settings sections">
+      <a id="nav-themes" href="#themes" data-section="themes" aria-current="page"><span data-icon="grid"></span>Themes</a>
+      <a id="nav-text" href="#text" data-section="text"><span data-icon="type"></span>Text &amp; layout</a>
+      <a id="nav-studio" href="#studio" data-section="studio"><span data-icon="palette"></span>Custom theme<span class="nav-tag">New</span></a>
+      <a id="nav-portals" href="#portals" data-section="portals"><span data-icon="layers"></span>Portals</a>
+      <a id="nav-privacy" href="#privacy" data-section="privacy"><span data-icon="shield"></span>Privacy &amp; data</a>
+    </nav>
+    <div class="side-foot">
+      <label class="row"><span class="row-text"><strong>Extension enabled</strong></span><input id="enabled" name="enabled" type="checkbox" role="switch" checked><span class="track" aria-hidden="true"></span></label>
+      <p>Your settings stay in this browser.</p>
+    </div>
+  </aside>
+
+  <div class="main" id="main">
+    <header class="bar">
+      <div>
+        <h1 id="section-title">Themes</h1>
+        <p id="section-desc">Pick a look. Changes show in the preview first and reach your portals when you save.</p>
+      </div>
+      <div class="bar-actions">
+        <span class="dirty" id="dirty" role="status" hidden>Unsaved changes</span>
+        <button id="save" class="btn primary" type="button"><span data-icon="check"></span><span id="save-label">Save changes</span></button>
+      </div>
+    </header>
+
+    <div class="work">
+      <div class="panels">
+        <!-- Themes -->
+        <section class="panel" id="section-themes" aria-labelledby="section-title">
+          <div class="group">
+            <div id="theme-list" class="theme-grid" role="group" aria-label="Themes"></div>
+          </div>
+          <div class="group" id="accent-group">
+            <div class="group-title"><h3>Accent color</h3><button id="reset-accent" class="text-button" type="button">Reset</button></div>
+            <div class="accent-controls">
+              <div class="accent-swatches" role="group" aria-label="Accent presets">
+                <button type="button" data-accent="#4263eb" style="--swatch:#4263eb" aria-label="Cobalt blue" aria-pressed="false"></button>
+                <button type="button" data-accent="#8b5cf6" style="--swatch:#8b5cf6" aria-label="Iris purple" aria-pressed="false"></button>
+                <button type="button" data-accent="#db4b91" style="--swatch:#db4b91" aria-label="Peony pink" aria-pressed="false"></button>
+                <button type="button" data-accent="#25866d" style="--swatch:#25866d" aria-label="Jade green" aria-pressed="false"></button>
+                <button type="button" data-accent="#c76b2b" style="--swatch:#c76b2b" aria-label="Amber orange" aria-pressed="false"></button>
+              </div>
+              <label class="custom-color" title="Choose any accent color"><input id="accent" name="accent" type="color" value="#4263eb" aria-label="Custom accent color"><i id="accent-chip" aria-hidden="true"></i>Custom</label>
+            </div>
+            <p class="hint" id="accent-hint">Button text switches between light and dark so it stays readable.</p>
+            <p class="lock-note" id="accent-lock" hidden>Your custom theme sets its own accent. Change it in <button class="text-button" type="button" id="goto-studio">Custom theme</button>.</p>
+          </div>
+          <div class="group">
+            <label class="row">
+              <span class="row-text"><strong>Match device appearance</strong><small id="system-note">Switch to Midnight when your device goes dark.</small></span>
+              <input id="system" name="system" type="checkbox" role="switch"><span class="track" aria-hidden="true"></span>
+            </label>
+          </div>
+        </section>
+
+        <!-- Text & layout -->
+        <section class="panel" id="section-text" aria-labelledby="section-title" hidden>
+          <div class="group">
+            <div class="group-title"><h3>Typeface</h3></div>
+            <label for="font" class="sr-only">Typeface</label>
+            <div class="select"><select id="font" name="font">
+              <option value="jakarta">Plus Jakarta Sans · Modern</option>
+              <option value="manrope">Manrope · Geometric and calm</option>
+              <option value="sora">Sora · Bold and techy</option>
+              <option value="inter">Inter · Clean and precise</option>
+              <option value="system">System · Familiar</option>
+              <option value="humanist">Humanist · Soft</option>
+              <option value="serif">Serif · Classic</option>
+            </select></div>
+            <div class="type-specimen" id="type-specimen" aria-hidden="true"><span>Aa</span><div>Good design feels effortless.<small>ABCDEFGHIJKLMNOPQRSTUVWXYZ</small></div></div>
+          </div>
+          <div class="group">
+            <div class="group-title"><h3>Size and spacing</h3></div>
+            <div class="range">
+              <div class="range-head"><label for="fontSize">Text size</label><output id="size-output" for="fontSize">15 px</output></div>
+              <input id="fontSize" name="fontSize" type="range" min="13" max="19" step="1" value="15">
+              <div class="range-ends"><span>Smaller</span><span>Larger</span></div>
+            </div>
+            <span class="field-label" id="density-label" style="margin-top:22px">Content spacing</span>
+            <div class="segmented block" id="density-seg" role="group" aria-labelledby="density-label">
+              <button type="button" data-density="compact" aria-pressed="false">Compact</button>
+              <button type="button" data-density="comfortable" aria-pressed="true">Comfortable</button>
+              <button type="button" data-density="spacious" aria-pressed="false">Spacious</button>
+            </div>
+          </div>
+          <div class="group">
+            <div class="group-title"><h3>Corners</h3></div>
+            <div class="range">
+              <div class="range-head"><label for="radius">Corner roundness</label><output id="radius-output" for="radius">10 px</output></div>
+              <input id="radius" name="radius" type="range" min="0" max="20" step="1" value="10">
+              <div class="radius-demo" aria-hidden="true"><i></i><i></i><i></i></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Custom theme -->
+        <section class="panel" id="section-studio" aria-labelledby="section-title" hidden>
+          <div id="studio-root"></div>
+        </section>
+
+        <!-- Portals -->
+        <section class="panel" id="section-portals" aria-labelledby="section-title" hidden>
+          <div class="group" id="portals-group">
+            <div class="group-title"><h3>Where Campuslit runs</h3></div>
+            <label class="row">
+              <span class="row-text"><strong>CMS</strong><small>The campus management portal</small></span>
+              <input id="cms" name="cms" type="checkbox" role="switch" checked><span class="track" aria-hidden="true"></span>
+            </label>
+            <label class="row">
+              <span class="row-text"><strong>LMS</strong><small>The learning management portal</small></span>
+              <input id="lms" name="lms" type="checkbox" role="switch" checked><span class="track" aria-hidden="true"></span>
+            </label>
+            <p class="hint">These move together with “Extension enabled” in the sidebar and the toolbar popup. Turn one portal off to keep its original look.</p>
+          </div>
+          <div class="group">
+            <div class="group-title"><h3>Experience</h3></div>
+            <label class="row">
+              <span class="row-text"><strong>Plain sign-in background</strong><small>Hide the campus photo on the CMS landing and sign-in pages.</small></span>
+              <input id="cleanBackground" name="cleanBackground" type="checkbox" role="switch"><span class="track" aria-hidden="true"></span>
+            </label>
+            <label class="row">
+              <span class="row-text"><strong>Gentle motion</strong><small>Soft fade-ins. Always off if your device asks for less motion.</small></span>
+              <input id="motion" name="motion" type="checkbox" role="switch"><span class="track" aria-hidden="true"></span>
+            </label>
+          </div>
+        </section>
+
+        <!-- Privacy & data -->
+        <section class="panel" id="section-privacy" aria-labelledby="section-title" hidden>
+          <div class="group">
+            <div class="group-title"><h3>What Campuslit does with your data</h3></div>
+            <ul class="facts">
+              <li><span data-icon="check"></span><span>No accounts, no analytics, no tracking, and no requests to any server of ours.</span></li>
+              <li><span data-icon="check"></span><span>Only your appearance choices are stored, in this browser.</span></li>
+              <li><span data-icon="check"></span><span>Passwords and form fields are never read. A few screens are redrawn from figures the page already shows (your first name, courses, attendance, time table); they stay in memory and are never saved or sent.</span></li>
+            </ul>
+            <p class="group-note" style="margin:16px 0 0"><a class="link-out" href="privacy.html">Read the full privacy policy <span data-icon="arrow"></span></a></p>
+          </div>
+          <div class="group">
+            <div class="group-title"><h3>Your settings file</h3></div>
+            <p class="group-note">Export your appearance, including your custom theme, to a small file. Import one to restore it. No student data is included.</p>
+            <div class="data-actions">
+              <button id="export" class="btn secondary" type="button"><span data-icon="download"></span>Export</button>
+              <button id="import" class="btn secondary" type="button"><span data-icon="upload"></span>Import</button>
+              <input id="import-file" type="file" accept=".json,application/json" hidden>
+            </div>
+          </div>
+          <div class="group">
+            <div class="group-title"><h3>Start over</h3></div>
+            <p class="group-note">Removes everything Campuslit has saved, including your custom theme, and goes back to the Bahria theme.</p>
+            <button id="reset" class="btn danger" type="button" aria-label="Reset all preferences"><span data-icon="reset"></span>Reset all settings</button>
+          </div>
+        </section>
+      </div>
+
+      <section class="preview" aria-label="Live preview">
+        <div class="preview-bar">
+          <div class="segmented" role="group" aria-label="Preview portal">
+            <button type="button" data-preview="cms" aria-pressed="true">Campus portal <span>CMS</span></button>
+            <button type="button" data-preview="lms" aria-pressed="false">Learning portal <span>LMS</span></button>
+          </div>
+          <span class="live-label"><i></i> Live preview</span>
+        </div>
+        <div class="browser">
+          <div class="browser-bar">
             <div class="browser-dots" aria-hidden="true"><i></i><i></i><i></i></div>
             <div class="address"><span data-icon="lock"></span><span id="preview-url">cms.bahria.edu.pk</span></div>
-            <span class="browser-more" aria-hidden="true">···</span>
           </div>
           <div class="preview-frame-wrap">
             <iframe id="preview-frame" class="preview-frame" title="Live preview of the redesigned portal, with sample data" src="preview/cms/dashboard.html"></iframe>
             <div class="preview-off" id="preview-off" hidden><span data-icon="shield"></span><span id="preview-off-text">Campuslit is switched off for this portal. This is roughly how the original looks.</span></div>
           </div>
         </div>
-      </div>
-      <div class="preview-caption"><span><i class="live-dot"></i><strong id="preview-theme-name">Crystal</strong></span><span>Sample pages with made-up data · try the sidebar links</span></div>
-
-      <p id="demo-notice" class="demo-notice" hidden><span data-icon="monitor"></span>You're in the browser demo. Install the extension to apply your look to CMS & LMS.</p>
-    </section>
-    <aside class="inspector" aria-label="Appearance controls">
-      <div class="inspector-heading"><span data-icon="sliders"></span><h2>Make it yours</h2><span class="local-tag">Local</span></div>
-      <div class="inspector-content">
-        <section class="control-section" id="personalize"><div class="control-title"><h3>Accent color</h3><button id="reset-accent" class="text-button" type="button">Reset</button></div><div class="accent-controls"><div class="accent-swatches" role="group" aria-label="Accent presets"><button type="button" data-accent="#4263eb" style="--swatch:#4263eb" aria-label="Cobalt blue"></button><button type="button" data-accent="#8b5cf6" style="--swatch:#8b5cf6" aria-label="Iris purple"></button><button type="button" data-accent="#db4b91" style="--swatch:#db4b91" aria-label="Peony pink"></button><button type="button" data-accent="#25866d" style="--swatch:#25866d" aria-label="Jade green"></button><button type="button" data-accent="#c76b2b" style="--swatch:#c76b2b" aria-label="Amber orange"></button></div><label class="custom-color" title="Choose a custom color"><input id="accent" name="accent" type="color" value="#4263eb" aria-label="Custom accent color"><span>Custom</span></label></div><p class="hint">Text contrast adjusts with your color.</p></section>
-        <section class="control-section"><div class="control-title"><h3>Typography</h3><span class="subtle-tag">Aa</span></div><label for="font" class="sr-only">Font family</label><select id="font" name="font"><option value="jakarta">Plus Jakarta Sans · Modern & premium</option><option value="manrope">Manrope · Geometric & calm</option><option value="sora">Sora · Bold & techy</option><option value="inter">Inter · Clean & precise</option><option value="system">System · Familiar & native</option><option value="humanist">Humanist · Soft & friendly</option><option value="serif">Serif · Editorial & classic</option></select><div class="type-specimen" id="type-specimen"><span>Aa</span><div>Good design feels effortless.<small>ABCDEFGHIJKLMNOPQRSTUVWXYZ</small></div></div><label class="range-label" for="fontSize">Text size <output id="size-output">15 px</output></label><input id="fontSize" name="fontSize" type="range" min="13" max="19" step="1" value="15"><div class="range-ends"><span>Aa</span><span>Aa</span></div></section>
-        <section class="control-section"><div class="control-title"><h3>Layout & feel</h3></div><div class="select-row"><label for="density">Content spacing</label><select id="density" name="density"><option value="compact">Compact</option><option value="comfortable">Comfortable</option><option value="spacious">Spacious</option></select></div><label class="range-label" for="radius">Corner radius <output id="radius-output">12 px</output></label><input id="radius" name="radius" type="range" min="0" max="20" step="1" value="12"><div class="range-ends"><span>Sharp</span><span>Rounded</span></div><label class="setting-row"><span><strong>Match device appearance</strong><small>Midnight after dark.</small></span><input id="system" name="system" type="checkbox" role="switch"><span class="switch-track" aria-hidden="true"></span></label></section>
-        <details class="advanced-settings" id="portals"><summary>Portal preferences <span data-icon="down"></span></summary><label class="setting-row"><span><strong>CMS</strong><small>Campus portal. Turns the master switch on or off with the LMS.</small></span><input id="cms" name="cms" type="checkbox" role="switch" checked><span class="switch-track" aria-hidden="true"></span></label><label class="setting-row"><span><strong>LMS</strong><small>Learning management portal</small></span><input id="lms" name="lms" type="checkbox" role="switch" checked><span class="switch-track" aria-hidden="true"></span></label><label class="setting-row"><span><strong>Plain sign-in background</strong><small>Hide the campus photo on the CMS landing and sign-in pages.</small></span><input id="cleanBackground" name="cleanBackground" type="checkbox" role="switch" checked><span class="switch-track" aria-hidden="true"></span></label><label class="setting-row"><span><strong>Gentle motion</strong><small>Soft fade-ins. Always off if your device asks for less motion.</small></span><input id="motion" name="motion" type="checkbox" role="switch"><span class="switch-track" aria-hidden="true"></span></label></details>
-      </div>
-      <div class="inspector-footer"><p id="status" role="status" aria-live="polite">Only saved on this browser.</p><div class="settings-tools"><button id="export" type="button"><span data-icon="download"></span>Export</button><button id="import" type="button"><span data-icon="upload"></span>Import</button><button id="reset" type="button" aria-label="Reset all preferences"><span data-icon="reset"></span>Reset</button><input id="import-file" type="file" accept=".json,application/json" hidden></div></div>
-    </aside>
+        <div class="preview-caption">
+          <span><i class="live-dot"></i><strong id="preview-theme-name">Bahria</strong></span>
+          <span>Sample pages with made-up data. Try the sidebar links.</span>
+        </div>
+        <p id="demo-notice" class="demo-notice" hidden>You're in the browser demo. Install the extension to apply your look to the CMS and LMS.</p>
+      </section>
+    </div>
   </div>
-  <footer class="studio-footer"><span><span data-icon="shield"></span>No tracking. No accounts. Just your style.</span><span>Made for Bahria students. Independent and unofficial; not affiliated with Bahria University.</span></footer>
-</main>
-<dialog id="reset-dialog"><div class="dialog-icon" data-icon="reset"></div><h2>Back to a clean slate?</h2><p>This removes your saved preferences and restores the Bahria theme.</p><div class="button-row"><button id="cancel-reset" class="secondary" type="button">Keep my settings</button><button id="confirm-reset" class="primary" type="button">Reset preferences</button></div></dialog>
-</body></html>
+</div>
+
+<p id="status" class="sr-only" role="status" aria-live="polite"></p>
+<div class="snack" id="snack" hidden></div>
+
+<dialog id="reset-dialog" aria-labelledby="reset-title">
+  <h2 id="reset-title">Back to a clean slate?</h2>
+  <p>This removes your saved preferences, including your custom theme, and restores the Bahria theme.</p>
+  <div class="button-row">
+    <button id="cancel-reset" class="btn secondary" type="button">Keep my settings</button>
+    <button id="confirm-reset" class="btn primary" type="button">Reset preferences</button>
+  </div>
+</dialog>
+</body>
+</html>

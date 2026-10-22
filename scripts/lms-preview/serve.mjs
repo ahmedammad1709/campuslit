@@ -16,7 +16,7 @@ const mystyle = `body{font-family:'Source Sans Pro',sans-serif}.skin-yellow-ligh
 function harness(query) {
   const theme = query.get('theme') || 'navy', font = query.get('font') || 'jakarta';
   return `<script src="/ext/themes.js"></script><script>
-(function(){const s=BahriaStudio.normalize({theme:${JSON.stringify(theme)},font:${JSON.stringify(font)},radius:${Number(query.get('radius') || 10)},density:${JSON.stringify(query.get('density') || 'comfortable')}});
+(function(){const s=BahriaStudio.normalize({custom:${JSON.stringify((()=>{try{return JSON.parse(query.get('custom')||'null')}catch{return null}})())},theme:${JSON.stringify(theme)},font:${JSON.stringify(font)},radius:${Number(query.get('radius') || 10)},density:${JSON.stringify(query.get('density') || 'comfortable')}});
 const r=document.documentElement;BahriaStudio.apply(r,s,false);r.dataset.bahriaStudio='lms';r.dataset.bsClean='true';r.dataset.bsMotion=${JSON.stringify(query.get('motion') || 'false')};r.dataset.bsPage='portal';
 Object.assign(BahriaLms=window.BahriaLms||{},{});window.__ready=0;})();</script>`;
 }

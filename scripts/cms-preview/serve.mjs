@@ -13,7 +13,7 @@ const root = path.resolve(here, '../..');
 const pages = path.join(root, 'html_pages');
 const types = { '.css': 'text/css', '.js': 'text/javascript', '.woff2': 'font/woff2', '.png': 'image/png' };
 function harness(q, kind) {
-  return `<script src="/ext/themes.js"></script><script>(function(){const s=BahriaStudio.normalize({theme:${JSON.stringify(q.get('theme') || 'navy')},font:${JSON.stringify(q.get('font') || 'jakarta')},radius:${Number(q.get('radius') || 10)}});
+  return `<script src="/ext/themes.js"></script><script>(function(){const s=BahriaStudio.normalize({custom:${JSON.stringify((() => { try { return JSON.parse(q.get('custom') || 'null'); } catch { return null; } })())},theme:${JSON.stringify(q.get('theme') || 'navy')},font:${JSON.stringify(q.get('font') || 'jakarta')},radius:${Number(q.get('radius') || 10)}});
 const r=document.documentElement;BahriaStudio.apply(r,s,false);r.dataset.bahriaStudio='cms';r.dataset.bsClean='true';r.dataset.bsMotion=${JSON.stringify(q.get('motion') || 'false')};r.dataset.bsPage=${JSON.stringify(kind)};})();</script>`;
 }
 const ALERT = `document.querySelector('#pageAlerts_up').innerHTML = '<div class="alert alert-danger alert-dismissible"><button type="button" class="close" data-dismiss="alert">&times;</button><strong>Error!</strong> Course Registration has been closed or not yet opened.</div>';`;

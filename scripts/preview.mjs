@@ -14,4 +14,4 @@ const server = http.createServer(async (req,res) => {
     res.writeHead(200, {'Content-Type':types[path.extname(target)] || 'application/octet-stream','Cache-Control':'no-store','Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'none'; img-src 'self' data:; object-src 'none'"}); res.end(data);
   } catch {res.writeHead(404);res.end('Not found');}
 });
-server.listen(4173, '127.0.0.1', () => console.log('Bahria Studio preview: http://127.0.0.1:4173'));
+server.listen(4173, '127.0.0.1', () => console.log('Campuslit preview: http://127.0.0.1:4173'));

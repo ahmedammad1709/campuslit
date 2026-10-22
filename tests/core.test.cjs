@@ -56,3 +56,79 @@ test('extension storage writes only preferences locally and reset removes its ke
   assert.equal((await ctx.StudioStorage.read()).theme,'rose');await ctx.StudioStorage.write({theme:'sage',password:'never-store'});
   assert.deepEqual(Object.keys(value),['bahriaStudioPreferences']);assert.equal(value.bahriaStudioPreferences.theme,'sage');assert.ok(!('password' in value.bahriaStudioPreferences));await ctx.StudioStorage.clear();assert.equal(removed,'bahriaStudioPreferences');
 });
+
+// ---------------------------------------------------------------- custom theme (Studio) and switches
+const goodCustom = { bg: '#f3f5fa', surface: '#ffffff', nav: '#0b1d40', ink: '#0e1a33', accent: '#2f5bea', name: 'Mine' };
+test('custom theme: strict validation, sanitised name, safe fallbacks', () => {
+  const m = model();
+  assert.equal(m.normalize({ theme: 'custom' }).theme, 'navy', 'selecting custom without a custom theme falls back');
+  assert.equal(m.normalize({ theme: 'custom', custom: { ...goodCustom, bg: 'red' } }).custom, null, 'a named colour is rejected');
+  assert.equal(m.normalize({ theme: 'custom', custom: { ...goodCustom, accent: '#12345' } }).theme, 'navy');
+  assert.equal(m.normalize({ custom: { ...goodCustom, surface: 'url(https://evil.test)' } }).custom, null);
+  assert.equal(m.normalize({ custom: ['#000000'] }).custom, null);
+  assert.equal(m.normalize({ custom: '#000000' }).custom, null);
+  const ok = m.normalize({ theme: 'custom', custom: { ...goodCustom, bg: '#F3F5FA', soft: 'javascript:alert(1)', muted: '#ABCDEF', name: '  <b>Hi</b>\u0007  there  ' + 'x'.repeat(60) } });
+  assert.equal(ok.theme, 'custom'); assert.equal(ok.custom.bg, '#f3f5fa', 'hex is lower-cased');
+  assert.equal(ok.custom.soft, '', 'an invalid optional colour becomes automatic'); assert.equal(ok.custom.muted, '#abcdef');
+  assert.ok(ok.custom.name.length <= 24 && !/[<>\u0007]/.test(ok.custom.name), 'name is trimmed, limited and stripped: ' + ok.custom.name);
+  assert.equal(m.normalize({ custom: { ...goodCustom, name: '   ' } }).custom.name, 'My theme');
+  assert.deepEqual(Object.keys(m.normalize({ custom: { ...goodCustom, password: 'x', extra: 1 } }).custom).sort(), ['accent', 'bg', 'gold', 'ink', 'line', 'muted', 'name', 'nav', 'navInk', 'soft', 'surface']);
+});
+test('custom theme: derived colours are complete, readable and respect manual overrides', () => {
+  const m = model(), c = m.normalizeCustom(goodCustom), p = m.deriveCustom(c);
+  for (const k of ['bg', 'surface', 'soft', 'ink', 'muted', 'line', 'nav', 'navInk', 'accent', 'gold']) assert.match(p[k], /^#[0-9a-f]{6}$/, k);
+  assert.equal(p.dark, false); assert.ok(m.ratio(p.muted, p.surface) >= 4.5); assert.ok(m.ratio(p.navInk, p.nav) >= 4.5);
+  assert.equal(p.gold, '#f2b84b', 'a dark sidebar gets the gold marker');
+  assert.equal(m.deriveCustom(m.normalizeCustom({ ...goodCustom, line: '#ff0000' })).line, '#ff0000', 'manual override wins');
+  const dark = m.deriveCustom(m.normalizeCustom({ bg: '#101218', surface: '#171a22', nav: '#0b0d12', ink: '#eef0f6', accent: '#8aa4ff' }));
+  assert.equal(dark.dark, true); assert.ok(m.ratio(dark.navInk, '#0b0d12') >= 4.5);
+  const light = m.deriveCustom(m.normalizeCustom({ bg: '#ffffff', surface: '#ffffff', nav: '#f4f4f4', ink: '#111111', accent: '#2255ee' }));
+  assert.equal(light.gold, '#2255ee', 'a light sidebar uses the accent as marker'); assert.ok(m.ratio(light.navInk, '#f4f4f4') >= 4.5);
+});
+test('custom theme: palette(), apply() and system appearance', () => {
+  const m = model(), settings = { theme: 'custom', custom: goodCustom, accent: '' };
+  assert.equal(m.palette(settings).name, 'Mine'); assert.equal(m.palette(settings).accent, '#2f5bea'); assert.equal(m.palette({ ...settings, accent: '#ff0000' }).accent, '#ff0000', 'the accent override still applies');
+  assert.equal(m.palette({ ...settings, mode: 'system' }, true).name, 'Mine', 'a custom theme is never swapped for Midnight');
+  assert.equal(m.palette({ theme: 'sage', mode: 'system' }, true).name, 'Midnight', 'presets still follow the device');
+  const styles = {}, el = { style: { setProperty: (k, v) => styles[k] = v }, dataset: {} };
+  m.apply(el, { theme: 'custom', custom: { bg: '#101218', surface: '#171a22', nav: '#0b0d12', ink: '#eef0f6', accent: '#8aa4ff' } });
+  assert.equal(styles['--bs-nav'], '#0b0d12'); assert.equal(styles['--bs-navOn'], '#ffffff'); assert.equal(el.dataset.bsDark, 'true');
+  for (const k of ['bg', 'surface', 'soft', 'ink', 'muted', 'line', 'nav', 'navInk', 'accent', 'gold', 'onAccent', 'link']) assert.match(styles['--bs-' + k], /^#[0-9a-f]{6}$/, k);
+});
+test('custom theme: generated palettes are always readable; fixing repairs bad ones and spares good ones', () => {
+  const m = model(), rnd = () => m.fromHsl(Math.random() * 360, Math.random(), Math.random());
+  for (let i = 0; i < 400; i++) for (const mode of ['light', 'dark']) for (const side of ['deep', 'tinted', 'soft']) {
+    const c = m.generateCustom({ accent: rnd(), mode, side });
+    assert.ok(c, 'generated'); assert.equal(JSON.stringify(m.contrastReport(c).filter(r => !r.pass).map(r => r.id)), '[]', mode + '/' + side + ' ' + c.accent);
+    assert.equal(JSON.stringify(m.fixCustom(c)), JSON.stringify(c), 'a good palette is untouched by the fixer');
+  }
+  for (let i = 0; i < 1500; i++) {
+    const bad = m.normalizeCustom({ bg: rnd(), surface: rnd(), nav: rnd(), ink: rnd(), accent: rnd(), muted: i % 3 ? '' : rnd(), navInk: i % 4 ? '' : rnd() });
+    assert.equal(m.contrastReport(m.fixCustom(bad)).filter(r => !r.pass).length, 0, 'fixer left a failing check');
+  }
+  assert.ok(m.surpriseCustom().custom, 'surprise returns a palette');
+  for (const id of Object.keys(m.themes)) assert.equal(m.contrastReport(m.customFromPalette(m.themes[id])).filter(r => !r.pass).length, 0, id + ' copied into the Studio is readable');
+});
+test('master switch controls both portals; a portal switch moves only itself and the master follows', () => {
+  const m = model(), on = { enabled: true, cms: true, lms: true }, off = { enabled: false, cms: false, lms: false };
+  const flags = s => [s.enabled, s.cms, s.lms].join('/');
+  assert.equal(flags(m.power(on, 'enabled', false)), 'false/false/false'); assert.equal(flags(m.power(off, 'enabled', true)), 'true/true/true');
+  assert.equal(flags(m.power(on, 'cms', false)), 'true/false/true'); assert.equal(flags(m.power(on, 'lms', false)), 'true/true/false');
+  assert.equal(flags(m.power({ enabled: true, cms: false, lms: true }, 'lms', false)), 'false/false/false', 'both off turns the master off');
+  assert.equal(flags(m.power(off, 'lms', true)), 'true/false/true', 'turning a portal on turns the master on');
+  assert.equal(m.power(on, 'enabled', false).theme, 'navy', 'other settings are kept');
+});
+test('storage keeps the custom theme and validates it on the way in', async () => {
+  let value;
+  const ctx = vm.createContext({ chrome: { runtime: { id: 'test' }, storage: { local: { get: async () => ({ bahriaStudioPreferences: { theme: 'custom', custom: goodCustom } }), set: async d => value = d, remove: async () => {} }, onChanged: { addListener() {} } } } });
+  vm.runInContext(source, ctx); vm.runInContext(fs.readFileSync('extension/storage.js', 'utf8'), ctx);
+  const read = await ctx.StudioStorage.read(); assert.equal(read.theme, 'custom'); assert.equal(read.custom.name, 'Mine');
+  await ctx.StudioStorage.write({ theme: 'custom', custom: { ...goodCustom, accent: 'nope' } });
+  assert.equal(value.bahriaStudioPreferences.custom, null, 'an invalid custom theme is never stored'); assert.equal(value.bahriaStudioPreferences.theme, 'navy');
+});
+test('extension pages ship every file they load', () => {
+  for (const page of ['options.html', 'popup.html', 'privacy.html']) {
+    const html = fs.readFileSync(path.join('extension', page), 'utf8');
+    for (const match of html.matchAll(/(?:src|href)="([^"#?]+\.(?:js|css|png|woff2|html))"/g)) assert.ok(fs.existsSync(path.join('extension', match[1])), page + ' references missing ' + match[1]);
+  }
+});

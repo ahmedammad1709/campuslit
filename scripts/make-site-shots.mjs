@@ -45,5 +45,9 @@ try {
   await shot('lms-assignments',{url:'preview/lms/assignments.html',settings:{theme:'navy'},height:760});
   await shot('lms-original',{url:'preview/lms/dashboard.html',settings:{enabled:false}});
   await shot('settings',{url:'options.html',width:1440,height:1000});
+  // a custom theme: the Studio tab with a generated palette, and the LMS drawn with it
+  const demo = {bg:'#1c1416',surface:'#271e20',nav:'#321a1f',ink:'#f3edee',accent:'#e11d48',name:'Rose Night'};
+  await shot('lms-custom',{url:'preview/lms/dashboard.html',settings:{theme:'custom',custom:demo}});
+  await shot('studio',{url:'options.html',width:1440,height:1500,after:`(async()=>{const s=ms=>new Promise(r=>setTimeout(r,ms));document.getElementById('nav-studio').click();document.querySelector('.studio-empty .btn.primary').click();await s(300);const h=document.querySelector('input[name=hex-brand]');h.value='#e11d48';h.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('.quick [data-mode=dark]').click();document.querySelector('.quick [data-side=tinted]').click();document.querySelector('.quick .btn.primary').click();await s(300);document.getElementById('studio-name').value='Rose Night';document.getElementById('studio-name').dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('.toast')?.remove();window.scrollTo(0,0);return 1})()`});
   await call('Browser.close');
 } finally {if(socket?.readyState===WebSocket.OPEN)socket.close();chrome.kill();}

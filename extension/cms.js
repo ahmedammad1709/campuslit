@@ -50,12 +50,24 @@
     });
     if (store && store.local) store.local.get(SIDE_KEY).then(d => { if (Number.isFinite(d[SIDE_KEY])) setSide(d[SIDE_KEY], false); }).catch(() => {});
   }
+  // The portal serves every submenu collapsed, even the one you are in. Open the group that holds the current page once
+  // (never again, so collapsing it by hand sticks), and put it back the way it was when Campuslit is switched off.
+  const opened = [];
+  function openGroup(link) {
+    const group = link.closest('.collapse');
+    if (!group || group.classList.contains('in') || group.hasAttribute('data-bs-opened')) return;
+    group.setAttribute('data-bs-opened', '');
+    const toggle = group.id ? document.querySelector('aside#sideBar a[data-toggle="collapse"][href="#' + group.id + '"]') : null;
+    group.classList.add('in'); group.setAttribute('aria-expanded', 'true');
+    if (toggle) { toggle.classList.remove('collapsed'); toggle.setAttribute('aria-expanded', 'true'); }
+    opened.push({ group, toggle });
+  }
   function markCurrent() {
     const here = location.pathname.toLowerCase().replace(/\/$/, '');
     document.querySelectorAll('aside#sideBar a.list-group-item[href]').forEach(a => {
       let path = '';
       try { path = new URL(a.href, location.href).pathname.toLowerCase().replace(/\/$/, ''); } catch (e) { return; }
-      if (path && path === here && !a.getAttribute('href').startsWith('#')) mark(a, 'data-bs-current');
+      if (path && path === here && !a.getAttribute('href').startsWith('#')) { mark(a, 'data-bs-current'); openGroup(a); }
     });
   }
   function attendance() {
@@ -303,6 +315,7 @@
     void root;
   }
   function disable() {
+    opened.splice(0).forEach(({ group, toggle }) => { group.classList.remove('in'); group.removeAttribute('aria-expanded'); group.removeAttribute('data-bs-opened'); if (toggle) { toggle.classList.add('collapsed'); toggle.setAttribute('aria-expanded', 'false'); } });
     owned.forEach(node => node.remove()); owned.clear();
     attrs.forEach((names, node) => names.forEach(name => node.removeAttribute(name))); attrs.clear();
     resizer = null; document.documentElement.style.removeProperty('--bs-side');

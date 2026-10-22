@@ -42,7 +42,7 @@ try {
   await call('Page.enable');await call('Runtime.enable');await call('Network.enable');
   await call('Emulation.setDeviceMetricsOverride',{width:1440,height:1050,deviceScaleFactor:1,mobile:false});
   await navigate(base+'options.html');
-  await waitFor("document.querySelectorAll('.theme-card').length === 6",'six theme cards');
+  await waitFor("document.querySelectorAll('#theme-list .theme-card').length === 7",'seven theme cards (six presets + Custom)');
   await frameReady('cms','dashboard');
   await evaluate('document.fonts.ready');
   assert.equal(await evaluate("document.fonts.check('500 15px \"Bahria Jakarta\"') || true"),true);
@@ -95,8 +95,8 @@ try {
   // 5. radius, spacing, font family, accent (with contrast), device appearance
   await setValue('radius',0);await waitFrameVar('--bs-radius','0px');
   await setValue('radius',20);await waitFrameVar('--bs-radius','20px');await setValue('radius',10);
-  await setValue('density','compact','change');await waitFrameVar('--bs-pad','8px');
-  await setValue('density','spacious','change');await waitFrameVar('--bs-pad','18px');await setValue('density','comfortable','change');
+  await press('#density-seg [data-density="compact"]');await waitFrameVar('--bs-pad','8px');
+  await press('#density-seg [data-density="spacious"]');await waitFrameVar('--bs-pad','18px');await press('#density-seg [data-density="comfortable"]');
   await setValue('font','sora','change');await waitFor(`${F}.documentElement.style.getPropertyValue('--bs-font').includes('Bahria Sora')`,'Sora');
   await setValue('font','jakarta','change');
   await press('[data-accent="#db4b91"]');assert.equal(await evaluate("document.getElementById('accent').value"),'#db4b91');await waitFrameVar('--bs-accent','#db4b91');
@@ -113,7 +113,7 @@ try {
   await waitFor("document.getElementById('preview-theme-name').textContent.startsWith('Bahria')",'back to Bahria');
 
   // 6. portal preferences: CMS/LMS switches, plain sign-in background, motion, master switch
-  await evaluate("document.getElementById('portals').open = true");
+  await press('#nav-portals');
   await press('[data-preview="cms"]');await waitFor(`${F}.documentElement.dataset.bahriaStudio === 'cms'`,'cms on');
   await toggle('cms',false);
   await waitFor(`${F}.documentElement.dataset.bahriaStudio === undefined`,'cms off in preview');
@@ -127,6 +127,108 @@ try {
   await toggle('enabled',false);await waitFor(`${F}.documentElement.dataset.bahriaStudio === undefined`,'everything off');
   assert.equal(await evaluate("document.getElementById('preview-off').hidden"),false);
   await toggle('enabled',true);await waitFor(`${F}.documentElement.dataset.bahriaStudio === 'cms'`,'master on');
+
+
+  // 6b. STUDIO: the custom theme maker
+  const hexOf=label=>`document.querySelector('input[name="hex-${label}"]')`;
+  const typeHex=async(label,value)=>evaluate(`(() => { const h=${hexOf(label)}; h.focus(); h.value=${JSON.stringify(value)}; h.dispatchEvent(new Event('input',{bubbles:true})); })()`);
+  const blurHex=label=>evaluate(`(() => { const h=${hexOf(label)}; h.dispatchEvent(new Event('blur')); h.blur(); })()`);   // headless pages are not focused, so fire the event explicitly
+  const summary=()=>evaluate("document.querySelector('.a11y-summary').textContent");
+  await press('#nav-studio');
+  assert.equal(await evaluate("document.getElementById('section-studio').hidden"),false,'studio section opens');
+  assert.equal(await evaluate("!document.querySelector('.studio-empty').hidden && document.querySelector('.studio-editor').hidden"),true,'empty state first');
+  assert.match(await evaluate("document.querySelector('#theme-list .theme-card.custom').textContent"),/Custom/);
+  await press('.studio-empty .btn.primary');
+  await waitFor("!document.querySelector('.studio-editor').hidden",'editor shown');
+  assert.equal(await evaluate("document.querySelector('#theme-list .theme-card.custom').getAttribute('aria-pressed')"),'true','custom selected');
+  assert.equal(await evaluate("document.querySelector('#theme-list .theme-card.custom strong').textContent"),'My theme');
+  assert.equal(await evaluate("document.querySelectorAll('#theme-list .theme-card[aria-pressed=true]').length"),1,'exactly one selected card');
+  await shot('studio-editor.png');
+  // typed hex updates the live preview
+  await typeHex('page-background','#112233');await waitFrameVar('--bs-bg','#112233');
+  assert.equal(await evaluate("document.querySelector('.studio-editor .color-row .swatch').style.getPropertyValue('--c')"),'#112233');
+  // invalid input is flagged, then reverts on blur; 3-digit shorthand expands
+  await typeHex('page-background','zzzz');assert.equal(await evaluate(`${hexOf('page-background')}.getAttribute('aria-invalid')`),'true');
+  await blurHex('page-background');assert.equal(await evaluate(`${hexOf('page-background')}.value`),'#112233');
+  await typeHex('cards-panels','#abc');await blurHex('cards-panels');await waitFrameVar('--bs-surface','#aabbcc');
+  // readability: unreadable text is reported, and "Fix automatically" repairs it
+  await typeHex('text','#112233');
+  await waitFor("document.querySelector('.a11y-summary').textContent.includes('need')",'unreadable text flagged');
+  assert.equal(await evaluate("document.querySelector('.a11y-summary').className.includes('bad')"),true);
+  assert.equal(await evaluate("getComputedStyle(document.querySelector('.a11y .btn')).display !== 'none'"),true,'fix button visible');
+  await evaluate("document.querySelector('.a11y .btn').click()");
+  await waitFor("document.querySelector('.a11y-summary').textContent === 'All checks pass'",'fix repaired readability');
+  assert.ok(await evaluate("BahriaStudio.ratio(JSON.parse(localStorage.getItem('x')||'null')?.ink||document.querySelector('input[name=\"hex-text\"]').value,document.querySelector('input[name=\"hex-page-background\"]').value) >= 4.5"),'text now readable on the page color');
+  // undo restores what the fix changed
+  await evaluate("document.querySelector('.toast button').click()");
+  await waitFor("document.querySelector('.a11y-summary').textContent.includes('need')",'undo brings the problem back');
+  // generate a full palette from a brand color: dark + tinted sidebar
+  await typeHex('brand','#e11d48');
+  await press('.quick [data-mode="dark"]');await press('.quick [data-side="tinted"]');
+  await press('.quick .btn.primary');
+  await waitFor(`${F}.documentElement.dataset.bsDark === 'true'`,'generated dark palette applied to preview');
+  assert.equal(await summary(),'All checks pass','generated palettes are readable');
+  assert.equal(await evaluate("document.querySelector('.quick [data-mode=dark]').getAttribute('aria-pressed') + document.querySelector('.quick [data-side=tinted]').getAttribute('aria-pressed') + document.querySelector('.quick [data-mode=light]').getAttribute('aria-pressed')"),'truetruefalse','quick palette switches show what was generated');
+  await shot('studio-dark.png');
+  // preset copy, random palette
+  await evaluate("document.querySelectorAll('.preset-chip')[3].click()");await waitFrameVar('--bs-nav','#f5f2ec');
+  await evaluate("document.querySelectorAll('.quick .btn-row .btn')[1].click()");
+  await waitFor("document.querySelector('.toast')?.textContent.includes('Random palette')",'random palette');
+  assert.equal(await summary(),'All checks pass','random palettes are readable');
+  // fine-tune overrides and reset to auto
+  await evaluate("document.querySelector('details.fine').open = true");
+  const auto=await evaluate("document.querySelector('.fine .auto-pill').hidden");assert.equal(auto,false,'auto pill shown by default');
+  await typeHex('borders','#ff0000');await waitFrameVar('--bs-line','#ff0000');
+  assert.equal(await evaluate("document.querySelectorAll('.fine .reset-auto')[1].hidden"),false);
+  assert.equal(await evaluate("document.querySelectorAll('.fine .reset-auto')[0].hidden"),true,'untouched rows stay automatic');
+  await evaluate("document.querySelectorAll('.fine .reset-auto')[1].click()");await waitFor(`${F}.documentElement.style.getPropertyValue('--bs-line') !== '#ff0000'`,'borders back to auto');
+  // name: trimmed, length-limited, markup can never render
+  await evaluate("(() => { const n=document.getElementById('studio-name'); n.focus(); n.value='  <img src=x onerror=alert(1)> Ocean Breeze that is far too long to fit  '; n.dispatchEvent(new Event('input',{bubbles:true})); })()");
+  assert.equal(await evaluate("document.querySelectorAll('#theme-list img, #studio-root img').length"),0,'no injected elements');
+  assert.ok((await evaluate("document.querySelector('#theme-list .theme-card.custom strong').textContent")).length<=24,'name limited to 24 characters');
+    await evaluate("(() => { const n=document.getElementById('studio-name'); n.value='Ocean Breeze'; n.dispatchEvent(new Event('input',{bubbles:true})); })()");
+  assert.equal(await evaluate("document.querySelector('#theme-list .theme-card.custom strong').textContent"),'Ocean Breeze');
+  // the global accent is locked while a custom theme is active
+  await press('#nav-themes');
+  assert.equal(await evaluate("document.getElementById('accent').disabled && !document.getElementById('accent-lock').hidden"),true,'accent locked for custom theme');
+  // a custom theme is never swapped for Midnight on a dark device
+  await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:'dark'}]});
+  await toggle('system',true);
+  await waitFor("document.getElementById('preview-theme-name').textContent.startsWith('Ocean Breeze')",'custom stays in system dark mode');
+  await toggle('system',false);await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:'light'}]});
+  // switching to a preset and back keeps the custom theme
+  await evaluate("document.querySelectorAll('#theme-list .theme-card')[1].click()");await waitFrameVar('--bs-accent',expected[1]);
+  await evaluate("document.querySelector('#theme-list .theme-card.custom').click()");
+  await waitFor("document.getElementById('preview-theme-name').textContent.startsWith('Ocean Breeze')",'custom reselected');
+  // removing needs a second click, then restores the default theme
+  await press('#nav-studio');
+  await evaluate("document.querySelector('.studio-foot .btn').click()");
+  assert.equal(await evaluate("document.querySelector('.studio-foot .btn').dataset.armed"),'1','first click only arms');
+  assert.equal(await evaluate("!document.querySelector('.studio-empty').hidden"),false,'still editing after one click');
+  await evaluate("document.querySelector('.studio-foot .btn').click()");
+  await waitFor("!document.querySelector('.studio-empty').hidden",'custom removed');
+  assert.equal(await evaluate("document.querySelector('#theme-list .theme-card[aria-pressed=true] strong').textContent"),'Bahria');
+  assert.equal(await evaluate("document.querySelector('#theme-list .theme-card.custom').classList.contains('is-empty')"),true);
+  await press('#nav-themes');
+
+  // sidebar navigation: one section at a time, a real link per section, state in the URL hash, browser back works
+  const here = () => evaluate("[...document.querySelectorAll('.side-nav a')].map(a => a.hasAttribute('aria-current') ? a.dataset.section : '').join('')");
+  const visible = () => evaluate("[...document.querySelectorAll('.panels > .panel')].filter(p => !p.hidden).map(p => p.id.replace('section-', '')).join(',')");
+  await press('#nav-themes');
+  assert.equal(await here(), 'themes'); assert.equal(await visible(), 'themes');
+  assert.equal(await evaluate("document.getElementById('section-title').textContent"), 'Themes');
+  for (const [id, title] of [['text', 'Text & layout'], ['studio', 'Custom theme'], ['portals', 'Portals'], ['privacy', 'Privacy & data'], ['themes', 'Themes']]) {
+    await press('#nav-' + id);
+    assert.equal(await here(), id); assert.equal(await visible(), id, 'only the ' + id + ' section is shown');
+    assert.equal(await evaluate("document.getElementById('section-title').textContent"), title);
+    assert.equal(await evaluate("location.hash"), '#' + id, 'section is in the URL');
+    assert.ok((await evaluate("document.title")).startsWith(title), 'window title follows the section');
+  }
+  await evaluate("history.back()"); await waitFor("location.hash === '#privacy'", 'back to the previous section');
+  assert.equal(await here(), 'privacy'); await press('#nav-themes');
+  assert.equal(await evaluate("[...document.querySelectorAll('.side-nav a')].every(a => a.tagName === 'A' && a.getAttribute('href').startsWith('#'))"), true, 'sidebar entries are real links');
+  // the preview and the Save button stay on screen while switching sections
+  assert.equal(await evaluate("document.querySelector('.preview').getBoundingClientRect().height > 300 && !document.getElementById('save').hidden"), true);
 
   // 7. save, reload, persistence; export/import payload; reset dialog
   await evaluate("document.querySelectorAll('.theme-card')[4].click()");await setValue('radius',14);
@@ -144,6 +246,40 @@ try {
   assert.equal(await evaluate("localStorage.getItem('bahriaStudioPreferences')"),null);
   assert.equal(await evaluate("document.querySelector('.theme-card[aria-pressed=true]').textContent.includes('Bahria')"),true);
 
+  // 7b. custom theme survives save + reload, shows in the popup, travels through export/import, dies with reset
+  await press('#nav-studio');await press('.studio-empty .btn.primary');
+  await waitFor("!document.querySelector('.studio-editor').hidden",'editor');
+  await typeHex('accent','#0f766e');await evaluate("(() => { const n=document.getElementById('studio-name'); n.value='Teal Night'; n.dispatchEvent(new Event('input',{bubbles:true})); })()");
+  await press('#save');await waitFor("document.getElementById('status').textContent.includes('Saved')",'custom saved');
+  const savedCustom=JSON.parse(await evaluate("localStorage.getItem('bahriaStudioPreferences')"));
+  assert.equal(savedCustom.theme,'custom');assert.equal(savedCustom.custom.name,'Teal Night');assert.equal(savedCustom.custom.accent,'#0f766e');
+  assert.equal(await evaluate("document.getElementById('dirty').hidden"),true,'unsaved chip cleared after save');
+  await navigate(base+'options.html');await waitFor("document.querySelector('#theme-list .theme-card.custom strong')?.textContent === 'Teal Night'",'custom restored after reload');
+  assert.equal(await evaluate("document.querySelector('#theme-list .theme-card.custom').getAttribute('aria-pressed')"),'true');
+  await waitFrameVar('--bs-accent','#0f766e');
+  const exportedCustom=JSON.parse(await evaluate("(() => { let text=''; const orig=Blob; globalThis.Blob=class extends orig { constructor(parts,o){ super(parts,o); text=parts.join(''); } }; document.getElementById('export').click(); globalThis.Blob=orig; return JSON.stringify(text); })()"));
+  assert.equal(JSON.parse(exportedCustom).settings.custom.name,'Teal Night','export carries the custom theme');
+  // import: a good file loads; a file with a bad colour loses its custom theme instead of breaking anything
+  const importFile=async data=>evaluate(`(() => { const dt=new DataTransfer(); dt.items.add(new File([${JSON.stringify(JSON.stringify(data))}],'t.json',{type:'application/json'})); const i=document.getElementById('import-file'); i.files=dt.files; i.dispatchEvent(new Event('change',{bubbles:true})); })()`);
+  await importFile({format:'campuslit',version:1,settings:{theme:'custom',custom:{bg:'#101820',surface:'#16222e',nav:'#0a1118',ink:'#e8eef5',accent:'#ffb000',name:'Imported'}}});
+  await waitFor("document.querySelector('#theme-list .theme-card.custom strong')?.textContent === 'Imported'",'import loaded');
+  await importFile({format:'campuslit',version:1,settings:{theme:'custom',custom:{bg:'red',surface:'#16222e',nav:'#0a1118',ink:'#e8eef5',accent:'#ffb000',name:'Bad'}}});
+  await waitFor("document.querySelector('#theme-list .theme-card.custom').classList.contains('is-empty')",'invalid custom theme rejected');
+  assert.equal(await evaluate("document.querySelector('#theme-list .theme-card[aria-pressed=true] strong').textContent"),'Bahria','falls back to default theme');
+  await navigate(base+'options.html');await waitFor("document.querySelector('#theme-list .theme-card.custom strong')?.textContent === 'Teal Night'",'saved theme still there after discarding imports');
+  // popup shows it as the 7th theme and can select it
+  await navigate(base+'popup.html');await waitFor("document.querySelector('.pop-swatch.custom .pop-name')?.textContent === 'Teal Night'",'popup custom row');
+  assert.equal(await evaluate("document.querySelector('.pop-swatch.custom').getAttribute('aria-pressed')"),'true');
+  await evaluate("document.querySelectorAll('.pop-swatch')[2].click()");await waitFor("JSON.parse(localStorage.getItem('bahriaStudioPreferences')).theme === 'midnight'",'popup preset');
+  assert.equal(JSON.parse(await evaluate("localStorage.getItem('bahriaStudioPreferences')")).custom.name,'Teal Night','choosing a preset keeps the custom theme');
+  await waitFor("document.querySelector('.pop-swatch.custom')",'custom row back');
+  await evaluate("document.querySelector('.pop-swatch.custom').click()");await waitFor("JSON.parse(localStorage.getItem('bahriaStudioPreferences')).theme === 'custom'",'popup selects custom');
+  await shot('studio-popup-custom.png');
+  // reset removes the custom theme with everything else
+  await navigate(base+'options.html');await waitFor("document.querySelector('#theme-list .theme-card.custom strong')?.textContent === 'Teal Night'",'custom before reset');
+  await press('#reset');await press('#confirm-reset');await waitFor("document.getElementById('status').textContent.includes('removed')",'reset');
+  assert.equal(await evaluate("document.querySelector('#theme-list .theme-card.custom').classList.contains('is-empty')"),true,'reset removed the custom theme');
+
   // 8. responsive
   for (const width of [1920,1280,1024,768]) {
     await call('Emulation.setDeviceMetricsOverride',{width,height:1080,deviceScaleFactor:1,mobile:false});
@@ -152,22 +288,32 @@ try {
   }
   await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
   assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'),true,'overflow at 390');
-  assert.equal(await evaluate("getComputedStyle(document.querySelector('.app-header .switch-label')).display !== 'none'"),true,'enable toggle accessible on mobile');
+  assert.equal(await evaluate("(() => { const r = document.getElementById('enabled').closest('.row').getBoundingClientRect(); return r.width > 40 && r.right <= innerWidth && r.left >= 0; })()"),true,'enable switch visible and inside the screen on a phone');
+  assert.equal(await evaluate("(() => { const n = document.querySelector('.side-nav'); return n.scrollWidth <= n.clientWidth || getComputedStyle(n).overflowX === 'auto'; })()"),true,'section links reachable on a phone (they scroll sideways inside their own bar)');
+  assert.equal(await evaluate("document.getElementById('save').getBoundingClientRect().right <= innerWidth"),true,'Save button inside the screen on a phone');
   assert.equal(await evaluate("document.getElementById('preview-frame').getBoundingClientRect().width <= innerWidth"),true,'preview fits');
   await shot('studio-mobile.png');
 
   // 9. popup and privacy pages
   await call('Emulation.setDeviceMetricsOverride',{width:1440,height:1050,deviceScaleFactor:1,mobile:false});
-  await navigate(base+'popup.html');await waitFor("document.querySelectorAll('.theme-card').length === 6",'popup cards');
+  await navigate(base+'popup.html');await waitFor("document.querySelectorAll('.pop-swatch:not(.custom)').length === 6 && document.querySelectorAll('.pop-swatch.custom').length === 1",'popup cards plus custom row');
   await shot('studio-popup.png');
-  await evaluate("document.querySelectorAll('.theme-card')[2].click()");await waitFor("document.getElementById('status').textContent.includes('Saved')",'popup saved');
+  await evaluate("document.querySelectorAll('.pop-swatch')[2].click()");await waitFor("document.getElementById('status').textContent.includes('Saved')",'popup saved');
   assert.equal(JSON.parse(await evaluate("localStorage.getItem('bahriaStudioPreferences')")).theme,'midnight');
   await evaluate("document.getElementById('enabled').click()");await waitFor("JSON.parse(localStorage.getItem('bahriaStudioPreferences')).enabled === false",'popup master switch');
+  // popup with no custom theme offers to create one, and opens the settings straight on the Studio tab
+  await navigate(base+'popup.html');await waitFor("document.querySelector('.pop-swatch.custom')",'popup row');
+  assert.equal(await evaluate("document.querySelector('.pop-swatch.custom').classList.contains('empty')"),true);
+  assert.match(await evaluate("document.querySelector('.pop-swatch.custom').textContent"),/Custom/);
+  await evaluate("document.querySelector('.pop-swatch.custom').click()");
+  await waitFor("location.pathname.endsWith('options.html') && location.hash === '#studio'",'popup opens the settings on #studio');
+  await waitFor("!document.getElementById('section-studio').hidden && document.getElementById('nav-studio').hasAttribute('aria-current')",'studio tab opened from the link');
+
   await navigate(base+'privacy.html');assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'),true);
 
   assert.deepEqual(errors,[],'runtime exceptions');
   const external=requests.filter(url=>!url.startsWith(base) && !url.startsWith('data:') && url!=='about:blank');
   assert.deepEqual(external,[],'unexpected external request');
-  console.log('Browser checks passed: 6 presets drive the real CMS and LMS sample pages, sidebar navigation inside the preview, time table and LMS cards, text size on both portals, radius, spacing, fonts, accent contrast, device appearance, per-portal and master switches, plain background and motion flags, save/reload, export, reset, five viewport widths, popup, privacy page, no exceptions or external requests.');
+  console.log('Browser checks passed: 6 presets plus the Studio (create, hex input and validation, readability check and fix, undo, generate, random palette, presets, fine-tune, name safety, accent lock, dark-device behavior, remove, save/reload, popup, export/import/reset) drive the real CMS and LMS sample pages, sidebar navigation inside the preview, time table and LMS cards, text size on both portals, radius, spacing, fonts, accent contrast, device appearance, per-portal and master switches, plain background and motion flags, save/reload, export, reset, five viewport widths, popup, privacy page, no exceptions or external requests.');
   await call('Browser.close');
 } finally {if(socket?.readyState===WebSocket.OPEN)socket.close();chrome.kill();}

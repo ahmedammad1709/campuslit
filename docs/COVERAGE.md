@@ -55,3 +55,7 @@ Reviewed in the preview, with real saved markup, and adjusted: Academic Document
 ## Other role sign-ins and dashboard notifications
 
 `login.js` now redesigns every `/Logins/<Role>/Login.aspx` page (student, alumni, faculty, admin staff, executive, candidate), not just the student one: the heading comes from the page's own title, and extra copy such as the alumni campus links is styled as small print. Verified only by simulating an alumni page (the student page with its two dropdowns removed, the alumni title and the campus links added); the real faculty, admin, executive and candidate pages have not been seen. The CMS dashboard notifications scroll up on their own and pause on hover or click, as the portal's own script does (entering from a shorter offset); with reduced motion they become a normal scrollable list.
+
+## Settings page, popup and custom themes (v0.3)
+
+Redesigned settings page, popup and Studio (see `DESIGN.md`). Visual checks: settings at 1440, 1024, 820 and 390 px; popup at 372 px (483 px tall); Studio with a generated dark palette, a copied preset and a fine-tuned colour; two custom themes (dark rose, light mint) on the saved LMS dashboard and assignments, the CMS dashboard and the student sign-in. Not verified: custom themes on every portal page (they use the same variables as the presets, so they should hold, but only those four pages were looked at), installed-extension behaviour of the preview iframe in Chrome and Firefox, Firefox popup sizing.
