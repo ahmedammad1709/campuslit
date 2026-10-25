@@ -10,7 +10,7 @@ A cleaner, calmer look for the Bahria University student **CMS** and **LMS**, as
 
 - **LMS** (`lms.bahria.edu.pk`): redesigned header, resizable sidebar that marks the page you are on, filter bars, tables, status pills and dropdowns; a dashboard with your courses as cards; tap-or-keyboard popovers instead of hover-only comments.
 - **CMS** (`cms.bahria.edu.pk`): a unified header and sidebar with icons, tidier tables, forms and modals, clear error alerts, a role-card landing page and a one-screen student sign-in.
-- **Dashboard attendance** drawn as readable per-course rows, and a **Time Table** as a compact day board or a one-page week calendar with a "next class" card.
+- **Attendance planner**: per-course rows on the CMS dashboard and a planner card on the Attendance page, with a plain line under each course ("Can miss up to 11 hrs of the remaining 24 hrs and still finish above 75%"). It uses your credit hours (hours per week; a lab is a 3-hour session per credit hour) and the semester length you set, to count the hours left. Attendance must be more than 75%; 75.0% exactly is not enough. The course at risk is named in a banner; and a **Time Table** as a compact day board or a one-page week calendar with a "next class" card.
 - **A settings page with a live preview** built from real-structure CMS and LMS sample pages (invented data), drawn by the very stylesheets the portals get, so what you pick is exactly what you see.
 - **Six themes** (Bahria, Crystal, Midnight, Linen, Grove, Bloom) **plus a custom-theme maker for your own seventh**: pick a brand color and a mode and it generates a full coherent palette (or start from a preset and change any color), with a live readability check and one-click fix, undo, and a name. Custom accent, bundled fonts (Plus Jakarta Sans, Manrope, Sora, Inter), text size, spacing and corner radius. One master switch plus a CMS and an LMS switch in the popup turn everything, or just one portal, on or off.
 
@@ -25,7 +25,7 @@ Not yet on the Chrome Web Store or Firefox Add-ons; see `docs/RELEASE.md`.
 
 ## Privacy
 
-No analytics, no accounts, no remote code or fonts, no network requests from the extension, no access to passwords or form values. Only appearance preferences are stored, in the browser's extension storage. To redraw a few screens it reads figures the page already shows (greeting name, LMS course list, CMS attendance percentages and time table) in memory only; nothing is saved or sent. Full text: `extension/privacy.html`.
+No analytics, no accounts, no remote code or fonts, no network requests from the extension, no access to passwords or form values. Only appearance preferences are stored, in the browser's extension storage. To redraw a few screens it reads figures the page already shows (greeting name, LMS course list, CMS attendance hours and time table) in memory only; nothing is saved or sent. Full text: `extension/privacy.html`.
 
 ## Repository layout
 
