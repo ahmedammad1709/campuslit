@@ -21,7 +21,7 @@
     root.dataset.bsClean = String(settings.cleanBackground);
     root.dataset.bsMotion = String(settings.motion);
     root.dataset.bsPage = 'portal';
-    const helper = mount(); if (helper) helper.mount();
+    const helper = mount(); if (helper) helper.mount(settings);
   }
 
   addEventListener('message', event => {

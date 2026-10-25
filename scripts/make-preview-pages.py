@@ -119,7 +119,7 @@ def lms_assignments():
 CMS_MENU = [
     ('/Sys/Student/Profile.aspx', 'Profile Information', None),
     (None, 'Course Registration', [('/Sys/Student/CourseRegistration/RegisteredCourses.aspx', 'Registered Courses'), ('/Sys/Student/CourseRegistration/RegisterRegularCourses.aspx', 'Register Regular Courses'), ('/Sys/Student/CourseRegistration/OfferedCourses.aspx', 'View Offered Courses'), ('/Sys/Student/CourseRegistration/CreditsTransfer.aspx', 'Credits Transfer')]),
-    (None, 'Courses', [('timetable.html', 'Time Table'), ('/Sys/Student/ClassAttendance/StudentWiseAttendance.aspx', 'Attendance')]),
+    (None, 'Courses', [('timetable.html', 'Time Table'), ('attendance.html', 'Attendance')]),
     (None, 'Exams', [('/Sys/Student/Exams/ExamResult.aspx', 'Provisional Result'), ('/Sys/Student/ExamSeatingPlan/ExamSeats', 'Exam Seating Plan'), ('/Sys/Student/Exams/CommunityServices.aspx', 'Community Services')]),
     (None, 'Underperforming Students', [('/Sys/Student/ExtraTeachingSessions.aspx', 'Extra Teaching Sessions')]),
     ('/Sys/Student/QualityAssurance/QualityAssuranceSurveys.aspx', 'Quality Assurance Surveys', None), ('/Sys/Student/FeeManagement/FeeChallans', 'Fee Challans', None), ('/Sys/Student/StudentInformation/AcademicDocuments.aspx', 'Academic Documents', None),
@@ -155,7 +155,7 @@ def cms_page(title, heading_icon, heading, crumbs, body, open_menu=None):
 <title>{title}</title>
 <link rel="stylesheet" href="../vendor/css/bootstrap.min.css"><link rel="stylesheet" href="../preview.css"><link rel="stylesheet" href="../preview-cms.css">
 <link rel="stylesheet" href="../../portal.css"><link rel="stylesheet" href="../../cms.css">
-<script src="../../themes.js" defer></script><script src="../../cms.js" defer></script><script src="../preview.js" defer data-site="cms"></script>
+<script src="../../themes.js" defer></script><script src="../../attendance.js" defer></script><script src="../../cms.js" defer></script><script src="../preview.js" defer data-site="cms"></script>
 </head>
 <body class="Army"><form method="post" action="#" id="form1" autocomplete="off">
 <div id="pageContainer">
@@ -182,21 +182,39 @@ def cms_page(title, heading_icon, heading, crumbs, body, open_menu=None):
 '''
 
 
-ATTENDANCE = [
-    ('CSC 220', 'Data Structures', '3', 24.0, 0.0, 24.0, '100'),
-    ('CSL 220', 'Data Structures Lab', '1', 21.0, 0.0, 21.0, '100'),
-    ('CSC 340', 'Database Systems', '3', 22.0, 2.0, 24.0, '91.67'),
-    ('CSL 340', 'Database Systems Lab', '1', 14.0, 1.0, 15.0, '93.33'),
-    ('CSC 360', 'Operating Systems', '3', 20.0, 4.0, 24.0, '83.33'),
-    ('SEN 311', 'Software Engineering', '3', 18.0, 4.0, 22.0, '81.82'),
-    ('CEN 223', 'Computer Networks', '3', 15.0, 6.0, 21.0, '71.43'),
-    ('CEL 223', 'Computer Networks Lab', '1', 21.0, 0.0, 21.0, '100'),
+ATTENDANCE = [   # code, title, credit hours, present, absent, total (percentage is worked out below)
+    ('CSC 220', 'Data Structures', '3', 24.0, 0.0, 24.0),
+    ('CSL 220', 'Data Structures Lab', '1', 21.0, 0.0, 21.0),
+    ('CSC 340', 'Database Systems', '3', 22.0, 2.0, 24.0),
+    ('CSL 340', 'Database Systems Lab', '1', 14.0, 1.0, 15.0),
+    ('CSC 360', 'Operating Systems', '3', 20.0, 4.0, 24.0),
+    ('SEN 311', 'Software Engineering', '3', 18.0, 4.0, 22.0),
+    ('CEN 223', 'Computer Networks', '3', 15.0, 6.0, 21.0),
+    ('CEL 223', 'Computer Networks Lab', '1', 21.0, 0.0, 21.0),
 ]
 
 
+def pct(present, total):
+    v = round(present / total * 100, 2)
+    return str(int(v)) if v == int(v) else str(v)
+
+
+def cms_attendance():
+    teachers = ['DR. SANA MALIK', 'ENGR. BILAL HUSSAIN', 'DR. AMNA RAZA', 'ENGR. HASSAN SHEIKH']
+    rows = ''
+    for i, (c, t, h, p, a, tot) in enumerate(ATTENDANCE, 1):
+        rows += (f'<tr><td class="text-center">{i}</td><td class="text-center">{c}</td><td>{t}</td><td class="text-center">{h}</td><td class="text-center">N/A </td>'
+                 f'<td>{t}</td><td>BSE[4]-5 (B) Morning</td><td>{teachers[i % 4]} </td><td class="text-center">Paid </td>'
+                 f'<td class="text-center">{p} :{pct(p, tot)}%</td><td class="text-center">{a} </td><td class="text-center">{tot} </td><td class="text-center"><a href="#" target="_blank">Detail</a></td></tr>')
+    body = f'''<div class="table-responsive"><table class="table table-bordered table-responsive table-condensed table-hover"><caption>Fall-2026</caption>
+<thead><tr><th class="text-center">#</th><th class="text-center">Code</th><th>Registered Course Title</th><th class="text-center">Credit<br /> Hours</th><th class="text-center">Majors</th><th>Offered Course Title</th><th>Class</th><th>Teacher Name</th><th>Fee Status</th><th>Present Hours</th><th>Absent Hours</th><th>Total Hours</th><th>Actions</th></tr></thead>
+<tbody>{rows}</tbody></table></div>'''
+    return cms_page('Attendance · CMS (sample)', 'glyphicon glyphicon-import', 'Attendance', ['Courses', 'Attendance'], body, open_menu='Courses')
+
+
 def cms_dashboard():
-    data = json.dumps([{'code': c, 'title': t, 'creditHours': h, 'present': p, 'absent': a, 'total': tot, 'percentage': pc}
-                       for c, t, h, p, a, tot, pc in ATTENDANCE])
+    data = json.dumps([{'code': c, 'title': t, 'creditHours': h, 'present': p, 'absent': a, 'total': tot, 'percentage': pct(p, tot)}
+                       for c, t, h, p, a, tot in ATTENDANCE])
     body = f'''<div class="row margin-bottom-15">
 <div class="col-md-6"><div class="panel panel-default notification-container"><div class="panel-heading"><h3 class="panel-title">Notifications</h3></div>
   <div class="scroll-container"><div id="scroll-text">
@@ -250,4 +268,5 @@ write('lms/dashboard.html', lms_dashboard())
 write('lms/assignments.html', lms_assignments())
 write('cms/dashboard.html', cms_dashboard())
 write('cms/timetable.html', cms_timetable())
-print('wrote 4 preview pages')
+write('cms/attendance.html', cms_attendance())
+print('wrote 5 preview pages')

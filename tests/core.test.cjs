@@ -132,3 +132,11 @@ test('extension pages ship every file they load', () => {
     for (const match of html.matchAll(/(?:src|href)="([^"#?]+\.(?:js|css|png|woff2|html))"/g)) assert.ok(fs.existsSync(path.join('extension', match[1])), page + ' references missing ' + match[1]);
   }
 });
+
+test('semester length setting: default 16, bounded to 8-24, junk ignored', () => {
+  const m = model();
+  assert.equal(m.normalize({}).semesterWeeks, 16);
+  assert.equal(m.normalize({ semesterWeeks: 14 }).semesterWeeks, 14);
+  assert.equal(m.normalize({ semesterWeeks: 2 }).semesterWeeks, 8); assert.equal(m.normalize({ semesterWeeks: 99 }).semesterWeeks, 24);
+  assert.equal(m.normalize({ semesterWeeks: '14' }).semesterWeeks, 16, 'a string is not a number'); assert.equal(m.normalize({ semesterWeeks: NaN }).semesterWeeks, 16);
+});

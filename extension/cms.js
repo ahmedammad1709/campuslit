@@ -10,7 +10,6 @@
   const SIDE_KEY = 'bahriaStudioSidebarWidth';
   const store = (globalThis.browser || globalThis.chrome || {}).storage;
   let resizer = null;
-  let attLevels = { ok: 85, warn: 75 };
   function mark(node, name, value = '') {
     if (!node || node.hasAttribute(name)) return;
     node.setAttribute(name, value);
@@ -70,38 +69,96 @@
       if (path && path === here && !a.getAttribute('href').startsWith('#')) { mark(a, 'data-bs-current'); openGroup(a); }
     });
   }
-  function attendance() {
+  // ---------- Attendance: per-course rows with a plain "how many hours can I miss" line ----------
+  const AT = () => globalThis.BahriaAttendance || null;
+  let weeks = 16, shownWeeks = null;   // weeks of classes in a semester (a setting); rows are rebuilt when it changes
+  const num = v => { const n = typeof v === 'number' ? v : parseFloat(String(v === undefined || v === null ? '' : v).replace(/,/g, '')); return Number.isFinite(n) ? n : NaN; };
+  // One course row. Never throws: a bad record becomes a row that says so, or is skipped.
+  function attendanceRow(item) {
+    const planner = AT(), plan = planner ? planner.plan(item, { weeks }) : { state: 'invalid' };
+    const portalPct = num(String(item.percentage === undefined || item.percentage === null ? '' : item.percentage).replace('%', ''));
+    const pct = Math.max(0, Math.min(100, Number.isFinite(plan.percent) ? plan.percent : portalPct));
+    if (!Number.isFinite(pct)) return null;
+    const row = make('div', 'bs-att-row');
+    row.dataset.level = plan.level || (plan.state === 'invalid' || plan.state === 'none' ? 'none' : 'warn');
+    const label = make('div', ''); label.append(make('b', '', String(item.code || '')));
+    const hrs = Number.isFinite(num(item.present)) && Number.isFinite(num(item.total)) ? num(item.present) + ' of ' + num(item.total) + ' hrs' : '';
+    label.append(make('small', '', [item.title, hrs].filter(Boolean).join(' · ')));
+    const value = make('span', 'bs-att-pct', (Number.isInteger(pct) ? pct : pct.toFixed(1)) + '%');
+    const bar = make('div', 'bs-att-bar'); bar.setAttribute('role', 'progressbar'); bar.setAttribute('aria-valuenow', String(pct)); bar.setAttribute('aria-valuemin', '0'); bar.setAttribute('aria-valuemax', '100'); bar.setAttribute('aria-label', String(item.code || 'Course') + ' attendance');
+    const fill = make('i', ''); fill.style.setProperty('--w', pct + '%'); bar.append(fill);
+    row.append(label, value, bar);
+    if (planner) { const d = planner.describe(plan); const note = make('p', 'bs-att-note', d.text); if (d.title) note.title = d.title; row.append(note); }
+    row._plan = plan;
+    return row;
+  }
+  const atRisk = p => p.state === 'recover' || p.state === 'lost' || (p.state === 'ended' && p.level === 'bad');
+  function attendanceList(items) {
+    const planner = AT(), min = planner ? planner.MIN_PERCENT : 75, comfy = planner ? planner.COMFORT_PERCENT : 85;
+    const rows = [];
+    items.forEach(item => { try { const r = attendanceRow(item); if (r) rows.push(r); } catch (e) { /* skip this course only */ } });
+    if (!rows.length) return null;
+    shownWeeks = weeks;
+    // Courses at or below the limit first (the panel on the dashboard scrolls), then the rest in the portal's own order.
+    const rank = r => (atRisk(r._plan) ? 0 : r._plan.state === 'tight' ? 1 : 2);
+    rows.sort((a, b) => rank(a) - rank(b));   // Array.prototype.sort is stable
+    const list = make('div', 'bs-att');
+    if (planner) {
+      const text = planner.summaryText(planner.summarize(rows.map(r => r._plan)));
+      if (text) {
+        const low = rows.filter(r => atRisk(r._plan)).map(r => (r.querySelector('b') || {}).textContent).filter(Boolean);
+        const s = make('p', 'bs-att-summary', text + (low.length ? ': ' + low.join(', ') : '')); s.setAttribute('role', 'status');
+        if (low.length) s.dataset.alert = 'true'; list.append(s);
+      }
+    }
+    const legend = make('div', 'bs-att-legend');
+    [['var(--bs-ok)', comfy + '% and above'], ['var(--bs-warn)', 'Above ' + min + '%'], ['var(--bs-bad)', min + '% or below']].forEach(([c, t]) => { const s = make('span', '', t); s.style.setProperty('--c', c); legend.append(s); });
+    list.append(legend, ...rows);
+    return list;
+  }
+  function dashboardAttendance() {
     const body = document.querySelector('.attendance-container .attendance-body');
     if (!body || body.querySelector('.bs-att')) return;
     let data = null;
     for (const script of document.querySelectorAll('script:not([src])')) {
       const text = script.textContent;
-      const at = text.indexOf('renderAttendanceSummaryChart([');
-      if (at < 0) continue;
-      const match = /renderAttendanceSummaryChart\((\[[\s\S]*?\])\s*\)\s*;/.exec(text.slice(at));
-      if (!match) continue;
-      try { data = JSON.parse(match[1]); } catch (e) { data = null; }
+      if (!text.includes('renderAttendanceSummaryChart(')) continue;
+      data = AT() ? AT().extractCourses(text) : null;
       if (data) break;
     }
     if (!Array.isArray(data) || !data.length) return;   // leave the original chart in place
-    const list = make('div', 'bs-att');
-    const legend = make('div', 'bs-att-legend');
-    [['var(--bs-ok)', attLevels.ok + '% and above'], [ 'var(--bs-warn)', attLevels.warn + '–' + (attLevels.ok - 1) + '%'], ['var(--bs-bad)', 'Below ' + attLevels.warn + '%']].forEach(([c, t]) => { const s = make('span', '', t); s.style.setProperty('--c', c); legend.append(s); });
-    list.append(legend);
-    data.forEach(course => {
-      const pct = Math.max(0, Math.min(100, parseFloat(course.percentage)));
-      if (!Number.isFinite(pct)) return;
-      const row = make('div', 'bs-att-row'); row.dataset.level = pct >= attLevels.ok ? 'ok' : pct >= attLevels.warn ? 'warn' : 'bad';
-      const label = make('div', ''); label.append(make('b', '', String(course.code || '')));
-      const detail = [course.title, Number.isFinite(course.present) && Number.isFinite(course.total) ? course.present + ' of ' + course.total + ' hrs' : ''].filter(Boolean).join(' · ');
-      label.append(make('small', '', detail));
-      const value = make('span', 'bs-att-pct', (Number.isInteger(pct) ? pct : pct.toFixed(1)) + '%');
-      const bar = make('div', 'bs-att-bar'); bar.setAttribute('role', 'progressbar'); bar.setAttribute('aria-valuenow', String(pct)); bar.setAttribute('aria-valuemin', '0'); bar.setAttribute('aria-valuemax', '100'); bar.setAttribute('aria-label', String(course.code || 'Course') + ' attendance');
-      const fill = make('i', ''); fill.style.setProperty('--w', pct + '%'); bar.append(fill);
-      row.append(label, value, bar); list.append(row);
-    });
+    const list = attendanceList(data.filter(c => c && typeof c === 'object'));
+    if (!list) return;
     body.append(list);
     mark(document.documentElement, 'data-bs-att');
+  }
+  // The Attendance page: the same numbers are in its table (present hours print as "20.0 :90.91%"). Add a planner above it.
+  function attendancePage() {
+    // Wait until the page has finished loading: with a slow connection the table can be only partly there, and a planner built from half a table would be wrong.
+    if (document.readyState === 'loading' || document.querySelector('.bs-plan')) return;
+    const tables = [...document.querySelectorAll('#pageContent table')];
+    for (const table of tables) {
+      const heads = [...table.querySelectorAll('thead th')].map(th => th.textContent.replace(/\s+/g, ' ').trim().toLowerCase());
+      const col = name => heads.findIndex(h => h.includes(name));
+      const iCode = col('code'), iTitle = col('registered course'), iCredit = col('credit'), iPresent = col('present'), iTotal = col('total hours');
+      if (iPresent < 0 || iTotal < 0) continue;
+      const items = [];
+      table.querySelectorAll('tbody tr').forEach(tr => {
+        const cells = tr.querySelectorAll('td');
+        if (cells.length <= Math.max(iPresent, iTotal)) return;
+        const m = /^\s*([\d.,]+)\s*(?::\s*([\d.]+)\s*%)?/.exec(cells[iPresent].textContent);
+        if (!m) return;
+        items.push({ code: iCode >= 0 ? cells[iCode].textContent.trim() : '', title: iTitle >= 0 ? cells[iTitle].textContent.trim() : '', creditHours: iCredit >= 0 ? cells[iCredit].textContent.trim() : undefined, present: m[1], total: cells[iTotal].textContent.trim(), percentage: m[2] });
+      });
+      const list = items.length ? attendanceList(items) : null;
+      if (!list) return;
+      const card = make('section', 'bs-plan');
+      const caption = table.querySelector('caption');
+      const head = make('div', 'bs-plan-head'); head.append(make('h2', '', 'Attendance planner'), make('span', '', caption ? caption.textContent.trim() : ''));
+      card.append(head, list);
+      (table.closest('.table-responsive') || table).before(card);
+      return;
+    }
   }
   // The university's own emblem is referenced from the page (its apple-touch-icon); nothing is bundled or fetched by us.
   function emblemUrl() {
@@ -301,17 +358,16 @@
       if (hit) mark(td, 'data-bs-status', hit[0]);
     });
   }
-  function mount() {
+  function mount(settings) {
     const root = document.documentElement;
     if (!document.body) return;
-    markCurrent();
-    document.querySelectorAll('#pageAlerts_up .alert').forEach(a => mark(a, 'role', 'alert'));
-    mountResizer();
-    attendance();
-    statuses();
-    timetable();
-    landing();
-    emblem();
+    if (settings && Number.isFinite(settings.semesterWeeks)) weeks = settings.semesterWeeks;
+    if (shownWeeks !== null && shownWeeks !== weeks) { document.querySelectorAll('.bs-att, .bs-plan').forEach(n => { n.remove(); owned.delete(n); }); shownWeeks = null; }
+    // Each feature runs on its own: if one fails on an unexpected page, the others (and the page itself) carry on untouched.
+    [markCurrent,
+      () => document.querySelectorAll('#pageAlerts_up .alert').forEach(a => mark(a, 'role', 'alert')),
+      mountResizer, dashboardAttendance, attendancePage, statuses, timetable, landing, emblem
+    ].forEach(step => { try { step(); } catch (e) { /* ignore */ } });
     void root;
   }
   function disable() {

@@ -97,8 +97,8 @@ $('goto-studio').addEventListener('click', () => showSection('studio', true, tru
 const setPct = input => input.style.setProperty('--pct', ((input.value - input.min) / (input.max - input.min) * 100) + '%');
 function syncControls() {
   for (const key of ['enabled', 'cms', 'lms', 'cleanBackground', 'motion']) $(key).checked = settings[key];
-  $('font').value = settings.font; $('fontSize').value = settings.fontSize; $('radius').value = settings.radius;
-  setPct($('fontSize')); setPct($('radius'));
+  $('font').value = settings.font; $('fontSize').value = settings.fontSize; $('radius').value = settings.radius; $('semesterWeeks').value = settings.semesterWeeks;
+  setPct($('fontSize')); setPct($('radius')); setPct($('semesterWeeks')); $('weeks-output').textContent = settings.semesterWeeks + ' weeks';
   $('size-output').textContent = settings.fontSize + ' px'; $('radius-output').textContent = settings.radius + ' px';
   document.querySelector('.radius-demo').style.setProperty('--demo-r', settings.radius + 'px');
   document.querySelectorAll('#density-seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.density === settings.density)));
@@ -188,7 +188,7 @@ document.querySelectorAll('[data-accent]').forEach(button => button.addEventList
 $('accent').addEventListener('input', e => { settings.accent = e.target.value; syncControls(); preview(); updateDirty(); });
 $('reset-accent').addEventListener('click', () => { settings.accent = ''; syncControls(); preview(); updateDirty(); });
 $('font').addEventListener('change', e => { settings.font = e.target.value; syncControls(); preview(); updateDirty(); });
-for (const key of ['fontSize', 'radius']) $(key).addEventListener('input', e => { settings[key] = Number(e.target.value); syncControls(); preview(); updateDirty(); });
+for (const key of ['fontSize', 'radius', 'semesterWeeks']) $(key).addEventListener('input', e => { settings[key] = Number(e.target.value); syncControls(); preview(); updateDirty(); });
 document.querySelectorAll('#density-seg button').forEach(b => b.addEventListener('click', () => { settings.density = b.dataset.density; syncControls(); preview(); updateDirty(); }));
 $('system').addEventListener('change', e => { settings.mode = e.target.checked ? 'system' : 'preset'; renderAll(); updateDirty(); });
 system.addEventListener('change', () => { syncControls(); preview(); renderThemes(); });

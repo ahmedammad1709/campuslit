@@ -135,6 +135,15 @@
             <p class="hint">These move together with “Extension enabled” in the sidebar and the toolbar popup. Turn one portal off to keep its original look.</p>
           </div>
           <div class="group">
+            <div class="group-title"><h3>Attendance planner</h3></div>
+            <p class="group-note">Used to work out how many class hours are left, and so how many you can still miss. Credit hours are your hours per week (a lab is one 3-hour session per credit hour). Set this to the number of weeks of classes in your semester.</p>
+            <div class="range">
+              <div class="range-head"><label for="semesterWeeks">Weeks of classes in a semester</label><output id="weeks-output" for="semesterWeeks">16 weeks</output></div>
+              <input id="semesterWeeks" name="semesterWeeks" type="range" min="10" max="20" step="1" value="16">
+              <div class="range-ends"><span>10</span><span>20</span></div>
+            </div>
+          </div>
+          <div class="group">
             <div class="group-title"><h3>Experience</h3></div>
             <label class="row">
               <span class="row-text"><strong>Plain sign-in background</strong><small>Hide the campus photo on the CMS landing and sign-in pages.</small></span>

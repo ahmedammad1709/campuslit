@@ -234,6 +234,19 @@
     & .bs-att-bar { grid-column: 1 / -1; height: 8px; border-radius: 999px; background: color-mix(in srgb, var(--bs-ink) 8%, var(--bs-surface)); overflow: hidden; }
     & .bs-att-bar i { display: block; height: 100%; border-radius: inherit; background: var(--tone); width: var(--w, 0%); transition: width .6s var(--bs-ease); }
     & .bs-att-row[data-level="ok"] { --tone: var(--bs-ok); } & .bs-att-row[data-level="warn"] { --tone: var(--bs-warn); } & .bs-att-row[data-level="bad"] { --tone: var(--bs-bad); }
+    & .bs-att-row[data-level="none"] { --tone: var(--bs-muted); }
+    & .bs-att-row[data-level="none"] .bs-att-bar i { opacity: .45; }
+    & .bs-att-note { grid-column: 1 / -1; margin: 1px 0 0; font-size: calc(var(--bs-size) * 0.8); line-height: 1.4; color: var(--bs-muted); }
+    & .bs-att-row[data-level="bad"] .bs-att-note { color: var(--bs-bad); font-weight: 600; }
+    & .bs-att-row[data-level="warn"] .bs-att-note { color: color-mix(in srgb, var(--bs-warn) 70%, var(--bs-ink)); }
+    & .bs-att-summary { margin: 0 0 12px; padding: 9px 12px; border-radius: calc(var(--bs-r) * .8); background: color-mix(in srgb, var(--bs-ok) 10%, var(--bs-surface)); color: var(--bs-ink); font-size: calc(var(--bs-size) * 0.8667); font-weight: 600; }
+    & .bs-att-summary[data-alert] { background: color-mix(in srgb, var(--bs-bad) 10%, var(--bs-surface)); }
+    & .bs-plan { margin-bottom: 20px; padding: 20px 22px 22px; background: var(--bs-surface); border: 1px solid var(--bs-line); border-radius: calc(var(--bs-r) + 4px); box-shadow: var(--bs-card-shadow); }
+    & .bs-plan-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+    & .bs-plan-head h2 { margin: 0; font-size: calc(var(--bs-size) * 1.0667); font-weight: 700; }
+    & .bs-plan-head span { color: var(--bs-muted); font-size: calc(var(--bs-size) * 0.8667); font-weight: 600; }
+    & .bs-plan .bs-att { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px 28px; }
+    & .bs-plan .bs-att > .bs-att-summary, & .bs-plan .bs-att > .bs-att-legend { grid-column: 1 / -1; margin-bottom: 0; }
     & .bs-att-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; font-size: calc(var(--bs-size) * 0.7667); font-weight: 600; color: var(--bs-muted); }
     & .bs-att-legend span::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--c); }
     &[data-bs-att] .attendance-canvas-wrapper { display: none !important; }
