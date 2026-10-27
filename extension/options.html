@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="studio.css">
 <script src="icons.js" defer></script>
 <script src="themes.js" defer></script>
+<script src="deadlines.js" defer></script>
 <script src="storage.js" defer></script>
 <script src="studio.js" defer></script>
 <script src="options.js" defer></script>
@@ -144,6 +145,18 @@
             </div>
           </div>
           <div class="group">
+            <div class="group-title"><h3>Assignment reminders</h3></div>
+            <label class="row">
+              <span class="row-text"><strong>Remind me about assignments</strong><small>A small popup on LMS pages with the next assignment you have not submitted. You can cross it away.</small></span>
+              <input id="reminders" name="reminders" type="checkbox" role="switch" checked><span class="track" aria-hidden="true"></span>
+            </label>
+            <p class="group-note">To remind you on other pages, Campuslit keeps a short note in this browser: the course, title and deadline of open assignments you have not submitted. It is never sent anywhere. Turning reminders off forgets it.</p>
+            <div class="data-actions">
+              <button id="forget-reminders" class="btn secondary" type="button"><span data-icon="reset"></span>Forget remembered assignments</button>
+              <span id="remembered" class="hint" role="status"></span>
+            </div>
+          </div>
+          <div class="group">
             <div class="group-title"><h3>Experience</h3></div>
             <label class="row">
               <span class="row-text"><strong>Plain sign-in background</strong><small>Hide the campus photo on the CMS landing and sign-in pages.</small></span>
@@ -162,7 +175,7 @@
             <div class="group-title"><h3>What Campuslit does with your data</h3></div>
             <ul class="facts">
               <li><span data-icon="check"></span><span>No accounts, no analytics, no tracking, and no requests to any server of ours.</span></li>
-              <li><span data-icon="check"></span><span>Only your appearance choices are stored, in this browser.</span></li>
+              <li><span data-icon="check"></span><span>Only your appearance choices are stored, in this browser, plus the short assignment-reminder note described under Portals (which you can turn off or forget).</span></li>
               <li><span data-icon="check"></span><span>Passwords and form fields are never read. A few screens are redrawn from figures the page already shows (your first name, courses, attendance, time table); they stay in memory and are never saved or sent.</span></li>
             </ul>
             <p class="group-note" style="margin:16px 0 0"><a class="link-out" href="privacy.html">Read the full privacy policy <span data-icon="arrow"></span></a></p>

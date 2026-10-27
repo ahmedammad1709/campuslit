@@ -130,6 +130,13 @@
     if (due) { clearInterval(due.timer); due.nodes.forEach(n => { n.remove(); owned.delete(n); }); due.trs.forEach(tr => { tr.removeAttribute('data-bs-due'); attrs.delete(tr); }); }
     due = null;
   }
+  // With no course chosen, list what is open in the courses you have already looked at, from the reminder note (if reminders are on).
+  function dueOthers(card, D, now) {
+    const list = rem.on && rem.data ? D.upcoming(rem.data, now).slice(0, 4) : [];
+    const sub = card.querySelector('.bs-due-sub'), ul = card.querySelector('.bs-due-others');
+    ul.textContent = ''; sub.textContent = list.length ? 'Not submitted yet, in courses you have opened' : ''; sub.hidden = !list.length;
+    list.forEach(item => { const li = make('li', ''); li.append(make('b', '', item.title), ' \u00b7 ' + (item.course ? item.course + ' \u00b7 ' : '') + 'due in ' + D.duration(item.left)); ul.append(li); });
+  }
   function dueRender() {
     const D = DL(); if (!D || !due) return;
     const now = Date.now();
@@ -139,11 +146,13 @@
       r.chip.textContent = text; r.chip.hidden = !text; r.chip.dataset.level = c.level;
       r.tr.setAttribute('data-bs-due', c.state);
     });
+    due.classified = classified;
     const sum = D.summarize(classified), next = sum.nextIndex >= 0 ? due.rows[sum.nextIndex] : null;
     const card = due.card;
     card.dataset.level = next ? classified[sum.nextIndex].level : sum.open ? 'warn' : 'none';
     const main = card.querySelector('.bs-due-main'); main.textContent = '';
-    if (next) {
+    if (due.noCourse) { dueOthers(card, D, now); main.textContent = 'Choose a course below to see what is due in it.'; card.dataset.level = 'none'; }
+    else if (next) {
       const c = classified[sum.nextIndex];
       main.append('Next: ', make('b', '', next.info.title || 'Assignment'), ' ' + D.describe(c).toLowerCase());
       if (next.info.dateText) main.append(make('small', '', next.info.dateText));
@@ -151,19 +160,20 @@
     else if (sum.total) main.textContent = 'Nothing is open in this course right now.';
     else main.textContent = 'No assignments are listed for this course.';
     const counts = card.querySelector('.bs-due-counts'); counts.textContent = '';
-    [[sum.open, 'open'], [sum.submitted, 'submitted'], [sum.closed, 'closed, not submitted']].forEach(([n, label]) => { if (!n) return; const li = make('li', ''); li.append(make('b', '', String(n)), ' ' + label); counts.append(li); });
+    if (!due.noCourse) [[sum.open, 'open'], [sum.submitted, 'submitted'], [sum.closed, 'closed, not submitted']].forEach(([n, label]) => { if (!n) return; const li = make('li', ''); li.append(make('b', '', String(n)), ' ' + label); counts.append(li); });
   }
   function assignmentsPage() {
     const D = DL();
     if (!D || document.readyState === 'loading') return;      // wait for the whole table: a partial one would give a wrong "next"
     const found = dueScan();
     if (!found) { dueClear(); return; }
-    const sig = found.rows.map(r => [r.title, r.texts.map(t => t.text).join('~'), r.portalClosed, r.submitted, r.control].join('|')).join('#');
+    const noCourse = !!document.querySelector('#courseId') && !chosen('#courseId');   // the portal says "Please select a course": there is nothing to count yet
+    const sig = [noCourse, ...found.rows.map(r => [r.title, r.texts.map(t => t.text).join('~'), r.portalClosed, r.submitted, r.control].join('|'))].join('#');
     if (due && due.sig === sig && due.card.isConnected) return;
     dueClear();
     const card = make('section', 'bs-due'); card.setAttribute('role', 'region'); card.setAttribute('aria-label', 'Assignments at a glance');
-    const head = make('div', 'bs-due-head'); head.append(make('h3', '', 'Due soon'), make('span', '', 'This course only'));
-    card.append(head, make('p', 'bs-due-main'), make('ul', 'bs-due-counts'), make('p', 'bs-due-hint', 'This is the course selected below. Choose another course to see its assignments.'));
+    const head = make('div', 'bs-due-head'); head.append(make('h3', '', 'Due soon'), make('span', '', noCourse ? 'No course chosen' : 'This course only'));
+    card.append(head, make('p', 'bs-due-main'), make('ul', 'bs-due-counts'), make('p', 'bs-due-sub'), make('ul', 'bs-due-others'), make('p', 'bs-due-hint', noCourse ? 'The portal shows one course at a time.' : 'This is the course selected below. Choose another course to see its assignments.'));
     const nodes = [card], trs = [];
     const rows = found.rows.map(r => {
       const eff = D.effectiveDeadline(r.texts);
@@ -174,11 +184,90 @@
     });
     const anchor = found.table.closest('.box') || found.table.closest('.table-responsive') || found.table;
     anchor.parentNode.insertBefore(card, anchor);
-    due = { sig, rows, card, nodes, trs, timer: setInterval(() => { if (!document.hidden) dueRender(); }, 30000) };
-    dueRender();
+    due = { sig, rows, card, nodes, trs, noCourse, timer: setInterval(() => { if (!document.hidden) dueRender(); }, 30000) };
+    dueRender(); remSave(due.classified);
   }
   const SIDE_KEY = 'bahriaStudioSidebarWidth';
   const store = (globalThis.browser || globalThis.chrome || {}).storage;
+  // ---------- Reminder: the next assignment you have not submitted, as a popup you can cross away ----------
+  // The portal shows one course at a time, so to remind you on another page this keeps a short note on this device only:
+  // course, assignment title and deadline of assignments that are open and not submitted. It is never sent anywhere.
+  // The settings page can turn reminders off (which also forgets the note) or forget it on demand.
+  const REM_KEY = 'bahriaStudioReminders';
+  const rem = { on: true, preview: false, sample: null, data: null, loaded: false, node: null, shown: '', timer: null, listener: null, forgot: false };
+  const remArea = () => (store && store.local ? store.local : null);
+  const chosen = selector => {   // the course or semester the page itself has selected (as the server wrote it), as plain text
+    const select = document.querySelector(selector); if (!select) return '';
+    const option = select.querySelector('option[selected]') || (select.selectedOptions && select.selectedOptions[0]);
+    return option && option.getAttribute('value') !== '' ? option.textContent.replace(/\s+/g, ' ').trim().slice(0, 80) : '';
+  };
+  // Change the note: read the latest copy, apply the change, write it back (so two open tabs cannot overwrite each other).
+  function remWrite(change) {
+    const D = DL(); if (!D) return;
+    rem.data = change(rem.data); remRender();            // show the effect straight away
+    const area = remArea(); if (!area || rem.preview) return;
+    area.get(REM_KEY).then(d => { const next = change(d[REM_KEY]); return JSON.stringify(next) === JSON.stringify(D.sanitize(d[REM_KEY])) ? null : area.set({ [REM_KEY]: next }); })
+      .catch(() => { /* the reminder simply will not be remembered */ });
+  }
+  function remSave(classified) {
+    const D = DL(); if (!D || !rem.on || !due || !Array.isArray(classified)) return;
+    const course = chosen('#courseId'), semester = chosen('#semesterId');
+    if (!course) return;                                 // cannot tell which course this is: remember nothing rather than the wrong thing
+    const items = due.rows.map((r, i) => ({ title: r.info.title, c: classified[i] })).filter(x => x.c && x.c.state === 'open').map(x => ({ title: x.title, due: x.c.ms }));
+    remWrite(data => D.remember(data, { semester, course }, items, Date.now()));
+  }
+  function remHide() { if (rem.node) { rem.node.remove(); owned.delete(rem.node); } rem.node = null; rem.shown = ''; }
+  function remRender() {
+    const D = DL();
+    if (due && due.noCourse && due.card.isConnected) dueRender();
+    const live = D && rem.on && rem.data && document.documentElement.dataset.bsRoute !== 'assignments' && document.querySelector('.main-sidebar') && (rem.preview || window.top === window);
+    const list = live ? D.upcoming(rem.data, Date.now()) : [];
+    if (!list.length) { remHide(); return; }
+    const top = list[0], sig = top.id + '#' + list.length;
+    if (!rem.node || !rem.node.isConnected || rem.shown !== sig) {
+      remHide();
+      const node = make('aside', 'bs-remind'); node.setAttribute('role', 'status'); node.setAttribute('aria-live', 'polite'); node.setAttribute('aria-label', 'Assignment reminder');
+      const link = [...document.querySelectorAll('.sidebar-menu a')].find(a => /^\s*assignments\s*$/i.test(a.textContent));
+      const go = make('a', 'bs-remind-go', 'Open Assignments'); go.setAttribute('href', (link && link.getAttribute('href')) || 'Assignments.php');
+      const x = make('button', 'bs-remind-x', '\u00d7'); x.type = 'button'; x.setAttribute('aria-label', 'Dismiss reminder'); x.title = 'Dismiss for a few hours';
+      x.addEventListener('click', () => remWrite(data => D.dismiss(data, top.id, Date.now())));
+      const body = make('div', 'bs-remind-body');
+      body.append(make('b', 'bs-remind-kicker', 'Not submitted yet'), make('p', 'bs-remind-title'), make('p', 'bs-remind-meta'), make('p', 'bs-remind-more'), make('small', 'bs-remind-note'), go);
+      node.append(body, x); document.body.append(node); rem.node = node; rem.shown = sig;
+    }
+    const age = Date.now() - top.savedAt, set = (cls, text) => { const n = rem.node.querySelector('.' + cls); n.textContent = text; n.hidden = !text; };
+    rem.node.dataset.level = top.left < 24 * 3600000 ? 'bad' : top.left < 72 * 3600000 ? 'warn' : 'info';
+    set('bs-remind-title', top.title);
+    set('bs-remind-meta', (top.course ? top.course + ' \u00b7 ' : '') + 'due in ' + D.duration(top.left));
+    set('bs-remind-more', list.length > 1 ? '+' + (list.length - 1) + ' more open this week' : '');
+    set('bs-remind-note', age > 3600000 ? 'Checked on the Assignments page ' + D.duration(age) + ' ago. Open it to refresh.' : '');
+  }
+  function remMount() {
+    const area = remArea(), D = DL();
+    if (!D) return;
+    if (!rem.on) {                                       // switched off: forget what was remembered, once
+      remHide();
+      if (!rem.forgot && area && !rem.preview) { rem.forgot = true; area.get(REM_KEY).then(d => { if (d[REM_KEY] !== undefined) return area.remove(REM_KEY); }).catch(() => {}); }
+      return;
+    }
+    rem.forgot = false;
+    if (!rem.timer) rem.timer = setInterval(() => { if (!document.hidden) remRender(); }, 30000);
+    if (!rem.loaded) {
+      rem.loaded = true;
+      if (rem.preview) rem.data = typeof rem.sample === 'function' ? rem.sample() : null;
+      else if (area) {
+        area.get(REM_KEY).then(d => { rem.data = D.sanitize(d[REM_KEY]); remRender(); }).catch(() => { rem.loaded = false; });
+        if (!rem.listener && store.onChanged) { rem.listener = (changes, name) => { if (name === 'local' && changes[REM_KEY]) { rem.data = D.sanitize(changes[REM_KEY].newValue); remRender(); } }; store.onChanged.addListener(rem.listener); }
+      }
+    }
+    remRender();
+  }
+  function remDisable() {
+    remHide(); clearInterval(rem.timer); rem.timer = null;
+    if (rem.listener && store && store.onChanged) store.onChanged.removeListener(rem.listener);
+    rem.listener = null; rem.loaded = false; rem.data = null; rem.forgot = false;
+  }
+
   let resizer = null;
   function setSide(px, save) {
     const w = Math.round(Math.min(420, Math.max(200, px)));
@@ -208,9 +297,11 @@
     });
     if (store && store.local) store.local.get(SIDE_KEY).then(d => { if (Number.isFinite(d[SIDE_KEY])) setSide(d[SIDE_KEY], false); }).catch(() => {});
   }
-  function mount() {
+  function mount(settings, env) {
     const root = document.documentElement;
     if (!document.body) return;
+    if (settings && typeof settings.reminders === 'boolean') rem.on = settings.reminders;
+    if (env && env.preview) { rem.preview = true; rem.sample = env.sample; }
     const route = (location.pathname.split('/').pop() || 'index').replace(/\.(php|html)$/i, '').toLowerCase();
     if (root.dataset.bsRoute !== route) root.dataset.bsRoute = route;
     // The portal hard-codes Dashboard as the active item on every page; mark the real current page instead.
@@ -235,9 +326,10 @@
     mountResizer();
     if (route === 'dashboard') dashboard();
     if (route === 'assignments') { try { assignmentsPage(); } catch (e) { /* the original table stays as it was */ } }
+    try { remMount(); } catch (e) { /* no reminder, nothing else affected */ }
   }
   function disable() {
-    hidePop(); dueClear();
+    hidePop(); dueClear(); remDisable();
     if (listening) { listening = false; document.removeEventListener('click', onClick); document.removeEventListener('keydown', onKey); removeEventListener('scroll', hidePop, true); }
     owned.forEach(node => node.remove()); owned.clear();
     titles.forEach((text, node) => node.setAttribute('title', text)); titles.clear();

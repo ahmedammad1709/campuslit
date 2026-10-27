@@ -96,7 +96,7 @@ $('goto-studio').addEventListener('click', () => showSection('studio', true, tru
 // ---------- controls <-> settings ----------
 const setPct = input => input.style.setProperty('--pct', ((input.value - input.min) / (input.max - input.min) * 100) + '%');
 function syncControls() {
-  for (const key of ['enabled', 'cms', 'lms', 'cleanBackground', 'motion']) $(key).checked = settings[key];
+  for (const key of ['enabled', 'cms', 'lms', 'cleanBackground', 'motion', 'reminders']) $(key).checked = settings[key];
   $('font').value = settings.font; $('fontSize').value = settings.fontSize; $('radius').value = settings.radius; $('semesterWeeks').value = settings.semesterWeeks;
   setPct($('fontSize')); setPct($('radius')); setPct($('semesterWeeks')); $('weeks-output').textContent = settings.semesterWeeks + ' weeks';
   $('size-output').textContent = settings.fontSize + ' px'; $('radius-output').textContent = settings.radius + ' px';
@@ -192,7 +192,7 @@ for (const key of ['fontSize', 'radius', 'semesterWeeks']) $(key).addEventListen
 document.querySelectorAll('#density-seg button').forEach(b => b.addEventListener('click', () => { settings.density = b.dataset.density; syncControls(); preview(); updateDirty(); }));
 $('system').addEventListener('change', e => { settings.mode = e.target.checked ? 'system' : 'preset'; renderAll(); updateDirty(); });
 system.addEventListener('change', () => { syncControls(); preview(); renderThemes(); });
-for (const key of ['cleanBackground', 'motion']) $(key).addEventListener('change', e => { settings[key] = e.target.checked; preview(); updateDirty(); });
+for (const key of ['cleanBackground', 'motion', 'reminders']) $(key).addEventListener('change', e => { settings[key] = e.target.checked; preview(); updateDirty(); });
 for (const key of ['enabled', 'cms', 'lms']) $(key).addEventListener('change', e => { Object.assign(settings, B.power(settings, key, e.target.checked)); syncControls(); preview(); updateDirty(); });
 
 // ---------- save / export / import / reset ----------
@@ -223,10 +223,23 @@ $('import-file').addEventListener('change', async e => {
   } catch { status('Choose a valid Campuslit settings file under 16 KB.'); }
   e.target.value = '';
 });
+async function showRemembered() {
+  try {
+    const n = await StudioStorage.remembered();
+    $('remembered').textContent = n.items ? 'Remembering ' + n.items + (n.items === 1 ? ' assignment' : ' assignments') + ' from ' + n.courses + (n.courses === 1 ? ' course' : ' courses') + '.' : 'Nothing is remembered right now.';
+    $('forget-reminders').disabled = !n.items;
+  } catch { $('remembered').textContent = ''; }
+}
+$('forget-reminders').addEventListener('click', async () => {
+  try { await StudioStorage.forgetReminders(); await showRemembered(); status('Forgot the remembered assignments.'); }
+  catch { status('Could not forget them. Please try again.'); }
+});
+showRemembered();
+if (StudioStorage.isExtension) chrome.storage.onChanged.addListener((changes, area) => { if (area === 'local' && changes.bahriaStudioReminders) showRemembered(); });
 $('reset').addEventListener('click', () => $('reset-dialog').showModal());
 $('cancel-reset').addEventListener('click', () => $('reset-dialog').close());
 $('confirm-reset').addEventListener('click', async () => {
-  try { await StudioStorage.clear(); settings = B.normalize({}); baseline = JSON.stringify(settings); renderAll(); $('reset-dialog').close(); status('Preferences removed. Bahria theme restored.'); }
+  try { await StudioStorage.clear(); settings = B.normalize({}); baseline = JSON.stringify(settings); renderAll(); showRemembered(); $('reset-dialog').close(); status('Preferences removed. Bahria theme restored.'); }
   catch { $('reset-dialog').close(); status('Could not reset preferences. Please try again.'); }
 });
 StudioStorage.subscribe(value => {

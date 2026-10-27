@@ -2,6 +2,7 @@
   'use strict';
   const api = globalThis.browser || globalThis.chrome;
   const key = 'bahriaStudioPreferences';
+  const remindersKey = 'bahriaStudioReminders';   // the short note behind the assignment reminder (course, title, deadline)
   const isExtension = Boolean(api?.runtime?.id);
   globalThis.StudioStorage = {
     isExtension,
@@ -16,8 +17,16 @@
       return settings;
     },
     async clear() {
-      if (isExtension) await api.storage.local.remove(key);
-      else localStorage.removeItem(key);
+      if (isExtension) await api.storage.local.remove([key, remindersKey]);
+      else { localStorage.removeItem(key); localStorage.removeItem(remindersKey); }
+    },
+    async remembered() {
+      const raw = isExtension ? (await api.storage.local.get(remindersKey))[remindersKey] : JSON.parse(localStorage.getItem(remindersKey) || 'null');
+      return globalThis.BahriaDeadlines ? BahriaDeadlines.count(raw) : { courses: 0, items: 0 };
+    },
+    async forgetReminders() {
+      if (isExtension) await api.storage.local.remove(remindersKey);
+      else localStorage.removeItem(remindersKey);
     },
     subscribe(callback) {
       if (isExtension) api.storage.onChanged.addListener((changes, area) => {

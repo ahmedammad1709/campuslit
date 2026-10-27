@@ -99,3 +99,90 @@ test('the module touches nothing outside itself', () => {
   const code = fs.readFileSync('extension/deadlines.js', 'utf8');
   assert.doesNotMatch(code, /\bfetch\s*\(|XMLHttpRequest|WebSocket|sendBeacon|document\.|window\.|localStorage|storage\.|chrome\.|browser\.|Intl\./);
 });
+
+// ---------- reminders: what is remembered between pages ----------
+const H = 3600000, DAYMS = 24 * H;
+const meta = { semester: 'Fall-2026', course: 'Data Structures' };
+
+test('remembering a course replaces only that course, and an empty list forgets it', () => {
+  const now = 1e12;
+  let d = D.remember(undefined, meta, [{ title: 'Assignment 2', due: now + 2 * H }, { title: 'Lab 3', due: now + 5 * DAYMS }], now);
+  d = D.remember(d, { semester: 'Fall-2026', course: 'Databases' }, [{ title: 'Quiz', due: now + H }], now);
+  assert.deepEqual(plain(D.count(d)), { courses: 2, items: 3 });
+  d = D.remember(d, meta, [{ title: 'Assignment 2', due: now + 2 * H }], now + 1000);
+  assert.deepEqual(plain(D.count(d)), { courses: 2, items: 2 }, 'the Data Structures entry was replaced, not added to');
+  d = D.remember(d, meta, [], now + 2000);
+  assert.deepEqual(plain(D.count(d)), { courses: 1, items: 1 }, 'submitted everything: that course is forgotten');
+  const other = D.remember(d, { semester: 'Spring-2026', course: 'Databases' }, [{ title: 'Old', due: now + H }], now);
+  assert.equal(D.count(other).courses, 2, 'the same course in another semester is a separate entry');
+});
+
+test('only the useful items are kept: future deadlines, real titles, no duplicates', () => {
+  const now = 1e12;
+  const d = D.remember(undefined, meta, [{ title: 'Past', due: now - 1 }, { title: '', due: now + H }, { title: 'No date', due: NaN }, { title: 'Dup', due: now + H }, { title: 'Dup', due: now + H }, { title: '  Spaced   out  title ', due: now + 2 * H }, null, 7, { title: 'Far', due: now + 40 * DAYMS }], now);
+  assert.deepEqual(plain(d.entries[0].items.map(i => i.title)), ['Dup', 'Spaced out title', 'Far']);
+  assert.equal(D.remember(undefined, meta, [{ title: 'x'.repeat(500), due: now + H }], now).entries[0].items[0].title.length, 80, 'titles are cut to 80 characters');
+  const many = Array.from({ length: 300 }, (_, i) => ({ title: 'T' + i, due: now + (i + 1) * H }));
+  assert.equal(D.remember(undefined, meta, many, now).entries[0].items.length, 60, 'at most 60 items per course');
+  let big; for (let i = 0; i < 100; i++) big = D.remember(big, { semester: 's', course: 'C' + i }, [{ title: 'A', due: now + H }], now + i);
+  assert.equal(big.entries.length, 40, 'at most 40 courses; the most recently seen are kept');
+  assert.equal(big.entries[0].course, 'C99');
+});
+
+test('what is shown: the soonest open assignment within a week, never past or far-off ones', () => {
+  const now = 1e12;
+  let d = D.remember(undefined, meta, [{ title: 'Soon', due: now + 5 * H }, { title: 'Next week', due: now + 6 * DAYMS }, { title: 'Far', due: now + 20 * DAYMS }], now);
+  d = D.remember(d, { semester: 'Fall-2026', course: 'Databases' }, [{ title: 'Sooner', due: now + 2 * H }], now);
+  const list = D.upcoming(d, now);
+  assert.deepEqual(plain(list.map(x => x.title)), ['Sooner', 'Soon', 'Next week'], 'Far is beyond a week');
+  assert.equal(list[0].course, 'Databases');
+  assert.deepEqual(plain(D.upcoming(d, now + 3 * H).map(x => x.title)), ['Soon', 'Next week'], 'a passed deadline drops out by itself');
+  assert.deepEqual(plain(D.upcoming(d, now, 3 * H).map(x => x.title)), ['Sooner'], 'a custom horizon');
+  assert.deepEqual(plain(D.upcoming(d, now + 30 * DAYMS)), [], 'long after, nothing is left');
+});
+
+test('crossing a reminder away hides that one for eight hours, then it comes back', () => {
+  const now = 1e12;
+  let d = D.remember(undefined, meta, [{ title: 'A', due: now + 20 * H }, { title: 'B', due: now + 30 * H }], now);
+  const first = D.upcoming(d, now)[0];
+  d = D.dismiss(d, first.id, now);
+  assert.deepEqual(plain(D.upcoming(d, now + H).map(x => x.title)), ['B'], 'A is hidden, B takes its place');
+  assert.deepEqual(plain(D.upcoming(d, now + 9 * H).map(x => x.title)), ['A', 'B'], 'after 8 hours A is back');
+  assert.equal(D.dismiss(d, first.id, now + H).dismissed.length, 1, 'dismissing twice does not pile up');
+  // a deadline that moves is a different assignment, so its reminder returns
+  const moved = D.remember(d, meta, [{ title: 'A', due: now + 22 * H }, { title: 'B', due: now + 30 * H }], now + 2 * H);
+  assert.equal(D.upcoming(moved, now + 3 * H)[0].title, 'A');
+  assert.doesNotThrow(() => D.dismiss(d, undefined, now)); assert.doesNotThrow(() => D.dismiss(undefined, 'x', now));
+  assert.equal(D.dismiss(d, 'x'.repeat(1000), now).dismissed.length, d.dismissed.length, 'an oversized id is ignored');
+});
+
+test('a clock that moved backwards, and finished semesters, do not produce reminders', () => {
+  const now = 1e12;
+  const d = D.remember(undefined, meta, [{ title: 'A', due: now + 5 * H }], now);
+  assert.equal(D.upcoming(d, now - 2 * DAYMS).length, 0, 'saved in the future by this clock: not trusted');
+  assert.equal(D.upcoming(d, now - 60000).length, 1, 'a minute of drift is fine');
+  assert.equal(D.prune(d, now + 200 * DAYMS).entries.length, 0, 'old notes are dropped after 150 days');
+  assert.equal(D.prune(d, now + 6 * H).entries.length, 0, 'once every deadline has passed the entry is gone');
+});
+
+test('whatever is read back from storage is checked again', () => {
+  for (const bad of [undefined, null, 5, 'x', [], {}, { entries: 'x' }, { entries: [null, 5, 'x', {}, { savedAt: 'now', items: [] }, { savedAt: -1, items: [] }] }, { entries: [{ savedAt: 5, items: 'x' }], dismissed: 7 }, { entries: [{ savedAt: 5, items: [{ title: {}, due: 'x' }] }], dismissed: [null, { id: 5 }, { id: 'a', until: 'x' }] }]) {
+    assert.doesNotThrow(() => D.upcoming(bad, 1e12), JSON.stringify(bad));
+    assert.doesNotThrow(() => D.remember(bad, meta, [], 1e12));
+    assert.deepEqual(plain(D.upcoming(bad, 1e12)), []);
+    assert.equal(D.sanitize(bad).v, 1);
+  }
+  // prototype tricks: a course called __proto__ is just text
+  const evil = D.remember(undefined, { semester: '__proto__', course: 'constructor' }, [{ title: '__proto__', due: 1e12 + 3600000 }], 1e12);
+  assert.equal(({}).polluted, undefined); assert.equal(D.upcoming(evil, 1e12)[0].title, '__proto__');
+  assert.equal(D.sanitize(JSON.parse('{"entries":[],"__proto__":{"x":1}}')).x, undefined, 'extra properties are not carried over');
+  // duplicate course entries collapse to the newest
+  const two = D.sanitize({ entries: [{ semester: 's', course: 'c', savedAt: 5, items: [{ title: 'old', due: 9 }] }, { semester: 's', course: 'c', savedAt: 8, items: [{ title: 'new', due: 9 }] }] });
+  assert.equal(two.entries.length, 1); assert.equal(two.entries[0].items[0].title, 'new');
+});
+
+test('count reports what is remembered, for the settings page', () => {
+  assert.deepEqual(plain(D.count(undefined)), { courses: 0, items: 0 });
+  const d = D.remember(D.remember(undefined, meta, [{ title: 'a', due: 2e12 }, { title: 'b', due: 2e12 + 1 }], 1e12), { semester: 'x', course: 'y' }, [{ title: 'c', due: 2e12 }], 1e12);
+  assert.deepEqual(plain(D.count(d)), { courses: 2, items: 3 });
+});

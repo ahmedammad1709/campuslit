@@ -108,8 +108,8 @@ def lms_assignments():
   <section class="content-header"><h1 class="bg-gray pad">Assignments<small></small></h1></section>
   <section class="content"><div class="row"><div class="col-xs-12"><div class="box">
     <div class="box-header text-center">
-      <div class="col-lg-6"><div class="col-xs-2">Semester:</div><div class="col-xs-6"><form action="#"><select class="form-control"><option>Fall-2026</option></select></form></div></div>
-      <div class="col-lg-6"><div class="col-xs-2"> Course : </div><div class="col-xs-6"><form action="#"><select class="form-control"><option>Data Structures</option><option>Database Systems</option></select></form></div></div>
+      <div class="col-lg-6"><div class="col-xs-2">Semester:</div><div class="col-xs-6"><form action="#"><select id="semesterId" class="form-control"><option selected>Fall-2026</option></select></form></div></div>
+      <div class="col-lg-6"><div class="col-xs-2"> Course : </div><div class="col-xs-6"><form action="#"><select id="courseId" class="form-control"><option selected>Data Structures</option><option>Database Systems</option></select></form></div></div>
     </div>
     <div class="box-body table-responsive no-padding"><table class="table table-hover"><tbody>
       <tr><th width="5%">Assign. No.</th><th width="15%">Title</th><th width="20%">Assignment <br> (Solution File) <br> Remarks</th><th width="10%">Added Submission</th><th width="10%">Marks Obtained</th><th width="10%">Returned Submission <br> (Comments)</th><th width="10%">Action</th><th width="10%">Deadline</th></tr>

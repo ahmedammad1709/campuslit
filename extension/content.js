@@ -27,7 +27,7 @@
     root.dataset.bsMotion = String(settings.motion);
     root.dataset.bsPage = /\/logins\//i.test(location.pathname) ? 'login' : /^\/(default\.aspx)?$/i.test(location.pathname) ? 'entry' : 'portal';
     globalThis.BahriaLogin?.mount();
-    if (site === 'lms') globalThis.BahriaLms?.mount();
+    if (site === 'lms') globalThis.BahriaLms?.mount(settings);
     if (site === 'cms') globalThis.BahriaCms?.mount(settings);
   }
   api.storage.local.get(key).then(data => { settings = BahriaStudio.normalize(data[key]); loaded = true; render(); }).catch(() => { /* Leave the original portal intact if storage is unavailable. */ });

@@ -8,6 +8,15 @@
   let settings = BahriaStudio.normalize({});
   let got = false;
 
+  // Invented reminders for the settings preview, so the popup can be seen (and crossed away) without touching real storage.
+  function sample() {
+    const D = globalThis.BahriaDeadlines; if (!D) return null;
+    const now = Date.now(), H = 3600000;
+    let data = D.remember(null, { semester: 'Fall-2026', course: 'Data Structures' }, [{ title: 'Assignment 2: Trees and Graphs', due: now + 53 * H }], now - 2 * H);
+    data = D.remember(data, { semester: 'Fall-2026', course: 'Database Systems' }, [{ title: 'Lab Task 3: Hash Tables', due: now + 120 * H }], now - 2 * H);
+    return data;
+  }
+
   function apply() {
     const root = document.documentElement;
     BahriaStudio.apply(root, settings, system.matches);
@@ -21,7 +30,7 @@
     root.dataset.bsClean = String(settings.cleanBackground);
     root.dataset.bsMotion = String(settings.motion);
     root.dataset.bsPage = 'portal';
-    const helper = mount(); if (helper) helper.mount(settings);
+    const helper = mount(); if (helper) helper.mount(settings, { preview: true, sample });
   }
 
   addEventListener('message', event => {

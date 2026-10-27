@@ -100,5 +100,75 @@
     };
   }
 
-  root.BahriaDeadlines = { parseDeadline, effectiveDeadline, duration, classify, describe, summarize, PKT_OFFSET_MIN };
+
+  // ---------- Reminders: what is worth remembering between pages ----------
+  // The portal shows one course at a time, so to remind you on another page the extension keeps a tiny note on this device:
+  // the course, the assignment title and its deadline, only for assignments that are still open and not submitted.
+  // Shape: { v: 1, entries: [{ key, semester, course, savedAt, items: [{ title, due }] }], dismissed: [{ id, until }] }
+  // Arrays rather than objects keyed by course name, so a strange course name can never touch an object's own properties.
+  const MAX_ENTRIES = 40, MAX_ITEMS = 60, MAX_DISMISSED = 100, TEXT = 80, KEEP = 150 * DAY, HORIZON = 7 * DAY, SNOOZE = 8 * HOUR, CLOCK_SLACK = 5 * MINUTE;
+  const clip = value => (typeof value === 'string' ? value.replace(/\s+/g, ' ').trim().slice(0, TEXT) : '');
+  const empty = () => ({ v: 1, entries: [], dismissed: [] });
+  const entryKey = (semester, course) => semester + '|' + course;
+
+  // Anything read back from storage is checked again: wrong types, missing fields and oversized lists are dropped, never trusted.
+  function sanitize(raw) {
+    const out = empty();
+    if (!raw || typeof raw !== 'object') return out;
+    const seen = new Map();
+    (Array.isArray(raw.entries) ? raw.entries : []).slice(0, MAX_ENTRIES * 2).forEach(e => {
+      if (!e || typeof e !== 'object' || !Number.isFinite(e.savedAt) || e.savedAt <= 0) return;
+      const semester = clip(e.semester), course = clip(e.course), have = new Set();
+      const items = (Array.isArray(e.items) ? e.items : []).slice(0, MAX_ITEMS).map(i => ({ title: clip(i && i.title), due: i && i.due }))
+        .filter(i => i.title && Number.isFinite(i.due) && i.due > 0 && !have.has(i.title + '|' + i.due) && have.add(i.title + '|' + i.due));
+      const entry = { key: entryKey(semester, course), semester, course, savedAt: e.savedAt, items };
+      const old = seen.get(entry.key);
+      if (!old || old.savedAt < entry.savedAt) seen.set(entry.key, entry);
+    });
+    out.entries = [...seen.values()].sort((x, y) => y.savedAt - x.savedAt).slice(0, MAX_ENTRIES);   // the most recently seen courses are kept
+    (Array.isArray(raw.dismissed) ? raw.dismissed : []).slice(0, MAX_DISMISSED).forEach(d => {
+      if (d && typeof d.id === 'string' && d.id.length <= 400 && Number.isFinite(d.until)) out.dismissed.push({ id: d.id, until: d.until });
+    });
+    return out;
+  }
+  function prune(data, now) {
+    const d = sanitize(data);
+    d.entries = d.entries.map(e => ({ ...e, items: e.items.filter(i => i.due > now) })).filter(e => e.items.length && now - e.savedAt < KEEP)
+      .sort((a, b) => b.savedAt - a.savedAt).slice(0, MAX_ENTRIES);
+    d.dismissed = d.dismissed.filter(x => x.until > now).slice(-MAX_DISMISSED);
+    return d;
+  }
+  // Replaces what is remembered for one course in one semester. An empty list forgets that course.
+  function remember(data, meta, items, now) {
+    const semester = clip(meta && meta.semester), course = clip(meta && meta.course), key = entryKey(semester, course);
+    const d = sanitize(data); d.entries = d.entries.filter(e => e.key !== key);
+    const have = new Set();
+    const list = (Array.isArray(items) ? items : []).map(i => ({ title: clip(i && i.title), due: i && i.due }))
+      .filter(i => i.title && Number.isFinite(i.due) && i.due > now && !have.has(i.title + '|' + i.due) && have.add(i.title + '|' + i.due))
+      .sort((a, b) => a.due - b.due).slice(0, MAX_ITEMS);
+    if (list.length) d.entries.push({ key, semester, course, savedAt: now, items: list });
+    return prune(d, now);
+  }
+  // The open, unsubmitted assignments worth a reminder now, soonest first. Hidden ones are those you crossed away.
+  function upcoming(data, now, horizon) {
+    const d = sanitize(data), limit = Number.isFinite(horizon) ? horizon : HORIZON, hidden = new Set(d.dismissed.filter(x => x.until > now).map(x => x.id));
+    const out = [];
+    d.entries.forEach(e => {
+      if (e.savedAt > now + CLOCK_SLACK) return;                 // saved "in the future": this device's clock has moved back, so do not trust it
+      e.items.forEach(i => {
+        const id = e.key + '|' + i.title + '|' + i.due;
+        if (i.due > now && i.due - now <= limit && !hidden.has(id)) out.push({ id, title: i.title, course: e.course, semester: e.semester, due: i.due, left: i.due - now, savedAt: e.savedAt });
+      });
+    });
+    return out.sort((a, b) => a.due - b.due || (a.title < b.title ? -1 : 1));
+  }
+  function dismiss(data, id, now, snooze) {
+    const d = prune(data, now);
+    if (typeof id !== 'string' || !id || id.length > 400) return d;
+    d.dismissed = d.dismissed.filter(x => x.id !== id).concat({ id, until: now + (Number.isFinite(snooze) && snooze > 0 ? snooze : SNOOZE) }).slice(-MAX_DISMISSED);
+    return d;
+  }
+  function count(data) { const d = sanitize(data); return { courses: d.entries.filter(e => e.items.length).length, items: d.entries.reduce((n, e) => n + e.items.length, 0) }; }
+
+  root.BahriaDeadlines = { parseDeadline, effectiveDeadline, duration, classify, describe, summarize, sanitize, prune, remember, upcoming, dismiss, count, PKT_OFFSET_MIN, REMINDER_HORIZON: HORIZON, SNOOZE };
 })(globalThis);

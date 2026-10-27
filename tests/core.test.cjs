@@ -54,7 +54,7 @@ test('extension storage writes only preferences locally and reset removes its ke
   const ctx=vm.createContext({chrome:{runtime:{id:'test'},storage:{local:{get:async()=>({bahriaStudioPreferences:{theme:'rose'}}),set:async data=>value=data,remove:async key=>removed=key},onChanged:{addListener(){}}}}});
   vm.runInContext(source,ctx);vm.runInContext(fs.readFileSync('extension/storage.js','utf8'),ctx);
   assert.equal((await ctx.StudioStorage.read()).theme,'rose');await ctx.StudioStorage.write({theme:'sage',password:'never-store'});
-  assert.deepEqual(Object.keys(value),['bahriaStudioPreferences']);assert.equal(value.bahriaStudioPreferences.theme,'sage');assert.ok(!('password' in value.bahriaStudioPreferences));await ctx.StudioStorage.clear();assert.equal(removed,'bahriaStudioPreferences');
+  assert.deepEqual(Object.keys(value),['bahriaStudioPreferences']);assert.equal(value.bahriaStudioPreferences.theme,'sage');assert.ok(!('password' in value.bahriaStudioPreferences));await ctx.StudioStorage.clear();assert.equal(JSON.stringify(removed),JSON.stringify(['bahriaStudioPreferences','bahriaStudioReminders']),'reset also forgets the reminder note');await ctx.StudioStorage.forgetReminders();assert.equal(removed,'bahriaStudioReminders');
 });
 
 // ---------------------------------------------------------------- custom theme (Studio) and switches
@@ -139,4 +139,12 @@ test('semester length setting: default 16, bounded to 8-24, junk ignored', () =>
   assert.equal(m.normalize({ semesterWeeks: 14 }).semesterWeeks, 14);
   assert.equal(m.normalize({ semesterWeeks: 2 }).semesterWeeks, 8); assert.equal(m.normalize({ semesterWeeks: 99 }).semesterWeeks, 24);
   assert.equal(m.normalize({ semesterWeeks: '14' }).semesterWeeks, 16, 'a string is not a number'); assert.equal(m.normalize({ semesterWeeks: NaN }).semesterWeeks, 16);
+});
+
+test('reminders setting: on by default, only a true boolean is accepted', () => {
+  const m = model();
+  assert.equal(m.normalize({}).reminders, true);
+  assert.equal(m.normalize({ reminders: false }).reminders, false);
+  assert.equal(m.normalize({ reminders: 'false' }).reminders, true, 'a string is not a boolean');
+  assert.equal(m.normalize({ reminders: 0 }).reminders, true); assert.equal(m.normalize({ reminders: null }).reminders, true);
 });
