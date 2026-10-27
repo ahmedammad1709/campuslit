@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Campuslit — a calmer CMS & LMS",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A cleaner, calmer look for the Bahria University student CMS and LMS. Themes, a better time table and attendance view. Unofficial; settings stay in your browser.",
   "permissions": ["storage"],
   "web_accessible_resources": [{"resources": ["fonts/inter-latin.woff2", "fonts/jakarta-latin.woff2", "fonts/manrope-latin.woff2", "fonts/sora-latin.woff2"], "matches": ["*://cms.bahria.edu.pk/*", "*://lms.bahria.edu.pk/*"]}],
@@ -10,7 +10,7 @@
   "icons": {"16": "icons/icon-16.png", "32": "icons/icon-32.png", "48": "icons/icon-48.png", "128": "icons/icon-128.png"},
   "content_scripts": [{
     "matches": ["*://cms.bahria.edu.pk/*", "*://lms.bahria.edu.pk/*"],
-    "js": ["themes.js", "login.js", "lms.js", "attendance.js", "cms.js", "content.js"],
+    "js": ["themes.js", "login.js", "deadlines.js", "lms.js", "attendance.js", "cms.js", "content.js"],
     "css": ["portal.css", "login.css", "lms.css", "cms.css"],
     "run_at": "document_start",
     "all_frames": true

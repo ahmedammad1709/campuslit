@@ -41,7 +41,7 @@ def lms_page(title, content):
 <link rel="stylesheet" href="../vendor/css/skin-yellow-light.min.css"><link rel="stylesheet" href="../vendor/css/font-awesome.min.css">
 <link rel="stylesheet" href="../preview.css"><link rel="stylesheet" href="../preview-lms.css">
 <link rel="stylesheet" href="../../portal.css"><link rel="stylesheet" href="../../lms.css">
-<script src="../../themes.js" defer></script><script src="../../lms.js" defer></script><script src="../preview.js" defer data-site="lms"></script>
+<script src="../../themes.js" defer></script><script src="../../deadlines.js" defer></script><script src="../../lms.js" defer></script><script src="../preview.js" defer data-site="lms"></script>
 </head>
 <body class="hold-transition skin-yellow-light sidebar-mini"><div class="wrapper">
 <header class="main-header">
@@ -89,17 +89,21 @@ def lms_dashboard():
 
 
 def lms_assignments():
-    def row(n, title, ext, orig, marks, submitted):
-        sub = '<a href="#" class="label label-info"><i class="fa fa-download"></i> Submission</a>' if submitted else 'No Submission'
+    UPLOAD = "<input type='file' name='file'><button type='button' class='btn btn-sm btn-primary'>Upload</button>"
+    EXCEEDED = "<div style='background:red; color:#fff; text-align:center; border-radius:4px; padding:5px 0px; line-height: 18px;'>Deadline Exceeded</div>"
+    # hours: how far from now the deadline is. preview.js turns it into a real date so the sample never goes stale; the text is a fallback.
+    def row(n, title, ext, orig, hours, marks, submitted, action):
+        sub = '<a href="#" class="label label-info"><i class="fa fa-download"></i> Submission</a>' if submitted else ''
         return f'''<tr><td>{n}</td><td>{title}</td>
-<td><a href="#" class="label label-info"><i class="fa fa-download"></i> Assignment</a><br><a href="#" class="label label-info"><i class="fa fa-download"></i> Solution</a><br><span class="label label-default" title="No Remarks" style="cursor:pointer">Hover To View</span></td>
+<td><a href="#" class="label label-info"><i class="fa fa-download"></i> Assignment</a><br><span class="label label-default" title="No Remarks" style="cursor:pointer">Hover To View</span></td>
 <td>{sub}</td><td>{marks}</td>
 <td>---<br><span class="label label-default" title="Good work." style="cursor:pointer">Hover To View Comments</span></td>
-<td><div style='background:red; color:#fff; text-align:center; border-radius:4px; padding:5px 0px; line-height: 18px;'>Deadline Exceeded</div></td>
-<td><small class='label label-warning' title='Extended '>{ext}</small><br/><small class='label label-info' title='Actual'>{orig}</small></td></tr>'''
-    rows = (row(1, 'Quiz 1: Arrays and Linked Lists', '29 September 2026 - 11:55 pm', '27 September 2026-11:55 pm', '5.000', True)
-            + row(2, 'Assignment 2: Trees and Graphs', '15 October 2026 - 11:55 pm', '12 October 2026-11:55 pm', 'Not marked yet', False)
-            + row(3, 'Lab Task 3: Hash Tables', '29 October 2026 - 11:55 pm', '26 October 2026-11:55 pm', 'Not marked yet', False))
+<td>{action}</td>
+<td><small class='label label-warning' title='Extended ' data-sample-due-hours='{hours}'>{ext}</small><br/><small class='label label-info' title='Actual' data-sample-due-hours='{hours - 48}'>{orig}</small></td></tr>'''
+    rows = (row(1, 'Quiz 1: Arrays and Linked Lists', '29 September 2026 - 11:55 pm', '27 September 2026-11:55 pm', -600, '5.000', True, EXCEEDED)
+            + row(2, 'Assignment 2: Trees and Graphs', '15 October 2026 - 11:55 pm', '12 October 2026-11:55 pm', 53, '', False, UPLOAD)
+            + row(3, 'Lab Task 3: Hash Tables', '29 October 2026 - 11:55 pm', '26 October 2026-11:55 pm', 190, '', False, UPLOAD)
+            + row(4, 'Assignment 4: Sorting', '2 October 2026 - 11:55 pm', '30 September 2026-11:55 pm', -400, '', False, EXCEEDED))
     content = f'''<div class="content-wrapper">
   <section class="content-header"><h1 class="bg-gray pad">Assignments<small></small></h1></section>
   <section class="content"><div class="row"><div class="col-xs-12"><div class="box">

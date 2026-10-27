@@ -82,6 +82,101 @@
     hero.append(text, stats);
     content.prepend(hero);
   }
+  // ---------- Assignments page: what is open, what is due next ----------
+  // Reads only text the page already shows (titles, the two deadline labels, the portal's own "Deadline Exceeded" box, whether a
+  // submission link exists). It never reads link addresses, file boxes or anything typed, makes no request and stores nothing.
+  // The portal shows one course at a time, so this covers the course selected on the page.
+  const DL = () => globalThis.BahriaDeadlines || null;
+  let due = null;   // { sig, rows: [{ tr, chip, info }], card, nodes, trs, timer }
+  const flat = node => { const copy = node.cloneNode(true); copy.querySelectorAll('.bs-due-chip').forEach(n => n.remove()); return copy.textContent.replace(/\s+/g, ' ').trim(); };
+  function dueScan() {
+    const content = document.querySelector('.content-wrapper section.content') || document;
+    for (const table of content.querySelectorAll('table')) {
+      const head = [...table.querySelectorAll('tr')].find(tr => tr.querySelector('th'));
+      if (!head) continue;
+      const names = [...head.querySelectorAll('th')].map(th => th.textContent.replace(/\s+/g, ' ').trim().toLowerCase());
+      const at = test => names.findIndex(test);
+      const iDeadline = at(n => n.includes('deadline')), iTitle = at(n => n.includes('title')), iSub = at(n => n.includes('added submission')), iAction = at(n => n === 'action');
+      if (iDeadline < 0) continue;
+      const rows = [];
+      table.querySelectorAll('tr').forEach(tr => {
+        if (tr.querySelector('th')) return;
+        const cells = tr.querySelectorAll(':scope > td');
+        if (cells.length <= iDeadline) return;
+        const labels = [...cells[iDeadline].querySelectorAll('small, .label')];
+        const texts = (labels.length ? labels : [cells[iDeadline]]).map(node => {
+          const tip = (node.getAttribute('title') || node.getAttribute('data-bs-title') || '').trim().toLowerCase();   // the portal tags them "Extended" and "Actual"
+          return { text: flat(node), extended: tip.startsWith('extend') || node.classList.contains('label-warning') };
+        });
+        const action = iAction >= 0 && cells[iAction] ? cells[iAction] : null;
+        const subCell = iSub >= 0 && cells[iSub] ? cells[iSub] : null;
+        const actionText = action ? flat(action) : '';
+        const control = !!(action && action.querySelector('input:not([type="hidden"]), button, textarea, select'));
+        const subText = subCell ? flat(subCell) : '';
+        rows.push({
+          tr, chipCell: iTitle >= 0 && cells[iTitle] ? cells[iTitle] : cells[iDeadline],   // the status sits beside the title: the deadline column is often off-screen to the right
+          title: (iTitle >= 0 && cells[iTitle] ? flat(cells[iTitle]) : '').slice(0, 80),
+          texts,
+          portalClosed: /exceed|closed|expired|deadline (?:has )?passed/i.test(actionText) ? true : control ? false : null,
+          control,
+          submitted: !!(subCell && subCell.querySelector('a') && subText && !/no submission|not submitted|^[-\u2013\u2014. ]+$/i.test(subText))
+        });
+      });
+      return { table, rows };
+    }
+    return null;
+  }
+  function dueClear() {
+    if (due) { clearInterval(due.timer); due.nodes.forEach(n => { n.remove(); owned.delete(n); }); due.trs.forEach(tr => { tr.removeAttribute('data-bs-due'); attrs.delete(tr); }); }
+    due = null;
+  }
+  function dueRender() {
+    const D = DL(); if (!D || !due) return;
+    const now = Date.now();
+    const classified = due.rows.map(r => D.classify(r.info, now));
+    due.rows.forEach((r, i) => {
+      const c = classified[i], text = D.describe(c);
+      r.chip.textContent = text; r.chip.hidden = !text; r.chip.dataset.level = c.level;
+      r.tr.setAttribute('data-bs-due', c.state);
+    });
+    const sum = D.summarize(classified), next = sum.nextIndex >= 0 ? due.rows[sum.nextIndex] : null;
+    const card = due.card;
+    card.dataset.level = next ? classified[sum.nextIndex].level : sum.open ? 'warn' : 'none';
+    const main = card.querySelector('.bs-due-main'); main.textContent = '';
+    if (next) {
+      const c = classified[sum.nextIndex];
+      main.append('Next: ', make('b', '', next.info.title || 'Assignment'), ' ' + D.describe(c).toLowerCase());
+      if (next.info.dateText) main.append(make('small', '', next.info.dateText));
+    } else if (sum.open) main.textContent = 'Open, but the deadline could not be checked here. See the portal.';
+    else if (sum.total) main.textContent = 'Nothing is open in this course right now.';
+    else main.textContent = 'No assignments are listed for this course.';
+    const counts = card.querySelector('.bs-due-counts'); counts.textContent = '';
+    [[sum.open, 'open'], [sum.submitted, 'submitted'], [sum.closed, 'closed, not submitted']].forEach(([n, label]) => { if (!n) return; const li = make('li', ''); li.append(make('b', '', String(n)), ' ' + label); counts.append(li); });
+  }
+  function assignmentsPage() {
+    const D = DL();
+    if (!D || document.readyState === 'loading') return;      // wait for the whole table: a partial one would give a wrong "next"
+    const found = dueScan();
+    if (!found) { dueClear(); return; }
+    const sig = found.rows.map(r => [r.title, r.texts.map(t => t.text).join('~'), r.portalClosed, r.submitted, r.control].join('|')).join('#');
+    if (due && due.sig === sig && due.card.isConnected) return;
+    dueClear();
+    const card = make('section', 'bs-due'); card.setAttribute('role', 'region'); card.setAttribute('aria-label', 'Assignments at a glance');
+    const head = make('div', 'bs-due-head'); head.append(make('h3', '', 'Due soon'), make('span', '', 'This course only'));
+    card.append(head, make('p', 'bs-due-main'), make('ul', 'bs-due-counts'), make('p', 'bs-due-hint', 'This is the course selected below. Choose another course to see its assignments.'));
+    const nodes = [card], trs = [];
+    const rows = found.rows.map(r => {
+      const eff = D.effectiveDeadline(r.texts);
+      const chip = make('div', 'bs-due-chip'); chip.hidden = true; r.chipCell.append(chip); nodes.push(chip); trs.push(r.tr);
+      const info = { deadlineMs: eff ? eff.ms : NaN, portalClosed: r.portalClosed, hasControl: r.control, submitted: r.submitted, title: r.title,
+        dateText: eff ? ((r.texts.filter(t => D.parseDeadline(t.text) === eff.ms)[0] || {}).text || '') : '' };
+      return { tr: r.tr, chip, info };
+    });
+    const anchor = found.table.closest('.box') || found.table.closest('.table-responsive') || found.table;
+    anchor.parentNode.insertBefore(card, anchor);
+    due = { sig, rows, card, nodes, trs, timer: setInterval(() => { if (!document.hidden) dueRender(); }, 30000) };
+    dueRender();
+  }
   const SIDE_KEY = 'bahriaStudioSidebarWidth';
   const store = (globalThis.browser || globalThis.chrome || {}).storage;
   let resizer = null;
@@ -139,9 +234,10 @@
     if (!listening) { listening = true; document.addEventListener('click', onClick); document.addEventListener('keydown', onKey); addEventListener('scroll', hidePop, true); }
     mountResizer();
     if (route === 'dashboard') dashboard();
+    if (route === 'assignments') { try { assignmentsPage(); } catch (e) { /* the original table stays as it was */ } }
   }
   function disable() {
-    hidePop();
+    hidePop(); dueClear();
     if (listening) { listening = false; document.removeEventListener('click', onClick); document.removeEventListener('keydown', onKey); removeEventListener('scroll', hidePop, true); }
     owned.forEach(node => node.remove()); owned.clear();
     titles.forEach((text, node) => node.setAttribute('title', text)); titles.clear();

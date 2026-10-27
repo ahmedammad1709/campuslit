@@ -44,8 +44,19 @@
     if (link.matches('.sidebar-toggle')) { document.body.classList.toggle('sidebar-collapse'); return; }
     if (link.matches('.dropdown-toggle') && link.parentElement) { const open = link.parentElement.classList.toggle('open'); document.querySelectorAll('.dropdown.open').forEach(li => { if (li !== link.parentElement) li.classList.remove('open'); }); void open; }
   });
+  // Sample deadlines are set relative to now, so the invented assignments never look stale. Written the way the portal prints them (Pakistan time).
+  function freshenDeadlines() {
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    document.querySelectorAll('[data-sample-due-hours]').forEach(node => {
+      const hours = Number(node.dataset.sampleDueHours); if (!Number.isFinite(hours)) return;
+      const d = new Date(Date.now() + hours * 3600000 + 5 * 3600000);   // shift so the UTC fields read as Pakistan time
+      const h = d.getUTCHours() % 12 || 12, m = String(d.getUTCMinutes()).padStart(2, '0');
+      node.textContent = d.getUTCDate() + ' ' + months[d.getUTCMonth()] + ' ' + d.getUTCFullYear() + ' - ' + h + ':' + m + ' ' + (d.getUTCHours() < 12 ? 'am' : 'pm');
+    });
+  }
   addEventListener('DOMContentLoaded', () => {
     // Ask the parent for the current settings; render with defaults meanwhile.
+    freshenDeadlines();
     apply();
     try { parent.postMessage({ type: 'campuslit-ready' }, location.origin); } catch (e) { /* standalone */ }
   });

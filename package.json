@@ -1,6 +1,6 @@
 {
   "name": "campuslit",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "license": "MIT",
   "description": "Campuslit: a cleaner look for the Bahria University student CMS and LMS (browser extension)",
