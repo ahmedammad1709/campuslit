@@ -13,7 +13,7 @@
     const root = document.documentElement;
     if (!root) return;
     const enabled = settings.enabled && settings[site];
-    if (!enabled) { globalThis.BahriaLogin?.disable(); globalThis.BahriaLms?.disable(); globalThis.BahriaCms?.disable(); delete root.dataset.bahriaStudio; return; }
+    if (!enabled) { globalThis.BahriaLogin?.disable(); globalThis.BahriaLms?.disable(); globalThis.BahriaCms?.disable(); globalThis.BahriaQuickSearch?.disable(); delete root.dataset.bahriaStudio; return; }
     const file = BahriaStudio.fontFiles[settings.font];
     if (file && !fontRequested.has(settings.font) && typeof FontFace !== 'undefined') {
       fontRequested.add(settings.font);
@@ -29,6 +29,7 @@
     globalThis.BahriaLogin?.mount();
     if (site === 'lms') globalThis.BahriaLms?.mount(settings);
     if (site === 'cms') globalThis.BahriaCms?.mount(settings);
+    globalThis.BahriaQuickSearch?.mount({ enabled: settings.quickSearch });
   }
   api.storage.local.get(key).then(data => { settings = BahriaStudio.normalize(data[key]); loaded = true; render(); }).catch(() => { /* Leave the original portal intact if storage is unavailable. */ });
   api.storage.onChanged.addListener((changes, area) => {

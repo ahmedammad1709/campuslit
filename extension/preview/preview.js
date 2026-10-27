@@ -23,6 +23,7 @@
     const active = settings.enabled && settings[site];
     if (!active) {
       const helper = mount(); if (helper) helper.disable();
+      if (globalThis.BahriaQuickSearch) BahriaQuickSearch.disable();
       delete root.dataset.bahriaStudio; delete root.dataset.bsClean; delete root.dataset.bsMotion; delete root.dataset.bsPage;
       return;
     }
@@ -31,6 +32,7 @@
     root.dataset.bsMotion = String(settings.motion);
     root.dataset.bsPage = 'portal';
     const helper = mount(); if (helper) helper.mount(settings, { preview: true, sample });
+    if (globalThis.BahriaQuickSearch) BahriaQuickSearch.mount({ preview: true, enabled: settings.quickSearch });
   }
 
   addEventListener('message', event => {
@@ -45,7 +47,7 @@
     const link = event.target.closest && event.target.closest('a');
     if (!link) return;
     const href = link.getAttribute('href') || '';
-    if (/^[\w-]+\.html$/.test(href)) return;   // another sample page: let it load
+    if (/^[\w-]+\.html$/.test(href) || link.closest('.bs-qs')) return;   // another sample page, or a result in the search window: let it load
     event.preventDefault();
     const collapse = link.matches('[data-toggle="collapse"]') ? document.querySelector(href) : null;
     if (collapse) { collapse.classList.toggle('in'); link.classList.toggle('collapsed'); return; }

@@ -148,3 +148,9 @@ test('reminders setting: on by default, only a true boolean is accepted', () => 
   assert.equal(m.normalize({ reminders: 'false' }).reminders, true, 'a string is not a boolean');
   assert.equal(m.normalize({ reminders: 0 }).reminders, true); assert.equal(m.normalize({ reminders: null }).reminders, true);
 });
+
+test('quick search setting: on by default, only a true boolean is accepted', () => {
+  const m = model();
+  assert.equal(m.normalize({}).quickSearch, true); assert.equal(m.normalize({ quickSearch: false }).quickSearch, false);
+  assert.equal(m.normalize({ quickSearch: 'no' }).quickSearch, true); assert.equal(m.normalize({ quickSearch: 0 }).quickSearch, true); assert.equal(m.normalize({ quickSearch: null }).quickSearch, true);
+});

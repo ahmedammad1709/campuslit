@@ -94,7 +94,7 @@
   }
   const atRisk = p => p.state === 'recover' || p.state === 'lost' || (p.state === 'ended' && p.level === 'bad');
   function attendanceList(items) {
-    const planner = AT(), min = planner ? planner.MIN_PERCENT : 75, comfy = planner ? planner.COMFORT_PERCENT : 85;
+    const planner = AT(), min = planner ? planner.MIN_PERCENT : 75, comfy = 85;   // the legend's top band (the planner module has no such constant)
     const rows = [];
     items.forEach(item => { try { const r = attendanceRow(item); if (r) rows.push(r); } catch (e) { /* skip this course only */ } });
     if (!rows.length) return null;

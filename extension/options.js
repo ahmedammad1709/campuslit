@@ -96,7 +96,7 @@ $('goto-studio').addEventListener('click', () => showSection('studio', true, tru
 // ---------- controls <-> settings ----------
 const setPct = input => input.style.setProperty('--pct', ((input.value - input.min) / (input.max - input.min) * 100) + '%');
 function syncControls() {
-  for (const key of ['enabled', 'cms', 'lms', 'cleanBackground', 'motion', 'reminders']) $(key).checked = settings[key];
+  for (const key of ['enabled', 'cms', 'lms', 'cleanBackground', 'motion', 'reminders', 'quickSearch']) $(key).checked = settings[key];
   $('font').value = settings.font; $('fontSize').value = settings.fontSize; $('radius').value = settings.radius; $('semesterWeeks').value = settings.semesterWeeks;
   setPct($('fontSize')); setPct($('radius')); setPct($('semesterWeeks')); $('weeks-output').textContent = settings.semesterWeeks + ' weeks';
   $('size-output').textContent = settings.fontSize + ' px'; $('radius-output').textContent = settings.radius + ' px';
@@ -192,7 +192,7 @@ for (const key of ['fontSize', 'radius', 'semesterWeeks']) $(key).addEventListen
 document.querySelectorAll('#density-seg button').forEach(b => b.addEventListener('click', () => { settings.density = b.dataset.density; syncControls(); preview(); updateDirty(); }));
 $('system').addEventListener('change', e => { settings.mode = e.target.checked ? 'system' : 'preset'; renderAll(); updateDirty(); });
 system.addEventListener('change', () => { syncControls(); preview(); renderThemes(); });
-for (const key of ['cleanBackground', 'motion', 'reminders']) $(key).addEventListener('change', e => { settings[key] = e.target.checked; preview(); updateDirty(); });
+for (const key of ['cleanBackground', 'motion', 'reminders', 'quickSearch']) $(key).addEventListener('change', e => { settings[key] = e.target.checked; preview(); updateDirty(); });
 for (const key of ['enabled', 'cms', 'lms']) $(key).addEventListener('change', e => { Object.assign(settings, B.power(settings, key, e.target.checked)); syncControls(); preview(); updateDirty(); });
 
 // ---------- save / export / import / reset ----------

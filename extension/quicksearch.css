@@ -1,0 +1,37 @@
+/* Campuslit quick search window and header button (CMS and LMS). Screen-only, scoped to the styled portals; colours come from the --bs-* tokens. */
+@media screen {
+  html[data-bahria-studio] {
+    & .bs-qs-btn { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--bs-ink); cursor: pointer; transition: background-color .16s; }
+    & .bs-qs-btn:hover { background: color-mix(in srgb, currentColor 14%, transparent); }
+    & .bs-qs-btn:focus-visible { outline: 2px solid var(--bs-accent); outline-offset: 1px; }
+    & #header .bs-qs-btn { color: var(--bs-hd-ink, var(--bs-navOn)); margin-left: auto; margin-right: 8px; }
+    & .bs-qs-li { display: flex !important; align-items: center; height: var(--bs-head, 64px); padding: 0 4px; float: left; }
+    & .bs-qs-li:hover { background: transparent !important; }
+
+    & dialog.bs-qs { box-sizing: border-box; width: 100%; max-width: none; height: 100%; max-height: none; margin: 0; padding: 12vh 12px 12px; border: 0; background: transparent; color: var(--bs-ink); overflow: hidden; font-family: var(--bs-font); font-size: var(--bs-size); }
+    & dialog.bs-qs::backdrop { background: color-mix(in srgb, var(--bs-ink) 38%, transparent); backdrop-filter: blur(2px); }
+    & dialog.bs-qs[open] { display: flex; justify-content: center; align-items: flex-start; animation: bs-qs-in .16s ease-out both; }
+    & .bs-qs-box { box-sizing: border-box; width: min(640px, 100%); max-height: calc(100vh - 12vh - 24px); display: flex; flex-direction: column; overflow: hidden; background: var(--bs-surface); border: 1px solid var(--bs-line); border-radius: calc(var(--bs-r) + 6px); box-shadow: 0 28px 70px -18px color-mix(in srgb, var(--bs-ink) 55%, transparent); }
+    & .bs-qs-row { display: flex; align-items: center; gap: 12px; padding: 0 16px; border-bottom: 1px solid var(--bs-line); color: var(--bs-muted); }
+    & dialog.bs-qs input.bs-qs-input, & dialog.bs-qs input.bs-qs-input:hover, & dialog.bs-qs input.bs-qs-input:focus { flex: 1; min-width: 0; height: 56px; padding: 0; border: 0 !important; border-radius: 0 !important; outline: 0 !important; box-shadow: none !important; background: transparent !important; color: var(--bs-ink) !important; font: 500 17px/1.2 var(--bs-font); }
+    & .bs-qs-input::placeholder { color: var(--bs-muted); opacity: 1; }
+    & .bs-qs-esc { padding: 3px 7px; border: 1px solid var(--bs-line); border-radius: 6px; background: var(--bs-soft); color: var(--bs-muted); font: 600 11px var(--bs-font); }
+    & .bs-qs-list { margin: 0; padding: 6px; list-style: none; overflow-y: auto; overscroll-behavior: contain; }
+    & .bs-qs-item { margin: 0; padding: 0; border-radius: calc(var(--bs-r) * .8); }
+    & .bs-qs-item[aria-selected="true"] { background: color-mix(in srgb, var(--bs-accent) 11%, var(--bs-surface)); box-shadow: inset 3px 0 0 var(--bs-accent); }
+    & .bs-qs-link { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 11px 14px; color: var(--bs-ink) !important; text-decoration: none !important; border-radius: inherit; }
+    & .bs-qs-name { min-width: 0; font-weight: 600; overflow-wrap: anywhere; }
+    & .bs-qs-name mark { padding: 0 1px; border-radius: 3px; background: color-mix(in srgb, var(--bs-accent) 20%, transparent); color: inherit; }
+    & .bs-qs-group, & .bs-qs-here { flex: none; font-size: calc(var(--bs-size) * 0.8667); color: var(--bs-muted); }
+    & .bs-qs-here { font-weight: 700; color: var(--bs-accent); }
+    & .bs-qs-group + .bs-qs-here { margin-left: -6px; }
+    & .bs-qs-empty { margin: 0; padding: 26px 20px 30px; text-align: center; color: var(--bs-muted); }
+    & .bs-qs-empty[hidden] { display: none; }
+    & .bs-qs-foot { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 0; padding: 10px 18px; border-top: 1px solid var(--bs-line); background: var(--bs-soft); color: var(--bs-muted); font-size: calc(var(--bs-size) * 0.8); }
+    & .bs-qs-live { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  }
+  @media (hover: none) { html[data-bahria-studio] .bs-qs-foot, html[data-bahria-studio] .bs-qs-esc { display: none; } }
+  @media (max-width: 767px) { html[data-bahria-studio="lms"] .main-header .navbar { position: relative; } html[data-bahria-studio] .bs-qs-li { position: absolute; left: 44px; top: 0; padding: 0; } html[data-bahria-studio] .bs-qs-li .bs-qs-btn { width: 36px; height: 36px; }   /* phones: the free space beside the menu button, so the bell and avatar keep their place */ html[data-bahria-studio] dialog.bs-qs { padding-top: 8px; } html[data-bahria-studio] .bs-qs-box { max-height: calc(100vh - 16px); } }
+}
+@keyframes bs-qs-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+@media screen and (prefers-reduced-motion: reduce) { html[data-bahria-studio] dialog.bs-qs[open] { animation: none; } }

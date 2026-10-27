@@ -40,8 +40,8 @@ def lms_page(title, content):
 <link rel="stylesheet" href="../vendor/css/bootstrap.min.css"><link rel="stylesheet" href="../vendor/css/AdminLTE.min.css">
 <link rel="stylesheet" href="../vendor/css/skin-yellow-light.min.css"><link rel="stylesheet" href="../vendor/css/font-awesome.min.css">
 <link rel="stylesheet" href="../preview.css"><link rel="stylesheet" href="../preview-lms.css">
-<link rel="stylesheet" href="../../portal.css"><link rel="stylesheet" href="../../lms.css">
-<script src="../../themes.js" defer></script><script src="../../deadlines.js" defer></script><script src="../../lms.js" defer></script><script src="../preview.js" defer data-site="lms"></script>
+<link rel="stylesheet" href="../../portal.css"><link rel="stylesheet" href="../../lms.css"><link rel="stylesheet" href="../../quicksearch.css">
+<script src="../../themes.js" defer></script><script src="../../deadlines.js" defer></script><script src="../../lms.js" defer></script><script src="../../search.js" defer></script><script src="../../quicksearch.js" defer></script><script src="../preview.js" defer data-site="lms"></script>
 </head>
 <body class="hold-transition skin-yellow-light sidebar-mini"><div class="wrapper">
 <header class="main-header">
@@ -158,8 +158,8 @@ def cms_page(title, heading_icon, heading, crumbs, body, open_menu=None):
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title}</title>
 <link rel="stylesheet" href="../vendor/css/bootstrap.min.css"><link rel="stylesheet" href="../preview.css"><link rel="stylesheet" href="../preview-cms.css">
-<link rel="stylesheet" href="../../portal.css"><link rel="stylesheet" href="../../cms.css">
-<script src="../../themes.js" defer></script><script src="../../attendance.js" defer></script><script src="../../calendar.js" defer></script><script src="../../cms.js" defer></script><script src="../preview.js" defer data-site="cms"></script>
+<link rel="stylesheet" href="../../portal.css"><link rel="stylesheet" href="../../cms.css"><link rel="stylesheet" href="../../quicksearch.css">
+<script src="../../themes.js" defer></script><script src="../../attendance.js" defer></script><script src="../../calendar.js" defer></script><script src="../../cms.js" defer></script><script src="../../search.js" defer></script><script src="../../quicksearch.js" defer></script><script src="../preview.js" defer data-site="cms"></script>
 </head>
 <body class="Army"><form method="post" action="#" id="form1" autocomplete="off">
 <div id="pageContainer">
