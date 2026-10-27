@@ -239,6 +239,56 @@
     if (!events.length) return null;
     return { semester: data.semester || '', step, events };
   }
+  // "Add to calendar": the classes on this page as a downloadable calendar file. Built here from the schedule the page already holds
+  // and handed straight to the browser as a download. Nothing is uploaded. The only values read are the three choices in this panel.
+  const CAL = () => globalThis.BahriaCalendar || null;
+  const longDate = ymd => { const m = /^(\d{4})(\d{2})(\d{2})$/.exec(ymd || ''); return m ? +m[3] + ' ' + ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][+m[2] - 1] + ' ' + m[1] : ''; };
+  function download(text, name) {
+    const url = URL.createObjectURL(new Blob([text], { type: 'text/calendar;charset=utf-8' }));
+    const link = document.createElement('a'); link.href = url; link.download = name; link.style.display = 'none';
+    document.body.append(link); link.click(); link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }
+  function exportTools(schedule) {
+    const lib = CAL(); if (!lib) return null;
+    const button = make('button', 'bs-tt-export', 'Add to calendar'); button.type = 'button'; button.setAttribute('aria-expanded', 'false'); button.setAttribute('aria-controls', 'bs-tt-exportpanel');
+    const panel = make('div', 'bs-tt-exportpanel'); panel.id = 'bs-tt-exportpanel'; panel.hidden = true; panel.setAttribute('role', 'group'); panel.setAttribute('aria-label', 'Add the time table to a calendar');
+    const field = (label, control) => { const wrap = make('div', 'bs-tt-field'); const l = make('label', '', label); l.htmlFor = control.id; wrap.append(l, control); return wrap; };
+    // no name attributes: if the page's own form is ever submitted, none of these values go with it
+    const start = make('input', 'bs-tt-input'); start.id = 'bs-tt-start'; start.type = 'date'; start.value = lib.mondayOf(new Date());
+    const count = make('input', 'bs-tt-input'); count.id = 'bs-tt-weeks'; count.type = 'number'; count.min = String(lib.MIN_WEEKS); count.max = String(lib.MAX_WEEKS); count.step = '1'; count.inputMode = 'numeric';
+    const remind = make('select', 'bs-tt-input'); remind.id = 'bs-tt-alarm';
+    [[0, 'No reminder'], [10, '10 minutes before'], [30, '30 minutes before'], [60, '1 hour before']].forEach(([v, t]) => { const o = document.createElement('option'); o.value = String(v); o.textContent = t; if (v === 10) o.selected = true; remind.append(o); });
+    const fields = make('div', 'bs-tt-fields'); fields.append(field('First day of classes', start), field('Weeks of classes', count), field('Reminder', remind));
+    const intro = make('p', 'bs-tt-exporthelp', 'Download your classes as a calendar file, then open it to add them to Google Calendar, Apple Calendar or Outlook. If the semester has already started, pick this week\u2019s Monday and the number of weeks left.');
+    const message = make('p', 'bs-tt-exportmsg'); message.hidden = true;
+    const go = make('button', 'bs-tt-exportgo', 'Download calendar file'); go.type = 'button';
+    const cancel = make('button', 'bs-tt-exportcancel', 'Close'); cancel.type = 'button';
+    const actions = make('div', 'bs-tt-exportactions'); actions.append(go, cancel);
+    panel.append(intro, fields, message, actions);
+    const say = (text, bad) => { message.textContent = text; message.hidden = !text; message.dataset.bad = bad ? 'true' : 'false'; message.setAttribute('role', bad ? 'alert' : 'status'); };
+    const open = on => {
+      panel.hidden = !on; button.setAttribute('aria-expanded', String(on));
+      if (on) { count.value = String(Number.isFinite(weeks) ? weeks : 16); say(''); start.focus(); } else button.focus();
+    };
+    button.addEventListener('click', () => open(panel.hidden));
+    cancel.addEventListener('click', () => open(false));
+    const run = () => {
+      try {
+        const built = lib.build(schedule.events, { start: start.value, weeks: count.value, alarm: remind.value, semester: schedule.semester });
+        if (!built.ok) { say(built.error, true); return; }
+        download(built.text, lib.fileName(schedule.semester));
+        say('Downloaded ' + built.count + (built.count === 1 ? ' class' : ' classes') + ', repeating every week until ' + longDate(built.until) + '. Open the file to add them. Opening it again later updates them instead of adding copies.', false);
+      } catch (err) { say('Could not create the calendar file. Please try again.', true); }
+    };
+    go.addEventListener('click', run);
+    // these controls sit inside the page's own form: Enter must not submit it
+    panel.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && e.target !== cancel && e.target !== go) { e.preventDefault(); run(); }
+      else if (e.key === 'Escape') { e.preventDefault(); open(false); }
+    });
+    return { button, panel };
+  }
   function nextClass(events) {
     const now = new Date(), today = now.getDay(), minutes = now.getHours() * 60 + now.getMinutes();
     let best = null;
@@ -277,7 +327,10 @@
       b.addEventListener('click', () => { wrap.dataset.view = id; Object.entries(buttons).forEach(([k, n]) => n.setAttribute('aria-pressed', String(k === id))); if (store && store.local) { try { store.local.set({ [VIEW_KEY]: id }); } catch (err) { /* view just will not persist */ } } });
       seg.append(b);
     });
-    bar.append(meta, seg);
+    const tools = make('div', 'bs-tt-tools'); const exporter = exportTools(schedule);
+    if (exporter) tools.append(exporter.button);
+    tools.append(seg);
+    bar.append(meta, tools);
 
     // next class
     const next = nextClass(events);
@@ -337,6 +390,7 @@
     });
 
     wrap.append(bar);
+    if (exporter) wrap.append(exporter.panel);
     if (nextCard) wrap.append(nextCard);
     wrap.append(week, list);
     host.prepend(wrap);

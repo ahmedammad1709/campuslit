@@ -302,6 +302,26 @@
     & .bs-tt-seg { display: inline-flex; padding: 3px; border-radius: calc(var(--bs-r) * .9); background: var(--bs-soft); border: 1px solid var(--bs-line); }
     & .bs-tt-segbtn { height: 32px; padding: 0 16px; border: 0; border-radius: calc(var(--bs-r) * .7); background: transparent; color: var(--bs-muted); font: 700 13px var(--bs-font); cursor: pointer; transition: background-color .16s, color .16s; }
     & .bs-tt-segbtn[aria-pressed="true"] { background: var(--bs-surface); color: var(--bs-ink); box-shadow: 0 1px 3px color-mix(in srgb, var(--bs-ink) 14%, transparent); }
+    & .bs-tt-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+    & .bs-tt-export { height: 38px; padding: 0 16px; border: 1px solid var(--bs-line); border-radius: calc(var(--bs-r) * .9); background: var(--bs-surface); color: var(--bs-ink); font: 700 13px var(--bs-font); cursor: pointer; transition: border-color .16s, background-color .16s; }
+    & .bs-tt-export:hover, & .bs-tt-export[aria-expanded="true"] { border-color: color-mix(in srgb, var(--bs-accent) 55%, var(--bs-line)); background: color-mix(in srgb, var(--bs-accent) 6%, var(--bs-surface)); }
+    & .bs-tt-exportpanel { margin: -4px 0 18px; padding: 18px 20px; border: 1px solid var(--bs-line); border-radius: var(--bs-r); background: var(--bs-surface); }
+    & .bs-tt-exportpanel[hidden], & .bs-tt-exportmsg[hidden] { display: none; }
+    & .bs-tt-exporthelp { margin: 0 0 14px; max-width: 62ch; font-size: calc(var(--bs-size) * 0.9333); line-height: 1.5; color: var(--bs-muted); }
+    & .bs-tt-fields { display: flex; flex-wrap: wrap; gap: 14px 18px; margin-bottom: 14px; }
+    & .bs-tt-field { display: flex; flex-direction: column; gap: 5px; min-width: 150px; }
+    & .bs-tt-field label { font-size: calc(var(--bs-size) * 0.8); font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--bs-muted); }
+    & .bs-tt-input { box-sizing: border-box; height: 40px; padding: 0 12px; border: 1px solid var(--bs-line); border-radius: calc(var(--bs-r) * .8); background: var(--bs-surface); color: var(--bs-ink); font: 500 14px var(--bs-font); color-scheme: light dark; }
+    & select.bs-tt-input { min-width: 200px; }
+    & .bs-tt-input:focus-visible { outline: 2px solid var(--bs-accent); outline-offset: 1px; }
+    & .bs-tt-exportmsg { margin: 0 0 14px; padding: 9px 12px; border-radius: calc(var(--bs-r) * .8); font-size: calc(var(--bs-size) * 0.9); line-height: 1.45; color: var(--bs-ink); background: color-mix(in srgb, var(--bs-ok) 11%, var(--bs-surface)); }
+    & .bs-tt-exportmsg[data-bad="true"] { background: color-mix(in srgb, var(--bs-bad) 10%, var(--bs-surface)); color: var(--bs-bad); font-weight: 600; }
+    & .bs-tt-exportactions { display: flex; flex-wrap: wrap; gap: 10px; }
+    & .bs-tt-exportgo, & .bs-tt-exportcancel { height: 40px; padding: 0 18px; border-radius: calc(var(--bs-r) * .8); font: 700 13px var(--bs-font); cursor: pointer; }
+    & .bs-tt-exportgo { border: 0; background: var(--bs-accent); color: var(--bs-onAccent, #fff); }
+    & .bs-tt-exportgo:hover { filter: brightness(1.08); }
+    & .bs-tt-exportcancel { border: 1px solid var(--bs-line); background: transparent; color: var(--bs-ink); }
+    & :is(.bs-tt-export, .bs-tt-exportgo, .bs-tt-exportcancel):focus-visible { outline: 2px solid var(--bs-accent); outline-offset: 2px; }
     & .bs-tt-next { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; padding: 14px 18px; border: 1px solid var(--bs-line); border-left: 4px solid var(--bs-accent); border-radius: var(--bs-r); background: var(--bs-surface); }
     & .bs-tt-next[data-live] { border-left-color: var(--bs-ok); background: color-mix(in srgb, var(--bs-ok) 7%, var(--bs-surface)); }
     & .bs-tt-pulse { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--bs-accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--bs-accent) 20%, transparent); }
