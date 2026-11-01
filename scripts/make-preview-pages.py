@@ -89,7 +89,7 @@ def lms_dashboard():
 
 
 def lms_assignments():
-    UPLOAD = "<input type='file' name='file'><button type='button' class='btn btn-sm btn-primary'>Upload</button>"
+    UPLOAD = "<a href='#' data-toggle='modal' data-target='#modal-assignment-solution-1' data-backdrop='static' data-keyboard='false' class='text-red'><div style='background:green; color:#fff; display:flex; text-align:center; line-height:22px; padding:11px 0px; border-radius:5px;'><i class='fa fa-plus-square' style='margin:4px 10px 0px 18px;'></i>Submit</div></a>"
     EXCEEDED = "<div style='background:red; color:#fff; text-align:center; border-radius:4px; padding:5px 0px; line-height: 18px;'>Deadline Exceeded</div>"
     # hours: how far from now the deadline is. preview.js turns it into a real date so the sample never goes stale; the text is a fallback.
     def row(n, title, ext, orig, hours, marks, submitted, action):

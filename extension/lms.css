@@ -144,6 +144,12 @@
     & td > div[style*="background:red"], & td > div[style*="background: red"] { background: color-mix(in srgb, var(--bs-bad) 12%, var(--bs-surface)) !important; color: color-mix(in srgb, var(--bs-bad) 80%, var(--bs-ink)) !important; border: 1px solid color-mix(in srgb, var(--bs-bad) 28%, transparent); border-radius: 999px !important; padding: 6px 12px !important; font-size: calc(var(--bs-size) * 0.7667); font-weight: 800 !important; line-height: 1.2 !important; letter-spacing: .02em; text-transform: uppercase; white-space: nowrap; }
     & td > div[style*="background:red"]::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 7px; border-radius: 50%; background: currentColor; vertical-align: 1px; }
     & .table .label { white-space: normal; text-align: left; }
+    /* the portal's own Submit button: a link around a green box that has no side padding, so the text touched the edge. Same box, evenly spaced. */
+    & td > a[data-toggle="modal"]:has(> div[style*="background"]) { display: inline-block; background-image: none !important; text-decoration: none !important; border-radius: calc(var(--bs-r) * .8); transition: transform .16s var(--bs-ease), filter .16s; }
+    & td > a[data-toggle="modal"]:has(> div[style*="background"]):hover { transform: translateY(-1px); filter: brightness(1.08); }
+    & td > a[data-toggle="modal"]:has(> div[style*="background"]):active { transform: scale(.97); }
+    & td > a[data-toggle="modal"] > div[style*="background"] > i { margin: 0 !important; flex: none; }   /* the icon carries its own margins (18px left, 10px right, 4px top) */
+    & td > a[data-toggle="modal"] > div[style*="background"] { box-sizing: border-box; display: inline-flex !important; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 0 18px !important; border-radius: calc(var(--bs-r) * .8) !important; font-size: calc(var(--bs-size) * 0.9); font-weight: 700; line-height: 1.2 !important; letter-spacing: -.005em; white-space: nowrap; vertical-align: middle; }
     & .label[data-bs-tip] { cursor: pointer; }
     & .label[data-bs-tip]:focus-visible { outline: 3px solid var(--bs-accent); outline-offset: 2px; }
     & .bg-gray, & .bg-yellow, & .bg-orange { background: transparent !important; color: inherit !important; }
@@ -199,8 +205,10 @@
     & .bs-remind-more, & .bs-remind-note { display: block; margin-top: 6px; font-size: calc(var(--bs-size) * 0.8); color: var(--bs-muted); line-height: 1.4; }
     & .bs-remind-go { display: inline-block; margin-top: 12px; padding: 7px 14px; border-radius: calc(var(--bs-r) * .8); font-size: calc(var(--bs-size) * 0.8667); font-weight: 700; text-decoration: none !important; color: var(--bs-onAccent, #fff) !important; background: var(--bs-accent); }
     & .bs-remind-go:hover { filter: brightness(1.08); }
-    & .bs-remind-x { position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--bs-muted); font-size: 22px; line-height: 1; cursor: pointer; }
-    & .bs-remind-x:hover { background: var(--bs-soft); color: var(--bs-ink); }
+    & .bs-remind-x { position: absolute; top: 8px; right: 8px; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 0 !important; border-radius: 50%; background: transparent; color: var(--bs-muted); box-shadow: none; cursor: pointer; transition: background-color .16s, color .16s; }
+    & .bs-remind-x:hover { background: color-mix(in srgb, var(--bs-ink) 12%, transparent) !important; color: var(--bs-ink) !important; }
+    & .bs-remind-x:active { background: color-mix(in srgb, var(--bs-ink) 20%, transparent) !important; }
+    & .bs-remind-x svg { display: block; pointer-events: none; }
     & .bs-remind-x:focus-visible, & .bs-remind-go:focus-visible { outline: 2px solid var(--bs-accent); outline-offset: 2px; }
 
     &[data-bs-route="dashboard"] .box { background: transparent !important; border: 0 !important; box-shadow: none !important; overflow: visible; }

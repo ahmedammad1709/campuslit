@@ -271,8 +271,9 @@
     &[data-bs-page="entry"] .portal-content h2 { margin: 0 0 14px; font-size: calc(var(--bs-size) * 1.2667); font-weight: 700; letter-spacing: -.01em; color: var(--bs-ink) !important; text-shadow: none; }
     &[data-bs-page="entry"] .portal-btn { display: inline-flex; align-items: center; padding: 0 18px; height: 38px; border-radius: calc(var(--bs-r) * .8); background: var(--bs-soft) !important; color: var(--bs-ink) !important; border: 1px solid var(--bs-line) !important; font-size: calc(var(--bs-size) * 0.9); font-weight: 700; box-shadow: none; backdrop-filter: none; transition: background-color .16s, filter .16s; }
     &[data-bs-page="entry"] .portal-btn:hover { filter: brightness(.97); transform: none; }
-    &[data-bs-page="entry"] .portal-card.student .portal-btn { background: var(--bs-accent) !important; color: var(--bs-onAccent) !important; border-color: transparent !important; }
-    &[data-bs-page="entry"] .portal-card.student .portal-btn:hover { filter: brightness(1.08); }
+    /* every card looks the same; the one you point at (or tab to) lights up, icon and button together, in the theme's accent */
+    &[data-bs-page="entry"] .portal-card:is(:hover, :focus-within) .portal-btn { background: var(--bs-accent) !important; color: var(--bs-onAccent) !important; border-color: transparent !important; }
+    &[data-bs-page="entry"] .portal-card:is(:hover, :focus-within) .portal-btn:hover { filter: brightness(1.08); }
     &[data-bs-page="entry"] footer#footer { position: static; left: 0 !important; background: transparent !important; color: #ffffffa6 !important; border: 0 !important; text-align: center; }
     &[data-bs-page="entry"] footer#footer a { color: #fff; }
 
@@ -284,13 +285,13 @@
     &[data-bs-page="entry"] .overlay { box-sizing: border-box; }
     &[data-bs-page="entry"] .portal-icon { display: none; }
     &[data-bs-page="entry"] .portal-card { align-items: flex-start; gap: 18px; padding: 24px; }
-    &[data-bs-page="entry"] .bs-card-icon { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 52px; height: 52px; border-radius: calc(var(--bs-r) + 2px); color: var(--bs-link); background: color-mix(in srgb, var(--bs-accent) 10%, var(--bs-surface)); border: 1px solid color-mix(in srgb, var(--bs-accent) 20%, transparent); }
+    &[data-bs-page="entry"] .bs-card-icon { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 52px; height: 52px; border-radius: calc(var(--bs-r) + 2px); color: var(--bs-link); background: color-mix(in srgb, var(--bs-accent) 10%, var(--bs-surface)); border: 1px solid color-mix(in srgb, var(--bs-accent) 20%, transparent); transition: background-color .18s, color .18s, border-color .18s; }
     &[data-bs-page="entry"] .portal-content { flex: 1; min-width: 0; }
     &[data-bs-page="entry"] .portal-content h2 { margin: 2px 0 4px; }
     &[data-bs-page="entry"] .bs-card-blurb { margin: 0 0 16px; font-size: calc(var(--bs-size) * 0.8667); line-height: 1.45; color: var(--bs-muted); }
     &[data-bs-page="entry"] .portal-btn::after { content: "\2192"; margin-left: 8px; font-weight: 700; transition: transform .18s var(--bs-ease); }
     &[data-bs-page="entry"] .portal-btn:hover::after { transform: translateX(3px); }
-    &[data-bs-page="entry"] .portal-card.student .bs-card-icon { color: var(--bs-onAccent); background: var(--bs-accent); border-color: transparent; }
+    &[data-bs-page="entry"] .portal-card:is(:hover, :focus-within) .bs-card-icon { color: var(--bs-onAccent); background: var(--bs-accent); border-color: transparent; }
 
     /* ---------- Time table ---------- */
     &[data-bs-tt] #BodyPH_updatePanelCalendar > .table-responsive { display: none; }

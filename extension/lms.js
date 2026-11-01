@@ -111,7 +111,7 @@
         const action = iAction >= 0 && cells[iAction] ? cells[iAction] : null;
         const subCell = iSub >= 0 && cells[iSub] ? cells[iSub] : null;
         const actionText = action ? flat(action) : '';
-        const control = !!(action && action.querySelector('input:not([type="hidden"]), button, textarea, select'));
+        const control = !!(action && (action.querySelector('input:not([type="hidden"]), button, textarea, select') || action.querySelector('a[data-toggle="modal"]') && /\b(?:re)?submit\b|\bupload\b/i.test(actionText)));
         const subText = subCell ? flat(subCell) : '';
         rows.push({
           tr, chipCell: iTitle >= 0 && cells[iTitle] ? cells[iTitle] : cells[iDeadline],   // the status sits beside the title: the deadline column is often off-screen to the right
@@ -217,6 +217,12 @@
     remWrite(data => D.remember(data, { semester, course }, items, Date.now()));
   }
   function remHide() { if (rem.node) { rem.node.remove(); owned.delete(rem.node); } rem.node = null; rem.shown = ''; }
+  function cross() {   // a drawn cross: crisp at any size, exactly centred (a text "×" sits off-centre in most fonts)
+    const NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg'), path = document.createElementNS(NS, 'path');
+    svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('width', '16'); svg.setAttribute('height', '16'); svg.setAttribute('aria-hidden', 'true'); svg.setAttribute('focusable', 'false');
+    path.setAttribute('d', 'M6 6l12 12M18 6L6 18'); path.setAttribute('fill', 'none'); path.setAttribute('stroke', 'currentColor'); path.setAttribute('stroke-width', '2.2'); path.setAttribute('stroke-linecap', 'round');
+    svg.append(path); return svg;
+  }
   function remRender() {
     const D = DL();
     if (due && due.noCourse && due.card.isConnected) dueRender();
@@ -229,7 +235,7 @@
       const node = make('aside', 'bs-remind'); node.setAttribute('role', 'status'); node.setAttribute('aria-live', 'polite'); node.setAttribute('aria-label', 'Assignment reminder');
       const link = [...document.querySelectorAll('.sidebar-menu a')].find(a => /^\s*assignments\s*$/i.test(a.textContent));
       const go = make('a', 'bs-remind-go', 'Open Assignments'); go.setAttribute('href', (link && link.getAttribute('href')) || 'Assignments.php');
-      const x = make('button', 'bs-remind-x', '\u00d7'); x.type = 'button'; x.setAttribute('aria-label', 'Dismiss reminder'); x.title = 'Dismiss for a few hours';
+      const x = make('button', 'bs-remind-x'); x.type = 'button'; x.append(cross()); x.setAttribute('aria-label', 'Dismiss reminder'); x.title = 'Dismiss for a few hours';
       x.addEventListener('click', () => remWrite(data => D.dismiss(data, top.id, Date.now())));
       const body = make('div', 'bs-remind-body');
       body.append(make('b', 'bs-remind-kicker', 'Not submitted yet'), make('p', 'bs-remind-title'), make('p', 'bs-remind-meta'), make('p', 'bs-remind-more'), make('small', 'bs-remind-note'), go);
