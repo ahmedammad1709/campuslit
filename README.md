@@ -25,7 +25,15 @@ A cleaner, calmer look for the Bahria University student **CMS** and **LMS**, as
    Firefox: `about:debugging#/runtime/this-firefox` → **Load Temporary Add-on** → `dist/firefox/manifest.json`.
 3. After rebuilding, press the reload icon on the extension card, then refresh the portal tab.
 
-Not yet on the Chrome Web Store or Firefox Add-ons; see `docs/RELEASE.md`.
+## Install (from a release)
+
+Download `campuslit-chrome.zip` or `campuslit-firefox.zip` from the latest GitHub release, unzip it somewhere you will keep it, and load it as above (Chrome: **Load unpacked** on the unzipped folder; Firefox: **Load Temporary Add-on** on its `manifest.json`). Step-by-step instructions for students are on the site.
+
+## Making a release
+
+`npm run package` builds both browsers, audits every file that would ship (permissions, portal-only matching, no network or `eval`, no private files, no personal-data patterns, manifest limits), zips them with `manifest.json` at the root, reads each zip back to prove it matches, and writes `dist/release/campuslit-chrome.zip`, `campuslit-firefox.zip` and `SHA256SUMS.txt`. `npm run store-assets` makes the store screenshots and promo tile from the invented sample pages. The full checklist and the store listing text are in `docs/RELEASE.md` and `docs/STORE_LISTING.md`.
+
+Not yet on the Chrome Web Store or Firefox Add-ons.
 
 ## Privacy
 
@@ -40,6 +48,9 @@ No analytics, no accounts, no remote code or fonts, no network requests from the
 | `extension/preview/` | Sample CMS and LMS pages for the settings preview; regenerate with `python scripts/make-preview-pages.py` |
 | `site/` | The marketing site (static HTML/CSS, no build step, deploys as-is, e.g. Vercel with root directory `site`). Preview: `node scripts/site-tools.mjs serve`; screenshots: `node scripts/make-site-shots.mjs`; share image: `node scripts/site-tools.mjs og` |
 | `scripts/build.mjs` | Builds `dist/chrome` and `dist/firefox` |
+| `scripts/package.mjs`, `scripts/lib/` | Release zips: `zip.mjs` (writer/reader), `audit.mjs` (what may ship), both unit-tested in `tests/package.test.cjs` (`npm run package`) |
+| `scripts/store-assets.mjs` | Store screenshots and promo tile from the sample pages (`npm run store-assets`) |
+| `scripts/firefox-check.mjs` | Smoke test in real Firefox: installs the built add-on over WebDriver BiDi and checks both portals (`npm run build`, then `npm run test:firefox`) |
 | `scripts/browser-check.mjs` | Headless-Chrome check of the settings page, custom theme maker, popup and preview (`npm run preview`, then `npm run test:browser`) |
 | `scripts/extension-check.mjs` | End-to-end check with the real built extension loaded into Chrome and fake portals (`npm run build`, then `npm run test:extension`) |
 | `tests/` | `npm test` (Node's built-in runner) |
