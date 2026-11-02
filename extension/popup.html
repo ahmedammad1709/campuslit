@@ -7,12 +7,16 @@
 <link rel="stylesheet" href="studio.css">
 <script src="icons.js" defer></script>
 <script src="themes.js" defer></script>
+<script src="guide.js" defer></script>
 <script src="storage.js" defer></script>
 <script src="popup.js" defer></script>
 </head>
 <body class="popup">
   <header class="pop-head">
-    <a class="pop-brand" href="options.html" target="_blank" rel="noopener"><img src="icons/icon-48.png" width="28" height="28" alt=""><span>Campuslit</span></a>
+    <a class="pop-brand" href="options.html" target="_blank" rel="noopener">
+      <svg class="pop-logo" viewBox="0 0 128 128" width="28" height="28" aria-hidden="true" focusable="false"><rect width="128" height="128" rx="30" fill="#0b1d40"/><path class="ring" pathLength="1" d="M80.57 81.21A30 30 0 1 1 80.57 46.79" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round"/><circle class="dot" cx="98" cy="64" r="8.5" fill="#f2b84b"/></svg>
+      <span>Campuslit</span>
+    </a>
     <button id="customize" class="pop-link" type="button">All settings <span data-icon="arrow"></span></button>
   </header>
 
@@ -29,6 +33,38 @@
     <label class="pop-row"><span>Follow device appearance<small id="system-note">Midnight when your device is dark</small></span><input id="system" type="checkbox" role="switch"><span class="track" aria-hidden="true"></span></label>
   </div>
 
-  <footer class="pop-foot"><span class="foot-status"><span class="local-dot"></span><span id="status" role="status" aria-live="polite">Stored only on this browser</span></span><a href="privacy.html" target="_blank" rel="noopener">Privacy</a></footer>
+  <footer class="pop-foot"><span class="foot-status"><span class="local-dot"></span><span id="status" role="status" aria-live="polite">Stored only on this browser</span></span><span class="foot-links"><button id="tour-link" class="foot-btn" type="button">Tour</button><a href="privacy.html" target="_blank" rel="noopener">Privacy</a></span></footer>
+
+  <!-- First time the popup is opened: a short welcome instead of the controls. Closing it (or "Show me around") is remembered. -->
+  <section id="welcome" class="pop-welcome" role="dialog" aria-modal="true" aria-labelledby="w-title" hidden>
+    <svg class="pop-logo" viewBox="0 0 128 128" width="60" height="60" aria-hidden="true" focusable="false"><rect width="128" height="128" rx="30" fill="#0b1d40"/><path class="ring" pathLength="1" d="M80.57 81.21A30 30 0 1 1 80.57 46.79" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round"/><circle class="dot" cx="98" cy="64" r="8.5" fill="#f2b84b"/></svg>
+    <h2 id="w-title">Welcome to Campuslit</h2>
+    <p class="w-sub">A calmer CMS and LMS, in three steps.</p>
+    <ol class="w-steps">
+      <li><span class="w-ico" data-icon="palette"></span><span><strong>Pick a look</strong><small>Choose a theme here, or design your own in All settings.</small></span></li>
+      <li><span class="w-ico" data-icon="monitor"></span><span><strong>Open your portal</strong><small>Sign in as usual. Campuslit restyles the CMS and LMS and adds a few helpers.</small></span></li>
+      <li><span class="w-ico" data-icon="search"></span><span><strong id="w-key">Press Ctrl+K</strong><small>Jump to any page. A short hint shows once beside each new feature.</small></span></li>
+    </ol>
+    <div class="w-actions">
+      <button id="w-tour" class="pop-btn primary" type="button">Take the quick tour</button>
+      <button id="w-start" class="pop-btn" type="button">Skip</button>
+    </div>
+    <p class="w-foot"><span class="local-dot"></span>Nothing leaves your browser.</p>
+  </section>
+
+  <!-- The tour: a spotlight on one part of the popup at a time, with a card that says what it is for. Skip is always there. -->
+  <div id="tour" class="pop-tour" hidden>
+    <div class="tour-spot" aria-hidden="true"></div>
+    <section class="tour-card" role="dialog" aria-modal="true" aria-labelledby="tour-title" aria-describedby="tour-text">
+      <p class="tour-count" id="tour-count"></p>
+      <h3 id="tour-title"></h3>
+      <p class="tour-text" id="tour-text"></p>
+      <div class="tour-actions">
+        <button id="tour-skip" class="tour-skip" type="button">Skip tour</button>
+        <button id="tour-guide" class="tour-skip" type="button" hidden>Open the full guide</button>
+        <span class="tour-nav"><button id="tour-back" class="pop-btn sm" type="button">Back</button><button id="tour-next" class="pop-btn sm primary" type="button">Next</button></span>
+      </div>
+    </section>
+  </div>
 </body>
 </html>

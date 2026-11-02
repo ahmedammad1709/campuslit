@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="studio.css">
 <script src="icons.js" defer></script>
 <script src="themes.js" defer></script>
+<script src="guide.js" defer></script>
 <script src="deadlines.js" defer></script>
 <script src="storage.js" defer></script>
 <script src="studio.js" defer></script>
@@ -26,6 +27,7 @@
       <a id="nav-text" href="#text" data-section="text"><span data-icon="type"></span>Text &amp; layout</a>
       <a id="nav-studio" href="#studio" data-section="studio"><span data-icon="palette"></span>Custom theme<span class="nav-tag">New</span></a>
       <a id="nav-portals" href="#portals" data-section="portals"><span data-icon="layers"></span>Portals</a>
+      <a id="nav-guide" href="#guide" data-section="guide"><span data-icon="spark"></span>Guide</a>
       <a id="nav-privacy" href="#privacy" data-section="privacy"><span data-icon="shield"></span>Privacy &amp; data</a>
     </nav>
     <div class="side-foot">
@@ -170,9 +172,83 @@
               <input id="cleanBackground" name="cleanBackground" type="checkbox" role="switch"><span class="track" aria-hidden="true"></span>
             </label>
             <label class="row">
+              <span class="row-text"><strong>Opening animation</strong><small>The logo draws itself and the toolbar popup fades in when you open it. Always off if your device asks for less motion.</small></span>
+              <input id="openingAnimation" name="openingAnimation" type="checkbox" role="switch" checked><span class="track" aria-hidden="true"></span>
+            </label>
+            <label class="row">
               <span class="row-text"><strong>Gentle motion</strong><small>Soft fade-ins. Always off if your device asks for less motion.</small></span>
               <input id="motion" name="motion" type="checkbox" role="switch"><span class="track" aria-hidden="true"></span>
             </label>
+          </div>
+        </section>
+
+        <!-- Guide -->
+        <section class="panel" id="section-guide" aria-labelledby="section-title" hidden>
+          <div class="group">
+            <div class="group-title"><h3>What Campuslit adds</h3></div>
+            <ul class="guide">
+              <li class="guide-item">
+                <span class="guide-ico" data-icon="palette"></span>
+                <div class="guide-text">
+                  <h4>Themes and your own look</h4>
+                  <p>Six themes, and one of your own. Set the text size, spacing and corners, and watch the preview before you save.</p>
+                  <div class="guide-foot"><span class="guide-chip">This page</span><button class="guide-go" type="button" data-goto="themes">Open Themes</button></div>
+                </div>
+              </li>
+              <li class="guide-item">
+                <span class="guide-ico" data-icon="search"></span>
+                <div class="guide-text">
+                  <h4>Quick search</h4>
+                  <p>Press <kbd>Ctrl</kbd> <kbd>K</kbd> (<kbd>Cmd</kbd> <kbd>K</kbd> on a Mac) or <kbd>/</kbd>, type a few letters and press Enter to open any page in the menu. There is a magnifier in the header too.</p>
+                  <div class="guide-foot"><span class="guide-chip">CMS</span><span class="guide-chip">LMS</span></div>
+                </div>
+              </li>
+              <li class="guide-item">
+                <span class="guide-ico" data-icon="file"></span>
+                <div class="guide-text">
+                  <h4>Assignments at a glance</h4>
+                  <p>A Due soon card counts down to your next deadline, and every assignment shows whether it is open, submitted or closed. Deadlines are read in Pakistan time.</p>
+                  <div class="guide-foot"><span class="guide-chip">LMS &rsaquo; Assignments</span></div>
+                </div>
+              </li>
+              <li class="guide-item">
+                <span class="guide-ico" data-icon="bell"></span>
+                <div class="guide-text">
+                  <h4>Assignment reminder</h4>
+                  <p>On other LMS pages a small popup names the next assignment you have not submitted. Cross it away and it stays hidden for a few hours.</p>
+                  <div class="guide-foot"><span class="guide-chip">LMS &rsaquo; any page</span><button class="guide-go" type="button" data-goto="portals">Reminder settings</button></div>
+                </div>
+              </li>
+              <li class="guide-item">
+                <span class="guide-ico" data-icon="clock"></span>
+                <div class="guide-text">
+                  <h4>Attendance planner</h4>
+                  <p>For each course, how many hours you can still miss and finish above 75%, worked out from your credit hours and the semester length you set.</p>
+                  <div class="guide-foot"><span class="guide-chip">CMS &rsaquo; Dashboard</span><span class="guide-chip">CMS &rsaquo; Courses &rsaquo; Attendance</span><button class="guide-go" type="button" data-goto="portals">Set semester length</button></div>
+                </div>
+              </li>
+              <li class="guide-item">
+                <span class="guide-ico" data-icon="book"></span>
+                <div class="guide-text">
+                  <h4>Time table and calendar</h4>
+                  <p>See your week as a day board or a one-page calendar. Add to calendar downloads your classes as a file for Google, Apple or Outlook Calendar.</p>
+                  <div class="guide-foot"><span class="guide-chip">CMS &rsaquo; Courses &rsaquo; Time Table</span></div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="group">
+            <div class="group-title"><h3>Tips and tour</h3></div>
+            <label class="row">
+              <span class="row-text"><strong>Show tips and the welcome screen</strong><small>A short welcome and tour the first time you open the toolbar popup, and a one-time hint beside each new feature on the portals.</small></span>
+              <input id="tips" name="tips" type="checkbox" role="switch" checked><span class="track" aria-hidden="true"></span>
+            </label>
+            <p class="group-note">Campuslit remembers which tips you have dismissed as a few yes/no flags in this browser. Nothing else, and nothing is sent anywhere.</p>
+            <div class="data-actions">
+              <button id="retake-tour" class="btn secondary" type="button"><span data-icon="spark"></span>Take the tour again</button>
+              <button id="reset-guide" class="btn secondary" type="button"><span data-icon="reset"></span>Show the hints again</button>
+            </div>
+            <p id="guide-progress" class="hint" role="status" style="margin:12px 0 0"></p>
           </div>
         </section>
 
@@ -182,7 +258,7 @@
             <div class="group-title"><h3>What Campuslit does with your data</h3></div>
             <ul class="facts">
               <li><span data-icon="check"></span><span>No accounts, no analytics, no tracking, and no requests to any server of ours.</span></li>
-              <li><span data-icon="check"></span><span>Only your appearance choices are stored, in this browser, plus the short assignment-reminder note described under Portals (which you can turn off or forget).</span></li>
+              <li><span data-icon="check"></span><span>Only your appearance choices are stored, in this browser, plus the short assignment-reminder note described under Portals (which you can turn off or forget) and a few yes/no flags for the tips you have dismissed.</span></li>
               <li><span data-icon="check"></span><span>Passwords and form fields are never read. A few screens are redrawn from figures the page already shows (your first name, courses, attendance, time table); they stay in memory and are never saved or sent.</span></li>
             </ul>
             <p class="group-note" style="margin:16px 0 0"><a class="link-out" href="privacy.html">Read the full privacy policy <span data-icon="arrow"></span></a></p>

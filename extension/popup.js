@@ -2,9 +2,14 @@
 const B = BahriaStudio;
 let settings = B.normalize({});
 let saving = false;
+let guide = null;            // which tips have been shown (null until read)
+let welcomeClosed = false;   // closed in this popup already, whatever the write is doing
 const status = document.getElementById('status');
 const system = matchMedia('(prefers-color-scheme: dark)');
 
+// The opening animation follows its setting; until the setting is known nothing is drawn (so it never flashes in and then jumps).
+function setAnimation() { document.body.dataset.anim = settings.openingAnimation ? 'on' : 'off'; }
+setTimeout(() => { if (!document.body.dataset.anim) document.body.dataset.anim = 'off'; }, 900);   // if the setting cannot be read, show the popup plainly
 function el(tag, cls, text) { const n = document.createElement(tag); if (cls) n.className = cls; if (text) n.textContent = text; return n; }
 // A theme is a small picture of the portal in its own colours (the same drawing the settings page uses), with its name under it.
 function sample(p) {
@@ -67,5 +72,107 @@ async function save(patch) {
 for (const k of ['enabled', 'cms', 'lms']) document.getElementById(k).addEventListener('change', e => save({ power: [k, e.target.checked] }));
 document.getElementById('system').addEventListener('change', e => save({ mode: e.target.checked ? 'system' : 'preset' }));
 document.getElementById('customize').addEventListener('click', () => StudioStorage.openOptions());
-StudioStorage.subscribe(value => { if (!saving) { settings = value; render(); } });
-StudioStorage.read().then(value => { settings = value; render(); }).catch(() => { render(); status.textContent = 'Could not load saved preferences.'; });
+
+// ---------- the first-run welcome and tour ----------
+// The first time the popup opens it shows a short welcome, then (if you take it) a tour: a spotlight on one part of the popup at a time.
+// Skip is always there. Once the welcome has been shown it is remembered (a yes/no flag on this device), so it never nags; "Tour" in the footer and
+// "Take the tour again" in settings play it again whenever you like.
+const welcome = document.getElementById('welcome'), tourBox = document.getElementById('tour');
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+const animated = () => document.body.dataset.anim === 'on' && !reducedMotion.matches;
+const mac = /Mac|iPhone|iPad/i.test(navigator.platform || navigator.userAgent || '');
+const searchKey = mac ? 'Cmd+K' : 'Ctrl+K';
+document.getElementById('w-key').textContent = 'Press ' + searchKey;
+const STEPS = [
+  { target: () => document.querySelector('.pop-list'), title: 'Switch it on or off', text: 'The top switch turns Campuslit on or off everywhere. CMS and LMS keep it on for just one portal.' },
+  { target: () => document.getElementById('themes'), title: 'Pick a look', text: 'Six themes, plus one you design yourself. Your portals change as soon as you choose.' },
+  { target: () => document.getElementById('system').closest('.pop-list'), title: 'Follow your device', text: 'Switch to Midnight automatically when your device goes dark.' },
+  { target: () => document.getElementById('customize'), title: 'All settings', text: 'Fonts, text size, your own theme, attendance and reminders. The Guide there explains every feature.' },
+  { final: true, title: 'You are all set', text: 'Open your CMS or LMS and press ' + searchKey + ' to jump to any page. A short hint shows once beside each new feature.' }
+];
+const TARGETS = STEPS.filter(step => !step.final).length;
+let step = -1;
+const whenSettled = () => Promise.allSettled(document.getAnimations().map(a => a.finished));   // let the popup finish fading in before measuring it
+const mainParts = () => [...document.body.children].filter(n => !n.classList.contains('pop-welcome') && !n.classList.contains('pop-tour'));
+
+function maybeWelcome() {
+  if (!guide || welcomeClosed || !welcome.hidden || !tourBox.hidden || !BahriaGuide.wantsTour(guide, settings.tips)) return;   // not the first time, tips off, or the record could not be read
+  welcomeClosed = true;
+  document.body.classList.add('is-welcome'); welcome.hidden = false;
+  document.getElementById('w-tour').focus({ preventScroll: true });
+  rememberWelcome();   // shown means done: it will not nag, whether or not you finish
+}
+function hideWelcome() {
+  if (welcome.hidden) return Promise.resolve();
+  welcome.classList.add('leaving');
+  return new Promise(done => setTimeout(() => { welcome.hidden = true; welcome.classList.remove('leaving'); document.body.classList.remove('is-welcome'); done(); }, animated() ? 170 : 0));
+}
+async function rememberWelcome() { try { guide = await StudioStorage.updateGuide(BahriaGuide.markWelcome); } catch { /* it will simply show again next time */ } }
+function openGuide() {
+  const api = globalThis.browser || globalThis.chrome;
+  if (StudioStorage.isExtension && api.tabs && api.tabs.create) api.tabs.create({ url: api.runtime.getURL('options.html#guide') });
+  else location.href = 'options.html#guide';
+}
+
+function place() {
+  const spot = tourBox.querySelector('.tour-spot'), card = tourBox.querySelector('.tour-card'), def = STEPS[step];
+  const vw = document.documentElement.clientWidth, vh = document.documentElement.clientHeight, width = Math.min(336, vw - 24);
+  card.style.width = width + 'px';
+  const height = card.offsetHeight;
+  if (def.final) { tourBox.dataset.mode = 'center'; card.style.left = (vw - width) / 2 + 'px'; card.style.top = Math.max(12, (vh - height) / 2) + 'px'; return; }
+  const target = def.target(); if (!target) { endTour(); return; }
+  tourBox.dataset.mode = 'spot';
+  const r = target.getBoundingClientRect(), pad = 6;
+  spot.style.left = r.left - pad + 'px'; spot.style.top = r.top - pad + 'px'; spot.style.width = r.width + pad * 2 + 'px'; spot.style.height = r.height + pad * 2 + 'px';
+  const below = vh - (r.bottom + pad) - 12, above = r.top - pad - 12;
+  const useBelow = height <= below || (height > above && below >= above);   // the side with room; the one with more room when neither fits
+  card.style.left = (vw - width) / 2 + 'px';
+  card.style.top = Math.max(12, Math.min(useBelow ? r.bottom + pad + 12 : r.top - pad - 12 - height, vh - height - 12)) + 'px';
+}
+function showStep(i) {
+  step = Math.max(0, Math.min(STEPS.length - 1, i));
+  const def = STEPS[step], last = !!def.final;
+  document.getElementById('tour-title').textContent = def.title;
+  document.getElementById('tour-text').textContent = def.text;
+  document.getElementById('tour-count').textContent = last ? '' : 'Step ' + (step + 1) + ' of ' + TARGETS;
+  document.getElementById('tour-count').hidden = last;
+  document.getElementById('tour-skip').hidden = last;
+  document.getElementById('tour-guide').hidden = !last;
+  document.getElementById('tour-back').hidden = step === 0;
+  const next = document.getElementById('tour-next'); next.textContent = last ? 'Done' : 'Next';
+  place();
+  next.focus({ preventScroll: true });
+}
+async function startTour() {
+  await hideWelcome();
+  mainParts().forEach(n => { n.inert = true; });
+  tourBox.hidden = false; tourBox.dataset.mode = 'center';
+  await whenSettled();
+  showStep(0);
+}
+function endTour() {
+  tourBox.hidden = true; step = -1;
+  mainParts().forEach(n => { n.inert = false; });
+  document.getElementById('tour-link').focus({ preventScroll: true });
+}
+document.getElementById('w-start').addEventListener('click', () => { hideWelcome(); });
+document.getElementById('w-tour').addEventListener('click', startTour);
+document.getElementById('tour-link').addEventListener('click', startTour);
+document.getElementById('tour-skip').addEventListener('click', endTour);
+document.getElementById('tour-guide').addEventListener('click', () => { openGuide(); endTour(); });
+document.getElementById('tour-back').addEventListener('click', () => showStep(step - 1));
+document.getElementById('tour-next').addEventListener('click', () => { if (STEPS[step].final) endTour(); else showStep(step + 1); });
+document.addEventListener('keydown', e => {
+  if (!welcome.hidden && e.key === 'Escape') { e.preventDefault(); hideWelcome(); }
+  else if (!tourBox.hidden) {
+    if (e.key === 'Escape') { e.preventDefault(); endTour(); }
+    else if (e.key === 'ArrowRight' && !STEPS[step].final) { e.preventDefault(); showStep(step + 1); }
+    else if (e.key === 'ArrowLeft' && step > 0) { e.preventDefault(); showStep(step - 1); }
+  }
+});
+addEventListener('resize', () => { if (!tourBox.hidden && step >= 0) place(); });
+
+StudioStorage.subscribe(value => { if (!saving) { settings = value; setAnimation(); render(); } });
+StudioStorage.subscribeGuide(value => { guide = value; });
+StudioStorage.read().then(value => { settings = value; setAnimation(); render(); maybeWelcome(); }).catch(() => { setAnimation(); render(); status.textContent = 'Could not load saved preferences.'; });
+StudioStorage.guide().then(value => { guide = value; maybeWelcome(); }).catch(() => { /* no welcome if the record cannot be read */ });

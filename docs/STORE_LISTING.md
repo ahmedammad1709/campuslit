@@ -33,13 +33,14 @@ WHAT YOU GET
 • Attendance planner: for each course, how many hours you can still miss and finish above 75%, worked out from your credit hours and the semester length you choose.
 • Time table: a compact day board or a one-page week calendar, and an "Add to calendar" button that downloads your classes as a calendar file you can open in Google, Apple or Outlook calendar.
 • Quick search: press Ctrl+K (Cmd+K on a Mac) or / to jump to any page in the portal's menu.
+• A short welcome and tour the first time you open it (skip it any time), and one small hint beside each new feature the first time it appears. Tips, the tour and the opening animation can all be switched off in settings.
 • A calmer sign-in page and portal chooser.
 
 PRIVATE BY DESIGN
 • Campuslit makes no network requests at all. There is no server, no account, no analytics and no remote code.
 • It never reads your password or anything you type into the portal.
 • To draw the extra screens it reads text the page already shows (course names, attendance hours, deadlines), in your browser's memory only.
-• What it stores, on your device only: your appearance choices, and (only if you leave assignment reminders on) a short note of your open assignments (course, title, deadline). Settings has a button to forget that note, and turning reminders off deletes it.
+• What it stores, on your device only: your appearance choices, and (only if you leave assignment reminders on) a short note of your open assignments (course, title, deadline), and a few yes/no flags for the tips you have seen. Settings has buttons to forget the note and to show the tips again, and turning reminders off deletes the note.
 • The code is open source (MIT): https://github.com/ahmedammad1709/campuslit
 
 GOOD TO KNOW

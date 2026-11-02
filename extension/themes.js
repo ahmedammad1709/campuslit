@@ -11,7 +11,7 @@
   };
   const CUSTOM_ESSENTIALS = ['bg', 'surface', 'nav', 'ink', 'accent'];
   const CUSTOM_OPTIONAL = ['soft', 'line', 'muted', 'navInk', 'gold'];
-  const defaults = { enabled: true, cms: true, lms: true, theme: 'navy', mode: 'preset', accent: '', font: 'jakarta', fontSize: 15, density: 'comfortable', radius: 10, motion: true, cleanBackground: false, custom: null, semesterWeeks: 16, reminders: true, quickSearch: true };
+  const defaults = { enabled: true, cms: true, lms: true, theme: 'navy', mode: 'preset', accent: '', font: 'jakarta', fontSize: 15, density: 'comfortable', radius: 10, motion: true, cleanBackground: false, custom: null, semesterWeeks: 16, reminders: true, quickSearch: true, tips: true, openingAnimation: true };
   const fonts = { jakarta: '"Bahria Jakarta", "Plus Jakarta Sans", "Segoe UI", sans-serif', manrope: '"Bahria Manrope", Manrope, "Segoe UI", sans-serif', sora: '"Bahria Sora", Sora, "Segoe UI", sans-serif', inter: '"Bahria Inter", Inter, Arial, sans-serif', system: '"Segoe UI", system-ui, sans-serif', humanist: '"Trebuchet MS", "Segoe UI", sans-serif', serif: 'Georgia, "Times New Roman", serif' };
   const HEX = /^#[0-9a-f]{6}$/i;
 
@@ -127,7 +127,7 @@
   function normalize(input) {
     const value = input && typeof input === 'object' ? input : {};
     const s = { ...defaults };
-    for (const key of ['enabled', 'cms', 'lms', 'motion', 'cleanBackground', 'reminders', 'quickSearch']) if (typeof value[key] === 'boolean') s[key] = value[key];
+    for (const key of ['enabled', 'cms', 'lms', 'motion', 'cleanBackground', 'reminders', 'quickSearch', 'tips', 'openingAnimation']) if (typeof value[key] === 'boolean') s[key] = value[key];
     for (const [key, allowed] of Object.entries({ theme: [...Object.keys(themes), 'custom'], mode: ['preset', 'system'], font: Object.keys(fonts), density: ['compact', 'comfortable', 'spacious'] })) if (allowed.includes(value[key])) s[key] = value[key];
     for (const [key, min, max] of [['fontSize', 13, 19], ['radius', 0, 20], ['semesterWeeks', 8, 24]]) if (Number.isFinite(value[key])) s[key] = Math.min(max, Math.max(min, Math.round(value[key])));
     if (typeof value.accent === 'string' && HEX.test(value.accent)) s.accent = value.accent;

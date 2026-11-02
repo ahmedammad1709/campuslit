@@ -114,6 +114,7 @@
     const items = lib_.build(collect(), location.href);
     if (!items.length) return;
     state.items = items;
+    if (!state.preview) globalThis.BahriaTips?.used('search');   // you found it: the hint about it is no longer needed
     const dialog = ensureDialog();
     if (!dialog.open) { if (typeof dialog.showModal !== 'function') return; dialog.showModal(); }
     state.input.value = ''; render(''); state.input.focus();

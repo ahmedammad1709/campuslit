@@ -106,6 +106,13 @@ try {
   assert.ok(await evaluate("document.querySelectorAll('.bs-qs-btn').length === 1"), 'the search button is in the header');
   console.log('LMS dashboard restyled in Firefox');
 
+  // a first visit shows one hint, pointing at the search button, and "Got it" dismisses it
+  await waitFor("document.querySelectorAll('.bs-tip').length === 1 && document.querySelector('.bs-tip').dataset.key === 'search'", 'the search hint');
+  assert.ok(await evaluate("(() => { const t = document.querySelector('.bs-tip').getBoundingClientRect(), a = document.querySelector('.bs-qs-btn').getBoundingClientRect(); return t.top >= a.bottom && t.left >= 0 && t.right <= innerWidth; })()"), 'the hint sits under the button, inside the window');
+  await evaluate("document.querySelector('.bs-tip-ok').click(); 0");
+  await waitFor("!document.querySelector('.bs-tip') && !document.querySelector('.bs-tip-target')", 'Got it removes the hint');
+  console.log('one-time hint shown and dismissed in Firefox');
+
   // quick search, with a real key press
   await ctrlK();
   await waitFor("!!document.querySelector('dialog.bs-qs') && document.querySelector('dialog.bs-qs').open", 'Ctrl+K opens quick search');

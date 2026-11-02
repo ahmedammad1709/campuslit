@@ -72,6 +72,7 @@ const SECTIONS = {
   text: ['Text & layout', 'Typeface, text size, spacing and how rounded the corners are.'],
   studio: ['Custom theme', 'Design a seventh theme. Pick a few colors and the rest is worked out for you.'],
   portals: ['Portals', 'Choose where Campuslit runs, and a couple of small extras.'],
+  guide: ['Guide', 'What Campuslit adds, and where to find it.'],
   privacy: ['Privacy & data', 'What Campuslit stores, and your controls.']
 };
 function showSection(name, focusFirst, push = false) {
@@ -81,6 +82,7 @@ function showSection(name, focusFirst, push = false) {
     if (on) $('nav-' + key).setAttribute('aria-current', 'page'); else $('nav-' + key).removeAttribute('aria-current');
     $('section-' + key).hidden = !on;
   }
+  document.querySelector('.work').dataset.section = name;   // the Guide uses the full width: the live preview has nothing to show for it
   $('section-title').textContent = SECTIONS[name][0]; $('section-desc').textContent = SECTIONS[name][1];
   document.title = SECTIONS[name][0] + ' · Campuslit settings';
   if (name === 'studio') StudioUI.refresh();
@@ -96,7 +98,7 @@ $('goto-studio').addEventListener('click', () => showSection('studio', true, tru
 // ---------- controls <-> settings ----------
 const setPct = input => input.style.setProperty('--pct', ((input.value - input.min) / (input.max - input.min) * 100) + '%');
 function syncControls() {
-  for (const key of ['enabled', 'cms', 'lms', 'cleanBackground', 'motion', 'reminders', 'quickSearch']) $(key).checked = settings[key];
+  for (const key of ['enabled', 'cms', 'lms', 'cleanBackground', 'motion', 'reminders', 'quickSearch', 'tips', 'openingAnimation']) $(key).checked = settings[key];
   $('font').value = settings.font; $('fontSize').value = settings.fontSize; $('radius').value = settings.radius; $('semesterWeeks').value = settings.semesterWeeks;
   setPct($('fontSize')); setPct($('radius')); setPct($('semesterWeeks')); $('weeks-output').textContent = settings.semesterWeeks + ' weeks';
   $('size-output').textContent = settings.fontSize + ' px'; $('radius-output').textContent = settings.radius + ' px';
@@ -192,7 +194,7 @@ for (const key of ['fontSize', 'radius', 'semesterWeeks']) $(key).addEventListen
 document.querySelectorAll('#density-seg button').forEach(b => b.addEventListener('click', () => { settings.density = b.dataset.density; syncControls(); preview(); updateDirty(); }));
 $('system').addEventListener('change', e => { settings.mode = e.target.checked ? 'system' : 'preset'; renderAll(); updateDirty(); });
 system.addEventListener('change', () => { syncControls(); preview(); renderThemes(); });
-for (const key of ['cleanBackground', 'motion', 'reminders', 'quickSearch']) $(key).addEventListener('change', e => { settings[key] = e.target.checked; preview(); updateDirty(); });
+for (const key of ['cleanBackground', 'motion', 'reminders', 'quickSearch', 'tips', 'openingAnimation']) $(key).addEventListener('change', e => { settings[key] = e.target.checked; preview(); updateDirty(); });
 for (const key of ['enabled', 'cms', 'lms']) $(key).addEventListener('change', e => { Object.assign(settings, B.power(settings, key, e.target.checked)); syncControls(); preview(); updateDirty(); });
 
 // ---------- save / export / import / reset ----------
@@ -235,6 +237,28 @@ $('forget-reminders').addEventListener('click', async () => {
   catch { status('Could not forget them. Please try again.'); }
 });
 showRemembered();
+// ---------- guide ----------
+document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => showSection(b.dataset.goto, true, true)));
+function showGuideState(guide) {
+  const p = BahriaGuide.progress(guide);
+  $('guide-progress').textContent = p.seen ? p.seen + ' of ' + p.total + ' hints dismissed.' : 'No hints dismissed yet.';
+}
+StudioStorage.guide().then(showGuideState).catch(() => { $('guide-progress').textContent = ''; });
+StudioStorage.subscribeGuide(showGuideState);
+$('reset-guide').addEventListener('click', async () => {
+  try { showGuideState(await StudioStorage.updateGuide(BahriaGuide.clearHints)); status('The hints will show again, once each.'); }
+  catch { status('Could not reset the hints. Please try again.'); }
+});
+// "Take the tour again": ask for the welcome and tour at the next popup open, and try to open the popup right now (not every browser allows that).
+$('retake-tour').addEventListener('click', async () => {
+  try { await StudioStorage.updateGuide(BahriaGuide.requestTour); }
+  catch { status('Could not set up the tour. Please try again.'); return; }
+  const api = globalThis.browser || globalThis.chrome;
+  if (StudioStorage.isExtension && api.action && typeof api.action.openPopup === 'function') {
+    try { await api.action.openPopup(); status('The tour is starting in the toolbar popup.'); return; } catch { /* fall through to the message */ }
+  }
+  status('The tour starts the next time you open Campuslit from the toolbar.');
+});
 if (StudioStorage.isExtension) chrome.storage.onChanged.addListener((changes, area) => { if (area === 'local' && changes.bahriaStudioReminders) showRemembered(); });
 $('reset').addEventListener('click', () => $('reset-dialog').showModal());
 $('cancel-reset').addEventListener('click', () => $('reset-dialog').close());

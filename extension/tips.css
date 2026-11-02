@@ -1,0 +1,30 @@
+/* Campuslit one-time hints on the CMS and LMS. Screen-only, scoped to the styled portals; colours come from the --bs-* tokens. */
+@media screen {
+  html[data-bahria-studio] {
+    & .bs-tip { box-sizing: border-box; color: var(--bs-ink); font-family: var(--bs-font); font-size: var(--bs-size); line-height: 1.45; }
+    & .bs-tip p { margin: 0; }
+    & .bs-tip-kicker { display: block; margin-bottom: 4px; font-size: calc(var(--bs-size) * 0.7333); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--bs-link, var(--bs-accent)); }
+    & .bs-tip-title { font-size: calc(var(--bs-size) * 1.0667); font-weight: 700; line-height: 1.3; }
+    & .bs-tip-text { margin-top: 4px; font-size: calc(var(--bs-size) * 0.9); color: var(--bs-muted); }
+    & .bs-tip-ok { flex: none; align-self: flex-start; min-height: 34px; margin-top: 12px; padding: 0 16px; border: 0 !important; border-radius: calc(var(--bs-r) * .8); background: var(--bs-accent) !important; color: var(--bs-onAccent, #fff) !important; font: 700 calc(var(--bs-size) * 0.8667) var(--bs-font); cursor: pointer; box-shadow: none !important; transition: filter .16s, transform .16s var(--bs-ease); }
+    & .bs-tip-ok:hover { filter: brightness(1.08); }
+    & .bs-tip-ok:active { transform: scale(.97); }
+    & .bs-tip-ok:focus-visible { outline: 2px solid var(--bs-accent); outline-offset: 2px; }
+
+    /* beside a button or line: a floating card with an arrow that points at it */
+    & .bs-tip[data-kind="pop"] { position: fixed; z-index: 1065; display: flex; flex-direction: column; padding: 16px 18px 16px; background: var(--bs-surface); border: 1px solid var(--bs-line); border-radius: calc(var(--bs-r) + 4px); box-shadow: 0 18px 48px -12px color-mix(in srgb, var(--bs-ink) 38%, transparent), 0 2px 6px color-mix(in srgb, var(--bs-ink) 10%, transparent); animation: bs-tip-in .26s var(--bs-ease) both; }
+    & .bs-tip-arrow { position: absolute; left: var(--arrow, 50%); width: 12px; height: 12px; margin-left: -6px; background: var(--bs-surface); border: 1px solid var(--bs-line); transform: rotate(45deg); }
+    & .bs-tip[data-place="below"] .bs-tip-arrow { top: -7px; border-right: 0; border-bottom: 0; }
+    & .bs-tip[data-place="above"] .bs-tip-arrow { bottom: -7px; border-left: 0; border-top: 0; }
+    & .bs-tip-target { outline: 2px solid var(--bs-accent); outline-offset: 3px; animation: bs-tip-ring 1.6s ease-out 2; }
+
+    /* under the Assignments card: part of the page, pushes nothing over anything */
+    & .bs-tip[data-kind="note"] { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: -4px 0 20px; padding: 14px 18px; background: color-mix(in srgb, var(--bs-accent) 8%, var(--bs-surface)); border: 1px solid color-mix(in srgb, var(--bs-accent) 28%, var(--bs-line)); border-radius: calc(var(--bs-r) + 2px); animation: bs-tip-note .3s var(--bs-ease) both; }
+    & .bs-tip[data-kind="note"] .bs-tip-ok { margin-top: 0; align-self: center; }
+  }
+  @media (max-width: 560px) { html[data-bahria-studio] .bs-tip[data-kind="note"] { flex-direction: column; align-items: flex-start; } html[data-bahria-studio] .bs-tip[data-kind="note"] .bs-tip-ok { margin-top: 10px; } }
+}
+@keyframes bs-tip-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes bs-tip-note { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@keyframes bs-tip-ring { 0% { outline-color: var(--bs-accent); outline-offset: 3px; } 70% { outline-color: transparent; outline-offset: 9px; } 100% { outline-color: transparent; outline-offset: 9px; } }
+@media screen and (prefers-reduced-motion: reduce) { html[data-bahria-studio] .bs-tip[data-kind], html[data-bahria-studio] .bs-tip-target { animation: none; } }
