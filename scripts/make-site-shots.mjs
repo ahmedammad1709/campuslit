@@ -24,30 +24,46 @@ try {
   const waitFor=async(expr,label)=>{for(let i=0;i<80;i++){try{if(await evaluate(expr))return;}catch{}await sleep(100);}throw Error('Timed out: '+label);};
   await call('Page.enable');await call('Runtime.enable');
 
-  async function shot(name,{url,width=1360,height=850,settings,after}) {
-    await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1.5,mobile:false});
-    await call('Page.navigate',{url:base+url});await waitFor("document.readyState === 'complete'",url);
+  // the greeting depends on the hour; every picture should read "Good morning", whatever time this runs
+  await call('Page.addScriptToEvaluateOnNewDocument', {source: 'Date.prototype.getHours = function () { return 10; };'});
+
+  // opts: url, width, height, scale, settings (posted to the sample page), before (script run, then the page reloads), after (script run before the picture),
+  //       wait (ms to let animations finish), clipBody (crop to the page's own height, for the popup)
+  async function shot(name, {url, width = 1360, height = 850, scale = 1.5, settings, before, after, wait = 700, clipBody = false}) {
+    await call('Emulation.setDeviceMetricsOverride', {width, height, deviceScaleFactor: scale, mobile: false});
+    await call('Page.navigate', {url: base + url}); await waitFor("document.readyState === 'complete'", url);
+    if (before) { await evaluate(before); await call('Page.reload'); await sleep(400); await waitFor("document.readyState === 'complete'", url + ' (reloaded)'); }
     if (settings) {
       // the sample pages listen for settings from their parent; a top-level page is its own parent
-      await evaluate(`window.postMessage({type:'campuslit-settings',settings:${JSON.stringify({motion:false,...settings})}}, location.origin)`);
+      await evaluate(`window.postMessage({type:'campuslit-settings',settings:${JSON.stringify({motion: false, ...settings})}}, location.origin)`);
     }
-    await evaluate('document.fonts.ready.then(()=>true)');await sleep(700);
-    if (after) {await evaluate(after);await sleep(500);}
-    const r=await call('Page.captureScreenshot',{format:'webp',quality:84,captureBeyondViewport:false});
-    await writeFile(path.join(out,name+'.webp'),Buffer.from(r.data,'base64'));
-    console.log('wrote',name);
+    await evaluate('document.fonts.ready.then(()=>true)'); await sleep(wait);
+    if (after) { await evaluate(after); await sleep(600); }
+    const params = {format: 'webp', quality: 86, captureBeyondViewport: false};
+    if (clipBody) { const h = await evaluate('Math.ceil(document.body.getBoundingClientRect().height)'); Object.assign(params, {clip: {x: 0, y: 0, width, height: h, scale: 1}}); }
+    const r = await call('Page.captureScreenshot', params);
+    await writeFile(path.join(out, name + '.webp'), Buffer.from(r.data, 'base64'));
+    console.log('wrote', name);
   }
-  const themes={bahria:'navy',crystal:'classic',midnight:'midnight',linen:'pearl',grove:'sage',bloom:'rose'};
-  for (const [name,key] of Object.entries(themes)) await shot('lms-'+name,{url:'preview/lms/dashboard.html',settings:{theme:key}});
-  await shot('cms-dashboard',{url:'preview/cms/dashboard.html',settings:{theme:'navy'}});
-  await shot('timetable-list',{url:'preview/cms/timetable.html',settings:{theme:'navy'},height:800});
-  await shot('timetable-week',{url:'preview/cms/timetable.html',settings:{theme:'navy'},height:800,after:"document.querySelector('.bs-tt-segbtn').click()"});
-  await shot('lms-assignments',{url:'preview/lms/assignments.html',settings:{theme:'navy'},height:760});
-  await shot('lms-original',{url:'preview/lms/dashboard.html',settings:{enabled:false}});
-  await shot('settings',{url:'options.html',width:1440,height:1000});
-  // a custom theme: the Studio tab with a generated palette, and the LMS drawn with it
-  const demo = {bg:'#1c1416',surface:'#271e20',nav:'#321a1f',ink:'#f3edee',accent:'#e11d48',name:'Rose Night'};
-  await shot('lms-custom',{url:'preview/lms/dashboard.html',settings:{theme:'custom',custom:demo}});
-  await shot('studio',{url:'options.html',width:1440,height:1500,after:`(async()=>{const s=ms=>new Promise(r=>setTimeout(r,ms));document.getElementById('nav-studio').click();document.querySelector('.studio-empty .btn.primary').click();await s(300);const h=document.querySelector('input[name=hex-brand]');h.value='#e11d48';h.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('.quick [data-mode=dark]').click();document.querySelector('.quick [data-side=tinted]').click();document.querySelector('.quick .btn.primary').click();await s(300);document.getElementById('studio-name').value='Rose Night';document.getElementById('studio-name').dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('.toast')?.remove();window.scrollTo(0,0);return 1})()`});
+  const themes = {bahria: 'navy', crystal: 'classic', midnight: 'midnight', linen: 'pearl', grove: 'sage', bloom: 'rose'};
+
+  // before and after: the same LMS page as the university serves it, and with Campuslit
+  await shot('hero-before', {url: 'preview/lms/dashboard.html', settings: {enabled: false}});
+  for (const [name, key] of Object.entries(themes)) await shot('lms-' + name, {url: 'preview/lms/dashboard.html', settings: {theme: key}});
+  // features
+  await shot('lms-assignments', {url: 'preview/lms/assignments.html', settings: {theme: 'navy'}, height: 800, after: "document.querySelector('.sidebar-toggle').click()"});
+  await shot('cms-attendance', {url: 'preview/cms/attendance.html', settings: {theme: 'navy'}, height: 800});
+  await shot('timetable-week', {url: 'preview/cms/timetable.html', settings: {theme: 'navy'}, height: 800, after: "document.querySelector('.bs-tt-segbtn').click()"});
+  await shot('quick-search', {url: 'preview/lms/dashboard.html', settings: {theme: 'navy'}, height: 800,
+    after: "(async () => { BahriaQuickSearch.open(); await new Promise(r => setTimeout(r, 300)); const i = document.getElementById('bs-qs-input'); i.value = 'assi'; i.dispatchEvent(new Event('input', {bubbles: true})); })()"});
+  // the toolbar popup: after the first run, the welcome, and a step of the tour
+  const seen = "localStorage.setItem('bahriaStudioGuide', JSON.stringify({v:1, welcome:true, tour:false, seen:[]}))";
+  await shot('popup', {url: 'popup.html', width: 360, height: 640, scale: 2, before: seen, wait: 1500, clipBody: true});
+  await shot('popup-tour', {url: 'popup.html', width: 360, height: 560, scale: 2, before: seen, wait: 1200,
+    after: "(async () => { document.getElementById('tour-link').click(); await new Promise(r => setTimeout(r, 700)); document.getElementById('tour-next').click(); await new Promise(r => setTimeout(r, 700)); })()"});
+  // settings
+  // a custom theme, drawn on the LMS
+  const demo = {bg: '#1c1416', surface: '#271e20', nav: '#321a1f', ink: '#f3edee', accent: '#e11d48', name: 'Rose Night'};
+  await shot('lms-custom', {url: 'preview/lms/dashboard.html', settings: {theme: 'custom', custom: demo}});
   await call('Browser.close');
 } finally {if(socket?.readyState===WebSocket.OPEN)socket.close();chrome.kill();}

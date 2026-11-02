@@ -3,17 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Campuslit — a calmer CMS and LMS for Bahria students</title>
-<meta name="description" content="Campuslit is a free Chrome and Firefox extension that gives the Bahria University student CMS and LMS a clean look, a readable time table, six themes and a maker for your own. Private, open source and unofficial.">
-<meta name="theme-color" content="#f6f8fd">
+<title>Campuslit — a cleaner Bahria University CMS and LMS, on every campus</title>
+<meta name="description" content="Campuslit is a free browser extension for Bahria University students on every campus. It redraws the CMS and LMS you already use, with due-date countdowns, an attendance planner, a readable time table and quick search. Private, open source and unofficial.">
+<meta name="theme-color" content="#0b1d40">
+<link rel="canonical" href="https://campuslit-bu.vercel.app/">
 <link rel="icon" href="assets/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preload" href="assets/fonts/jakarta-latin.woff2" as="font" type="font/woff2" crossorigin>
 <meta property="og:type" content="website">
-<meta property="og:title" content="Campuslit — a calmer CMS and LMS for Bahria students">
-<meta property="og:description" content="Same data, same links, a much nicer portal. Free, private and open source.">
-<meta property="og:image" content="assets/og.png">
+<meta property="og:site_name" content="Campuslit">
+<meta property="og:url" content="https://campuslit-bu.vercel.app/">
+<meta property="og:title" content="Campuslit — a cleaner Bahria University CMS and LMS">
+<meta property="og:description" content="A free browser extension for Bahria students on every campus. Same data, same logins — a much nicer portal. Private and open source.">
+<meta property="og:image" content="https://campuslit-bu.vercel.app/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Campuslit: the Bahria LMS dashboard before and after.">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Campuslit — a cleaner Bahria University CMS and LMS">
+<meta name="twitter:description" content="A free browser extension for Bahria students on every campus. Private and open source.">
+<meta name="twitter:image" content="https://campuslit-bu.vercel.app/assets/og.png">
 <link rel="stylesheet" href="styles.css">
 <script src="script.js" defer></script>
 </head>
@@ -22,230 +31,249 @@
 
 <header class="site-header" id="top">
   <div class="wrap nav">
-    <a class="brand" href="#top" aria-label="Campuslit home"><img src="assets/logo.svg" width="32" height="32" alt=""><span>campus<span>lit</span></span></a>
-    <nav class="nav-links" aria-label="Main">
-      <a href="#features">Features</a>
-      <a href="#themes">Themes</a>
-      <a href="#how">How to use</a>
-      <a href="#privacy">Privacy</a>
+    <a class="brand" href="#top" aria-label="Campuslit home"><svg class="logo" viewBox="0 0 128 128" width="34" height="34" aria-hidden="true" focusable="false"><rect width="128" height="128" rx="30" fill="#0b1d40"/><path class="ring" pathLength="1" d="M80.57 81.21A30 30 0 1 1 80.57 46.79" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round"/><circle class="dot" cx="98" cy="64" r="8.5" fill="#f2b84b"/></svg><span>campus<span>lit</span></span></a>
+    <button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <nav class="nav-links" id="menu" aria-label="Main">
+      <a href="#features">What it does</a>
+      <a href="#install">Install</a>
       <a href="#faq">FAQ</a>
+      <a href="privacy">Privacy</a>
       <a class="btn btn-primary btn-sm" href="#install">Get Campuslit</a>
     </nav>
   </div>
 </header>
 
 <main id="main">
-  <section class="hero" style="padding-top:76px">
+  <!-- ============ hero ============ -->
+  <section class="hero" aria-labelledby="hero-title">
     <div class="wrap">
-      <span class="eyebrow"><i></i> Free for Chrome, Edge, Brave and Firefox</span>
-      <h1>A calmer way to use your <em>university portals.</em></h1>
-      <p class="lede">Campuslit restyles the Bahria University student CMS and LMS: cleaner pages, a time table you can actually read, attendance at a glance, six themes and a maker for your own. Same data, same links.</p>
+      <span class="eyebrow"><i></i> Free for Bahria University students on every campus</span>
+      <h1 id="hero-title">Your Bahria portals, finally <em>pleasant</em> to use.</h1>
+      <p class="lede">Campuslit is a free browser extension that redraws the student CMS and LMS you already use. Same logins, same data, with a cleaner look, due-date countdowns, an attendance planner and a time table you can read.</p>
       <div class="cta-row">
         <a class="btn btn-primary" href="#install">Get Campuslit</a>
-        <a class="btn btn-ghost" href="#how">See how it works</a>
+        <a class="btn btn-glass" href="#features">See what it does</a>
       </div>
-      <ul class="facts"><li>Free</li><li>Open source</li><li>No accounts</li><li>Nothing leaves your browser</li></ul>
-      <figure class="frame hero-shot reveal">
-        <div class="frame-bar"><i></i><i></i><i></i><span>lms.bahria.edu.pk</span></div>
-        <img src="assets/shots/lms-bahria.webp" width="2040" height="1275" alt="The LMS dashboard with Campuslit: a navy sidebar, a greeting card and the student's courses as cards.">
-        <figcaption>The LMS dashboard with Campuslit. Sample data, not a real student.</figcaption>
-      </figure>
+      <ul class="trust">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>Free and open source</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>No accounts</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>Nothing leaves your browser</li>
+      </ul>
+      <div class="hero-visual reveal">
+        <figure class="frame big compare" data-compare data-sweep>
+          <div class="frame-bar"><i></i><i></i><i></i><span>lms.bahria.edu.pk</span><b></b></div>
+          <div class="compare-stage">
+            <img class="compare-after" src="assets/shots/lms-bahria.webp" width="2040" height="1275" alt="The LMS dashboard with Campuslit: a navy sidebar, a greeting card, courses as cards and a reminder about the next assignment.">
+            <img class="compare-before" src="assets/shots/hero-before.webp" width="2040" height="1275" alt="The same LMS dashboard without Campuslit: the portal as it looks today, with a plain list-style layout.">
+            <span class="compare-tag b">Before: the portal today</span>
+            <span class="compare-tag a">After: with Campuslit</span>
+            <input class="compare-range" type="range" min="0" max="100" value="50" aria-label="Drag to compare the LMS before and after Campuslit">
+            <span class="compare-handle" aria-hidden="true"></span>
+          </div>
+          <figcaption>Drag to compare. The same LMS page, drawn with invented sample data, not a real student.</figcaption>
+        </figure>
+      </div>
     </div>
   </section>
 
-  <section id="features">
+  <!-- ============ facts strip ============ -->
+  <div class="facts">
+    <div class="wrap">
+      <p><b>Works on</b> <code>cms.bahria.edu.pk</code> and <code>lms.bahria.edu.pk</code>, the portals every campus uses.</p>
+      <p><b>Changes</b> how pages look and adds helpers. Your data, marks and buttons stay the university&rsquo;s.</p>
+      <p><b>Unofficial.</b> Made by students. Not made, endorsed or supported by Bahria University.</p>
+    </div>
+  </div>
+
+  <!-- ============ features, one at a time ============ -->
+  <section id="features" aria-labelledby="features-title">
     <div class="wrap">
       <div class="section-head center reveal">
-        <p class="kicker">What you get</p>
-        <h2>Everything you open every day, made pleasant.</h2>
-        <p>Campuslit changes how the portals look and read. It does not change what they do.</p>
+        <p class="kicker">What it does</p>
+        <h2 id="features-title">The things you check every day, made clear.</h2>
+        <p>Every picture is the real extension, drawn with invented student data.</p>
       </div>
-      <div class="grid">
-        <article class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16M3 10h6"/></svg></div><h3>The LMS, redesigned</h3><p>A sidebar that shows where you are, readable tables, clear status labels and downloads a tap away. On Assignments, a card counts down to the next deadline.</p></article>
-        <article class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 11h18M8 15h3"/></svg></div><h3>A time table you can read</h3><p>A one-page week calendar or a day-by-day board, with your next class always on top, and a button to add every class to your phone's calendar. Press Ctrl+K anywhere to jump straight to any page.</p></article>
-        <article class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg></div><h3>Attendance at a glance</h3><p>One bar per course that turns amber, then red, before it becomes a problem.</p></article>
-        <article class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div><h3>Sign in on one screen</h3><p>A compact sign-in with show or hide password and a Caps Lock warning. Errors appear where you can see them.</p></article>
-        <article class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h9m4 0h3M4 17h3m4 0h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></div><h3>Make it yours</h3><p>Six themes, or design your own. Plus four fonts, text size, spacing and corner roundness.</p></article>
-        <article class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg></div><h3>Private by design</h3><p>No accounts, no analytics, no servers. It only restyles what your browser already shows.</p></article>
-      </div>
-
-      <div class="show reveal">
-        <div class="show-text">
-          <p class="kicker">Time table</p>
-          <h3>Your whole week, in one glance.</h3>
-          <p>The portal draws your schedule as a wide grid that is hard to scan. Campuslit draws the same classes as a clean calendar, and tells you what is next.</p>
-          <ul class="ticks"><li>Week calendar or day-by-day list. It remembers your choice.</li><li>“Next class” or “In class now” card at the top.</li><li>Fits on one screen. No scrolling sideways.</li></ul>
+      <div class="tabs reveal" data-tabs>
+        <div class="tablist" role="tablist" aria-label="Campuslit features">
+          <button class="tab" role="tab" type="button" id="t-assignments" aria-controls="p-assignments" aria-selected="true">Assignments</button>
+          <button class="tab" role="tab" type="button" id="t-attendance" aria-controls="p-attendance" aria-selected="false" tabindex="-1">Attendance</button>
+          <button class="tab" role="tab" type="button" id="t-timetable" aria-controls="p-timetable" aria-selected="false" tabindex="-1">Time table</button>
+          <button class="tab" role="tab" type="button" id="t-search" aria-controls="p-search" aria-selected="false" tabindex="-1">Quick search</button>
+          <button class="tab" role="tab" type="button" id="t-themes" aria-controls="p-themes" aria-selected="false" tabindex="-1">Themes</button>
+          <button class="tab" role="tab" type="button" id="t-popup" aria-controls="p-popup" aria-selected="false" tabindex="-1">Toolbar popup</button>
         </div>
-        <figure class="frame">
-          <div class="frame-bar"><i></i><i></i><i></i><span>cms.bahria.edu.pk · Time Table</span></div>
-          <img loading="lazy" src="assets/shots/timetable-week.webp" width="2040" height="1200" alt="The week view of the time table: days as rows, hours across, classes as coloured blocks, labs in gold.">
-          <figcaption>Week view. Sample schedule.</figcaption>
-        </figure>
-      </div>
 
-      <div class="show flip reveal">
-        <div class="show-text">
-          <p class="kicker">CMS dashboard</p>
-          <h3>Know how many classes you can miss.</h3>
-          <p>The attendance chart becomes one readable row per course, with a plain line under it: how many hours you can still miss this semester, or how many you must attend to finish above 75%. It counts from your credit hours and the length of your semester.</p>
-          <ul class="ticks"><li>“Can miss up to 3 lab sessions (9 hrs) of the remaining 27 hrs.”</li><li>Courses at or below 75% are named at the top.</li><li>Also on the Attendance page, built from its own table.</li></ul>
+        <div class="tabpanel" role="tabpanel" id="p-assignments" aria-labelledby="t-assignments">
+          <div class="panel-text">
+            <h3>See what is due, before it is late.</h3>
+            <p>A <b>Due soon</b> card counts down to your next deadline, and each assignment says if it is open, submitted or closed.</p>
+            <ul class="ticks"><li>A small reminder on other LMS pages names the next assignment you have not submitted.</li><li>Deadlines are read in Pakistan time.</li></ul>
+            <div class="where"><span>LMS &rsaquo; Assignments</span></div>
+          </div>
+          <figure class="frame"><div class="frame-bar"><i></i><i></i><i></i><span>lms.bahria.edu.pk · Assignments</span><b></b></div>
+            <img loading="lazy" decoding="async" src="assets/shots/lms-assignments.webp" width="2040" height="1200" alt="The Assignments page with Campuslit: a Due soon card, a status under each deadline and a tidy Submit button.">
+          </figure>
         </div>
-        <figure class="frame">
-          <div class="frame-bar"><i></i><i></i><i></i><span>cms.bahria.edu.pk</span></div>
-          <img loading="lazy" src="assets/shots/cms-dashboard.webp" width="2040" height="1275" alt="The CMS dashboard with a navy sidebar, notifications and an attendance summary with one bar per course.">
-          <figcaption>CMS dashboard. Sample data.</figcaption>
-        </figure>
-      </div>
 
-      <div class="show reveal">
-        <div class="show-text">
-          <p class="kicker">Custom theme</p>
-          <h3>Design a theme that is yours.</h3>
-          <p>Pick one brand color and Campuslit builds the rest, or take control of every color. A readability check keeps text clear, and your theme joins the gallery as number seven.</p>
-          <ul class="ticks"><li>Start from a preset, one brand color, or Surprise me.</li><li>Fine-tune any color. Everything else stays automatic.</li><li>A built-in readability check with a one-click fix.</li><li>Undo any change, and share your theme with Export.</li></ul>
+        <div class="tabpanel" role="tabpanel" id="p-attendance" aria-labelledby="t-attendance">
+          <div class="panel-text">
+            <h3>Know how many classes you can still miss.</h3>
+            <p>One clear row per course, with a plain line under it: how many hours you can still miss, or must attend, to finish above 75%.</p>
+            <ul class="ticks"><li>Counted from your credit hours and your semester length (16 weeks by default).</li><li>Courses at or below 75% are named at the top.</li></ul>
+            <div class="where"><span>CMS &rsaquo; Dashboard</span><span>CMS &rsaquo; Courses &rsaquo; Attendance</span></div>
+            <p class="fine-note">An estimate from the hours the portal shows. The university&rsquo;s records decide.</p>
+          </div>
+          <figure class="frame"><div class="frame-bar"><i></i><i></i><i></i><span>cms.bahria.edu.pk · Attendance</span><b></b></div>
+            <img loading="lazy" decoding="async" src="assets/shots/cms-attendance.webp" width="2040" height="1200" alt="The Attendance page with an attendance planner: one bar per course and a sentence under each saying how many hours can still be missed.">
+          </figure>
         </div>
-        <figure class="frame">
-          <div class="frame-bar"><i></i><i></i><i></i><span>Campuslit settings · Custom theme</span></div>
-          <img loading="lazy" src="assets/shots/studio.webp" width="2160" height="2250" alt="The Campuslit settings page on Custom theme: a custom dark rose theme with its palette, a quick palette generator, color rows and a live preview.">
-          <figcaption>Custom theme, with a theme called Rose Night.</figcaption>
-        </figure>
+
+        <div class="tabpanel" role="tabpanel" id="p-timetable" aria-labelledby="t-timetable">
+          <div class="panel-text">
+            <h3>Your week on one page, or in your calendar.</h3>
+            <p>A clean week calendar or day-by-day list that tells you which class is next, instead of a wide grid you scroll sideways.</p>
+            <ul class="ticks"><li><b>Add to calendar</b> downloads your classes for Google, Apple or Outlook Calendar.</li><li>It remembers Week or List.</li></ul>
+            <div class="where"><span>CMS &rsaquo; Courses &rsaquo; Time Table</span></div>
+          </div>
+          <figure class="frame"><div class="frame-bar"><i></i><i></i><i></i><span>cms.bahria.edu.pk · Time Table</span><b></b></div>
+            <img loading="lazy" decoding="async" src="assets/shots/timetable-week.webp" width="2040" height="1200" alt="The week view of the time table: days as rows, hours across, classes as coloured blocks, with an Add to calendar button.">
+          </figure>
+        </div>
+
+        <div class="tabpanel" role="tabpanel" id="p-search" aria-labelledby="t-search">
+          <div class="panel-text">
+            <h3>Jump to any page in two keystrokes.</h3>
+            <p>Press <span class="kbd">Ctrl</span> <span class="kbd">K</span> (<span class="kbd">Cmd</span> <span class="kbd">K</span> on a Mac) or <span class="kbd">/</span>, type a few letters, press Enter. No more nested menus.</p>
+            <ul class="ticks"><li>Finds pages by related words and forgives typos.</li><li>Searches only the menu you can already see.</li></ul>
+            <div class="where"><span>CMS</span><span>LMS</span></div>
+          </div>
+          <figure class="frame"><div class="frame-bar"><i></i><i></i><i></i><span>lms.bahria.edu.pk</span><b></b></div>
+            <img loading="lazy" decoding="async" src="assets/shots/quick-search.webp" width="2040" height="1200" alt="Quick search open over the LMS dashboard: typing &ldquo;assi&rdquo; finds Assignments.">
+          </figure>
+        </div>
+
+        <div class="tabpanel" role="tabpanel" id="p-themes" aria-labelledby="t-themes">
+          <div class="panel-text">
+            <h3>Pick a look, or design your own.</h3>
+            <p>Six hand-tuned themes and room for one of your own, with your choice of text size, spacing and typeface. One theme follows your device&rsquo;s dark mode.</p>
+            <div class="chips" role="group" aria-label="Choose a theme to preview">
+              <button class="chip" type="button" data-theme="bahria" aria-pressed="true"><i></i>Bahria</button>
+              <button class="chip" type="button" data-theme="crystal" aria-pressed="false"><i></i>Crystal</button>
+              <button class="chip" type="button" data-theme="midnight" aria-pressed="false"><i></i>Midnight</button>
+              <button class="chip" type="button" data-theme="linen" aria-pressed="false"><i></i>Linen</button>
+              <button class="chip" type="button" data-theme="grove" aria-pressed="false"><i></i>Grove</button>
+              <button class="chip" type="button" data-theme="bloom" aria-pressed="false"><i></i>Bloom</button>
+              <button class="chip" type="button" data-theme="custom" aria-pressed="false"><i></i>Yours</button>
+            </div>
+          </div>
+          <figure class="frame"><div class="frame-bar"><i></i><i></i><i></i><span>lms.bahria.edu.pk</span><b></b></div>
+            <img id="theme-shot" loading="lazy" decoding="async" src="assets/shots/lms-bahria.webp" width="2040" height="1275" alt="The LMS dashboard in the Bahria theme.">
+          </figure>
+        </div>
+
+        <div class="tabpanel" role="tabpanel" id="p-popup" aria-labelledby="t-popup">
+          <div class="panel-text">
+            <h3>Everything one click away.</h3>
+            <p>The Campuslit button in your toolbar switches themes, and turns Campuslit off for the CMS, the LMS or both. The first time, a short tour shows you around. Skip it any time.</p>
+            <ul class="ticks"><li>Off means the original portal, instantly.</li><li>Open settings for a live preview of every change.</li></ul>
+          </div>
+          <div class="popup-pair">
+            <img loading="lazy" decoding="async" src="assets/shots/popup.webp" width="720" height="1108" alt="The Campuslit toolbar popup with on and off switches and six theme previews.">
+            <img loading="lazy" decoding="async" src="assets/shots/popup-tour.webp" width="720" height="1120" alt="A step of the Campuslit tour pointing at the theme choices, with a Skip tour button.">
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <section id="themes">
-    <div class="wrap">
-      <div class="section-head center reveal">
-        <p class="kicker">Themes</p>
-        <h2>Pick a look. Change anything.</h2>
-        <p>Six hand-tuned themes, or design your own. Settings update the portals live.</p>
-      </div>
-      <div class="theme-stage reveal">
-        <div class="chips" role="group" aria-label="Choose a theme">
-          <button class="chip" type="button" data-theme="bahria" aria-pressed="true" style="--a:#0b1d40;--b:#2f5bea"><i></i>Bahria</button>
-          <button class="chip" type="button" data-theme="crystal" aria-pressed="false" style="--a:#f4f6fc;--b:#4263eb"><i></i>Crystal</button>
-          <button class="chip" type="button" data-theme="midnight" aria-pressed="false" style="--a:#1f2028;--b:#a5b5ff"><i></i>Midnight</button>
-          <button class="chip" type="button" data-theme="linen" aria-pressed="false" style="--a:#f5f2ec;--b:#80613d"><i></i>Linen</button>
-          <button class="chip" type="button" data-theme="grove" aria-pressed="false" style="--a:#f0f5f2;--b:#2d7c5b"><i></i>Grove</button>
-          <button class="chip" type="button" data-theme="bloom" aria-pressed="false" style="--a:#fcf0f6;--b:#b73c7d"><i></i>Bloom</button>
-          <button class="chip" type="button" data-theme="custom" aria-pressed="false" style="--a:#321a1f;--b:#e11d48"><i></i>Yours</button>
-        </div>
-        <figure class="frame">
-          <div class="frame-bar"><i></i><i></i><i></i><span>lms.bahria.edu.pk</span></div>
-          <img id="theme-shot" src="assets/shots/lms-bahria.webp" width="2040" height="1275" alt="The LMS dashboard in the Bahria theme.">
-        </figure>
-        <p class="theme-note">Settings, with a live preview, open from the Campuslit toolbar icon.</p>
-      </div>
-    </div>
-  </section>
-
-  <section id="install">
+  <!-- ============ install ============ -->
+  <section id="install" aria-labelledby="install-title">
     <div class="wrap">
       <div class="section-head center reveal">
         <p class="kicker">Get Campuslit</p>
-        <h2>Install it in a minute.</h2>
-        <p>Store listings are on the way. Until then, installing from the download takes four clicks.</p>
+        <h2 id="install-title">Add it in a minute. Then sign in as usual.</h2>
+        <p>Campuslit runs in browsers on a computer. It is free, with no sign-up. After installing, open your CMS or LMS and the new look is there.</p>
       </div>
       <div class="install">
         <article class="card reveal">
-          <span class="badge">Store listing coming soon</span>
+          <span class="badge">Chrome Web Store: in review</span>
           <h3>Chrome, Edge and Brave</h3>
-          <p>Works on any Chromium browser on a computer.</p>
+          <p>Until the store listing is live, install from the download in four clicks.</p>
           <a class="btn btn-primary" href="https://github.com/ahmedammad1709/campuslit/releases/latest">Download for Chrome</a>
         </article>
         <article class="card reveal">
-          <span class="badge">Store listing coming soon</span>
-          <h3>Firefox</h3>
-          <p>Firefox 140 or newer on a computer.</p>
+          <span class="badge">Firefox Add-ons: coming soon</span>
+          <h3>Firefox 140 or newer</h3>
+          <p>Until the Add-ons listing is live, you can load it temporarily.</p>
           <a class="btn btn-primary" href="https://github.com/ahmedammad1709/campuslit/releases/latest">Download for Firefox</a>
         </article>
       </div>
-      <div class="faq" style="margin-top:28px">
-        <details class="reveal"><summary>Step by step: Chrome, Edge or Brave</summary><div class="details-body"><ol>
+      <div class="install-steps">
+        <details class="reveal"><summary>Steps for Chrome, Edge or Brave</summary><div class="details-body"><ol>
           <li>Download <code>campuslit-chrome.zip</code> from the latest release and unzip it somewhere you will keep it.</li>
           <li>Open <code>chrome://extensions</code> (or <code>edge://extensions</code>) and switch on <b>Developer mode</b>.</li>
-          <li>Click <b>Load unpacked</b> and choose the unzipped folder.</li>
-          <li>Pin Campuslit from the puzzle-piece menu, then open the CMS or LMS.</li></ol></div></details>
-        <details class="reveal"><summary>Step by step: Firefox</summary><div class="details-body"><ol>
+          <li>Click <b>Load unpacked</b> and choose the unzipped folder, then pin Campuslit to your toolbar.</li></ol></div></details>
+        <details class="reveal"><summary>Steps for Firefox</summary><div class="details-body"><ol>
           <li>Download <code>campuslit-firefox.zip</code> from the latest release and unzip it.</li>
-          <li>Open <code>about:debugging#/runtime/this-firefox</code>.</li>
-          <li>Click <b>Load Temporary Add-on</b> and choose <code>manifest.json</code> inside the folder.</li>
-          <li>Firefox removes temporary add-ons when it closes, so repeat after a restart until the Add-ons listing is live.</li></ol></div></details>
+          <li>Open <code>about:debugging#/runtime/this-firefox</code> and click <b>Load Temporary Add-on</b>.</li>
+          <li>Choose <code>manifest.json</code> inside the folder. Firefox removes temporary add-ons when it closes, so repeat this after a restart until the Add-ons listing is live.</li></ol></div></details>
       </div>
     </div>
   </section>
 
-  <section id="how">
+  <!-- ============ trust ============ -->
+  <div class="band" id="trust">
     <div class="wrap">
-      <div class="section-head center reveal">
-        <p class="kicker">How to use</p>
-        <h2>There is nothing to learn.</h2>
-        <p>Install it, sign in the way you always do, and the portals look different.</p>
+      <div class="band-grid reveal">
+        <div>
+          <p class="kicker">Private by design</p>
+          <h2>It never sees your password, and it cannot send anything anywhere.</h2>
+        </div>
+        <ul class="band-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>No server, no accounts, no analytics. The extension makes no network requests.</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>It never reads what you type into a form.</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>Open source under the MIT licence, so anyone can check.</li>
+        </ul>
       </div>
-      <ol class="steps">
-        <li class="reveal"><h3>Install Campuslit</h3><p>Follow the steps above. Pin it to your toolbar so it is one click away.</p></li>
-        <li class="reveal"><h3>Open the CMS or the LMS and sign in as usual</h3><p>The new look applies by itself. Your password goes to the university exactly as before; Campuslit never sees it.</p></li>
-        <li class="reveal"><h3>Choose how it looks</h3><p>Click the Campuslit icon to switch themes in one tap. Choose <b>Open settings</b> for accent colour, fonts, text size, spacing and a live preview, or open <b>Custom theme</b> in the settings sidebar to design your own. Click <b>Save appearance</b> and your open portals update.</p></li>
-        <li class="reveal"><h3>Switch it off whenever you like</h3><p>Click the Campuslit icon: one switch turns everything on or off, and the CMS and LMS switches below it turn just one portal on or off.</p></li>
-      </ol>
-      <div class="tips reveal">
-        <div class="tip"><b>Resize the sidebar</b><span>Drag its right edge. Double-click to reset.</span></div>
-        <div class="tip"><b>Time table views</b><span>Switch between Week and List at the top right. It remembers.</span></div>
-        <div class="tip"><b>Read the comments</b><span>Tap a “Hover To View” label on the LMS instead of hovering.</span></div>
+      <div class="band-links reveal">
+        <a class="btn btn-light" href="privacy">Privacy policy</a>
+        <a class="btn btn-glass" href="license">Licence</a>
+        <a class="btn btn-glass" href="https://github.com/ahmedammad1709/campuslit">Source code</a>
       </div>
-    </div>
-  </section>
-
-  <div class="band" id="privacy">
-    <div class="wrap">
-      <div class="section-head reveal">
-        <p class="kicker">Privacy</p>
-        <h2>Built so there is nothing to trust.</h2>
-        <p>Campuslit has no server, no account and no analytics. Everything happens in your browser.</p>
-      </div>
-      <div class="grid">
-        <article class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></div><h3>It never sees your password</h3><p>It does not read form values, change what a form sends, or touch your login.</p></article>
-        <article class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></div><h3>Two websites only</h3><p>It runs on cms.bahria.edu.pk and lms.bahria.edu.pk, and asks for the browser’s storage permission to remember your theme.</p></article>
-        <article class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg></div><h3>Open source</h3><p>Every line is on <a href="https://github.com/ahmedammad1709/campuslit">GitHub</a> under the MIT licence. Read it, or ask a friend who codes to.</p></article>
-      </div>
-      <p class="reveal" style="margin-top:28px;color:rgba(255,255,255,.72);font-size:15.5px">To redraw a few screens it reads figures the page already shows, such as your attendance percentages and class schedule, in memory only. Nothing is saved or sent. <a href="privacy.html">Read the full policy</a>.</p>
     </div>
   </div>
 
-  <section id="faq">
+  <!-- ============ faq ============ -->
+  <section id="faq" aria-labelledby="faq-title">
     <div class="wrap">
       <div class="section-head center reveal">
         <p class="kicker">Questions</p>
-        <h2>Good to know.</h2>
+        <h2 id="faq-title">Good to know.</h2>
       </div>
       <div class="faq">
-        <details class="reveal"><summary>Is this official?</summary><div class="details-body"><p>No. Campuslit is an independent project by a Bahria student. It is not made, endorsed or supported by Bahria University, and the university’s name and emblem are theirs.</p></div></details>
-        <details class="reveal"><summary>Is it safe to use while I sign in or submit work?</summary><div class="details-body"><p>Campuslit changes appearance only. Forms, links, uploads and downloads still go to the university exactly as before. If anything ever looks wrong, switch Campuslit off from its popup (or just that one portal) and the portal returns to normal.</p></div></details>
-        <details class="reveal"><summary>Can I make my own theme?</summary><div class="details-body"><p>Yes. Open Campuslit settings and choose <b>Custom theme</b> in the sidebar. Pick a brand color and a mode and it builds a full palette, or start from one of the six themes and change any color. The readability check warns you if text gets hard to read and can fix it for you. Your theme shows up as the seventh one in the settings and in the toolbar popup.</p></div></details>
-        <details class="reveal"><summary>Which browsers work?</summary><div class="details-body"><p>Chrome, Edge and Brave (and other Chromium browsers) on a computer, and Firefox 140 or newer on a computer. Browsers on phones generally do not run extensions like this.</p></div></details>
-        <details class="reveal"><summary>What does it cost?</summary><div class="details-body"><p>Nothing. It is free and open source.</p></div></details>
-        <details class="reveal"><summary>Why is it not in the Chrome Web Store yet?</summary><div class="details-body"><p>The store listings are being prepared and reviewed. This page will link to them as soon as they are live. Installing from the download works the same way.</p></div></details>
-        <details class="reveal"><summary>The portal changed and something looks off. What now?</summary><div class="details-body"><p>The university can change its pages at any time, and that can upset a restyle. Switch Campuslit off for that portal, then <a href="https://github.com/ahmedammad1709/campuslit/issues">report it on GitHub</a> with a screenshot (blur your name and number first).</p></div></details>
+        <details class="reveal"><summary>Is Campuslit official?</summary><div class="details-body"><p>No. It is an independent project made by students and is not made, endorsed or supported by Bahria University. The university&rsquo;s name and emblem belong to the university, and are used here only to say which websites Campuslit works on.</p></div></details>
+        <details class="reveal"><summary>Which campuses does it work for?</summary><div class="details-body"><p>All of them. Campuslit runs on the two student portals every campus uses, so it does not matter where you study. It was built using pages from one campus, so if a screen at yours looks wrong, <a href="https://github.com/ahmedammad1709/campuslit/issues">tell us</a> and it will be fixed.</p></div></details>
+        <details class="reveal"><summary>Is it safe, and does it send my data anywhere?</summary><div class="details-body"><p>It changes how pages look. Forms, uploads and downloads still go to the university exactly as before, and your marks and submissions are never touched. Campuslit makes no network requests at all. On your device it keeps only your look, an optional note of open assignments so reminders work, and which tips you have seen. Switch it off from the toolbar button, or remove it, and the original portal is back. Details are in the <a href="privacy">privacy policy</a>.</p></div></details>
+        <details class="reveal"><summary>Can I rely on the attendance numbers?</summary><div class="details-body"><p>Treat them as a helpful estimate. They are worked out from the hours the portal shows, your credit hours and the semester length you set. The university&rsquo;s own records are what count.</p></div></details>
+        <details class="reveal"><summary>Which browsers work? What about my phone?</summary><div class="details-body"><p>Chrome, Edge, Brave and Firefox 140 or newer, on a computer. Most phone browsers do not run extensions like this.</p></div></details>
+        <details class="reveal"><summary>The university changed its pages and something looks off.</summary><div class="details-body"><p>That can happen. Switch Campuslit off for that portal and the page is back to normal, then <a href="https://github.com/ahmedammad1709/campuslit/issues">report it on GitHub</a> with a screenshot (hide your name and enrollment number first).</p></div></details>
       </div>
     </div>
   </section>
-
-  <div class="wrap">
-    <div class="cta reveal">
-      <h2>A calmer portal is one install away.</h2>
-      <p>Free, private and gone the moment you switch it off.</p>
-      <div class="cta-row"><a class="btn btn-primary" href="#install">Get Campuslit</a></div>
-    </div>
-  </div>
 </main>
 
 <footer>
   <div class="wrap">
     <div class="foot">
-      <a class="brand" href="#top"><img src="assets/logo.svg" width="28" height="28" alt=""><span>campus<span>lit</span></span></a>
-      <nav aria-label="Footer"><a href="#features">Features</a><a href="#how">How to use</a><a href="privacy.html">Privacy</a><a href="https://github.com/ahmedammad1709/campuslit">GitHub</a><a href="https://github.com/ahmedammad1709/campuslit/blob/main/LICENSE">MIT licence</a></nav>
+      <div>
+        <a class="brand" href="#top"><img src="assets/logo.svg" width="30" height="30" alt=""><span>campus<span>lit</span></span></a>
+        <p>A free browser extension for Bahria University students on every campus.</p>
+      </div>
+      <div><h4>Campuslit</h4><ul><li><a href="#features">What it does</a></li><li><a href="#install">Install</a></li></ul></div>
+      <div><h4>Trust</h4><ul><li><a href="privacy">Privacy policy</a></li><li><a href="license">Licence</a></li><li><a href="https://github.com/ahmedammad1709/campuslit">Source code</a></li></ul></div>
+      <div><h4>Help</h4><ul><li><a href="#faq">FAQ</a></li><li><a href="https://github.com/ahmedammad1709/campuslit/issues">Report a problem</a></li><li><a href="https://github.com/ahmedammad1709/campuslit/releases">Downloads</a></li></ul></div>
     </div>
-    <p class="fine">Campuslit is an independent student project and is not affiliated with, endorsed by, or supported by Bahria University. All screenshots use invented sample data. “Bahria University” is named only to say which websites the extension works on.</p>
+    <p class="fine">Campuslit is an independent student project and is not affiliated with, endorsed by, or supported by Bahria University. Every screenshot on this site is drawn with invented sample data. &ldquo;Bahria University&rdquo; is named only to say which websites the extension works on. &copy; 2026 Campuslit contributors, released under the <a href="license">MIT Licence</a>.</p>
   </div>
 </footer>
 </body>

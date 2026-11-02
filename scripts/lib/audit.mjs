@@ -20,7 +20,7 @@ const FORBIDDEN_CODE = [
 ];
 const HTML_INJECTION = [[/innerHTML|outerHTML|insertAdjacentHTML/, 'innerHTML, outerHTML or insertAdjacentHTML']];   // fine in the extension's own pages (fixed icons); never in a script that runs on the portals
 // Web addresses that may appear in shipped code (namespaces, the portal's own address, the project's page). Anything else is reported.
-const ALLOWED_URLS = [/^http:\/\/www\.w3\.org\//, /^https?:\/\/(?:cms|lms)\.bahria\.edu\.pk(?:\/|$)/, /^https:\/\/github\.com\/ahmedammad1709\/campuslit(?:\/|$)/];
+const ALLOWED_URLS = [/^http:\/\/www\.w3\.org\//, /^https:\/\/campuslit-bu\.vercel\.app(?:\/|$)/, /^https?:\/\/(?:cms|lms)\.bahria\.edu\.pk(?:\/|$)/, /^https:\/\/github\.com\/ahmedammad1709\/campuslit(?:\/|$)/];
 const PERSONAL = [
   [/[A-Za-z0-9._%+-]@[A-Za-z0-9-]+\.[A-Za-z]{2,}/, 'an e-mail address'],   // one character before the @: stays fast on very long unbroken lines
   [/(?<!\d)\d{2}-(?!0{5,6}-)\d{5,6}-\d{3}(?!\d)/, 'an enrollment-number pattern'],   // 02-000000-000 is the sample pages' placeholder

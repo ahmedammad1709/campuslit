@@ -13,8 +13,9 @@ changes, change the text here in the same commit.
 | Category | Education (Chrome, Edge) / Other (Firefox) |
 | Language | English |
 | Support URL | https://github.com/ahmedammad1709/campuslit/issues |
-| Homepage / source | https://github.com/ahmedammad1709/campuslit |
-| Privacy policy URL | The deployed `site/privacy.html` (Vercel serves it at `/privacy`). **Deploy the site first and paste its address here.** |
+| Homepage URL | https://campuslit-bu.vercel.app/ |
+| Source code | https://github.com/ahmedammad1709/campuslit (make the repository public before submitting: the listing, the privacy policy and the licence page all point to it) |
+| Privacy policy URL | https://campuslit-bu.vercel.app/privacy |
 | Licence | MIT |
 
 ## Detailed description

@@ -13,6 +13,7 @@
     "test:browser": "node scripts/browser-check.mjs",
     "test:extension": "node scripts/extension-check.mjs",
     "test:firefox": "node scripts/firefox-check.mjs",
+    "test:site": "node scripts/site-check.mjs",
     "site": "node scripts/site-tools.mjs serve"
   }
 }

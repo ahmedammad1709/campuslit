@@ -3,47 +3,174 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Privacy · Campuslit</title>
-<meta name="description" content="What Campuslit stores, what it does not collect, and why it runs on the Bahria CMS and LMS.">
+<title>Privacy Policy · Campuslit</title>
+<meta name="description" content="The Campuslit privacy policy: what the extension reads, what it stores on your device, and what it never does. No accounts, no analytics, no network requests.">
+<meta name="theme-color" content="#f6f8fd">
+<link rel="canonical" href="https://campuslit-bu.vercel.app/privacy">
 <link rel="icon" href="assets/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preload" href="assets/fonts/jakarta-latin.woff2" as="font" type="font/woff2" crossorigin>
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Campuslit">
+<meta property="og:url" content="https://campuslit-bu.vercel.app/privacy">
+<meta property="og:title" content="Campuslit Privacy Policy">
+<meta property="og:description" content="No accounts, no analytics, no network requests. What Campuslit stores on your device, and what it never does.">
+<meta property="og:image" content="https://campuslit-bu.vercel.app/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="styles.css">
+<script src="script.js" defer></script>
 </head>
 <body>
-<header class="site-header scrolled">
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header light">
   <div class="wrap nav">
-    <a class="brand" href="index.html" aria-label="Campuslit home"><img src="assets/logo.svg" width="32" height="32" alt=""><span>campus<span>lit</span></span></a>
-    <nav class="nav-links" aria-label="Main"><a href="index.html#features">Features</a><a href="index.html#how">How to use</a><a class="btn btn-primary btn-sm" href="index.html#install">Get Campuslit</a></nav>
+    <a class="brand" href="./" aria-label="Campuslit home"><svg class="logo" viewBox="0 0 128 128" width="34" height="34" aria-hidden="true" focusable="false"><rect width="128" height="128" rx="30" fill="#0b1d40"/><path class="ring" pathLength="1" d="M80.57 81.21A30 30 0 1 1 80.57 46.79" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round"/><circle class="dot" cx="98" cy="64" r="8.5" fill="#f2b84b"/></svg><span>campus<span>lit</span></span></a>
+    <button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <nav class="nav-links" id="menu" aria-label="Main">
+      <a href="./#features">What it does</a>
+      <a href="./#install">Install</a>
+      <a href="./#faq">FAQ</a>
+      <a href="license">Licence</a>
+      <a class="btn btn-primary btn-sm" href="./#install">Get Campuslit</a>
+    </nav>
   </div>
 </header>
-<main class="wrap policy">
-  <h1>Your portal. Your preferences. Your privacy.</h1>
-  <p class="meta">Effective October 18, 2026 · Applies to the Campuslit extension, version 0.2</p>
-  <div class="callout"><p style="margin-top:0"><b>No accounts. No analytics. No tracking.</b> Campuslit makes no requests to external servers, includes no remote fonts or scripts, and runs without any server of its own.</p></div>
 
-  <h2>What it stores</h2>
-  <p>Only your appearance choices: theme, the name and colors of the custom theme you design (if any), accent colour, font, text size, spacing, corner radius, motion and background options, the sidebar width you drag to, your Week or List time table choice, and whether styling is on for the CMS and the LMS. These live in the browser’s extension storage on your device. Campuslit does not use browser cloud sync. If assignment reminders are on (the default), it also keeps one short note in the same place: for each course, the titles and deadlines of assignments you have not submitted, so a reminder can appear on other LMS pages. It never leaves your device. Turning reminders off deletes it, and Settings has a button to forget it at any time. It also remembers, as a few yes/no flags in the same place, whether the welcome has been shown and which one-time hints you have dismissed, so they do not repeat. Settings can turn tips off, show them again, or take the tour again.</p>
+<main id="main">
+  <div class="doc-hero">
+    <div class="wrap">
+      <p class="kicker">Legal</p>
+      <h1>Privacy Policy</h1>
+      <p>Campuslit is built so that your information stays with you. This page explains exactly what the extension and this website do with it.</p>
+      <div class="doc-meta"><span>Effective 2 November 2026</span><span>Applies to the Campuslit extension 0.3 and this website</span><span>Version history is public on GitHub</span></div>
+    </div>
+  </div>
 
-  <h2>What it does not collect</h2>
-  <p>Apart from that optional reminder note and the tip flags, Campuslit does not record, store or send passwords, enrollment numbers, grades, attendance records, course content, fee details or browsing history. To redraw a few screens it reads figures the portal has already put on your page: your first name in the LMS greeting, your course list on the LMS dashboard, attendance hours and credit hours on the CMS dashboard and Attendance page (from which it works out how many hours you can miss), your assignment titles and deadlines on the LMS Assignments page, the names and addresses of the links in the portal's menu (for the optional quick search), and your class schedule on the CMS Time Table page. If you press Add to calendar there, the schedule becomes a calendar file in your browser that is saved as a download; nothing is uploaded. These are used in your browser’s memory only, shown back to you, and discarded when the page closes. We do not sell data, run analytics or show ads.</p>
+  <div class="wrap doc">
+    <nav class="toc" aria-label="On this page">
+      <h2>On this page</h2>
+      <ol>
+        <li><a href="#glance">At a glance</a></li>
+        <li><a href="#who">Who we are</a></li>
+        <li><a href="#reads">What the extension reads</a></li>
+        <li><a href="#stores">What it stores</a></li>
+        <li><a href="#never">What it never does</a></li>
+        <li><a href="#permissions">Permissions</a></li>
+        <li><a href="#website">This website</a></li>
+        <li><a href="#portals">The university portals</a></li>
+        <li><a href="#control">Your control</a></li>
+        <li><a href="#changes">Changes and contact</a></li>
+      </ol>
+    </nav>
 
-  <h2>Why it can run on the portals</h2>
-  <p>The extension runs only on pages under <code>cms.bahria.edu.pk</code> and <code>lms.bahria.edu.pk</code>. It checks the page address to choose the right look, applies your theme and responds to your changes. It does not read form values, intercept requests or alter what a form submits. It asks for the browser’s <code>storage</code> permission and nothing else.</p>
+    <article class="prose">
+      <section id="glance" class="glance">
+        <h2>At a glance</h2>
+        <ul class="list">
+          <li><b>No accounts, no analytics, no tracking.</b> Campuslit has no server of its own and makes no network requests.</li>
+          <li><b>It never reads your password</b> or anything you type into a form on the portals.</li>
+          <li><b>It runs only on <code>cms.bahria.edu.pk</code> and <code>lms.bahria.edu.pk</code></b>, the student portals of Bahria University, and nowhere else.</li>
+          <li><b>What it keeps stays on your device:</b> your appearance choices, an optional short note of open assignments so reminders work, and which tips you have seen.</li>
+          <li><b>You are in control.</b> Switch it off, forget what it remembers, or remove it, and everything it saved goes with it.</li>
+        </ul>
+      </section>
 
-  <h2>What “stays in your browser” means</h2>
-  <p>This promise covers Campuslit. The university’s websites still talk to the university and its services as they always do; Campuslit does not block that traffic, control the university’s own privacy practices or make an insecure site secure.</p>
+      <section id="who">
+        <h2><small>1</small>Who we are</h2>
+        <p>Campuslit is an independent, open-source project made by Bahria University students. It is released by &ldquo;Campuslit contributors&rdquo; under the MIT Licence. It is <b>not</b> made, endorsed or supported by Bahria University, and it is not affiliated with it.</p>
+        <p>The code is public at <a href="https://github.com/ahmedammad1709/campuslit">github.com/ahmedammad1709/campuslit</a>, so every statement on this page can be checked against it. To ask a question or report a concern, open an issue at <a href="https://github.com/ahmedammad1709/campuslit/issues">github.com/ahmedammad1709/campuslit/issues</a>.</p>
+      </section>
 
-  <h2>Export and import</h2>
-  <p>Export saves a small file with only your appearance choices. Import reads only the file you pick. Neither uploads anything. If you share an exported file, that is your choice.</p>
+      <section id="reads">
+        <h2><small>2</small>What the extension reads on the portals</h2>
+        <p>To redraw a few screens, Campuslit reads figures the portal has already put on your page. It uses them in your browser&rsquo;s memory to build the new screen and then lets them go. It does not copy them anywhere, except for the optional reminder note described in section 3.</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>What</th><th>Where</th><th>Used for</th></tr></thead>
+          <tbody>
+            <tr><td>Your first name</td><td>LMS dashboard</td><td>The greeting, for example &ldquo;Good morning, Ayesha&rdquo;</td></tr>
+            <tr><td>Your course list</td><td>LMS dashboard</td><td>Drawing your courses as cards</td></tr>
+            <tr><td>Assignment titles, deadlines and whether each is submitted</td><td>LMS Assignments page</td><td>The Due soon card, the status under each deadline and the reminder</td></tr>
+            <tr><td>Attendance hours and credit hours</td><td>CMS dashboard and Attendance page</td><td>Attendance bars and the planner</td></tr>
+            <tr><td>Your class schedule</td><td>CMS Time Table page</td><td>The week calendar, and the calendar file you can download</td></tr>
+            <tr><td>The names and addresses of the links in the portal&rsquo;s menu</td><td>Both portals</td><td>Quick search</td></tr>
+          </tbody>
+        </table></div>
+        <p>When you press <b>Add to calendar</b>, your schedule is turned into a calendar file inside your browser and saved as an ordinary download. Nothing is uploaded.</p>
+        <p>Campuslit does <b>not</b> read passwords, anything typed into form fields, or the contents of files you upload or download.</p>
+      </section>
 
-  <h2>Your controls</h2>
-  <p>Switch Campuslit off for everything or for one portal from its popup or settings, reset your preferences in settings, or remove the extension. Removing it normally deletes its stored data; files you exported must be deleted separately.</p>
+      <section id="stores">
+        <h2><small>3</small>What it stores on your device</h2>
+        <p>Campuslit saves a small amount of information in your browser&rsquo;s extension storage. It stays on this device. Campuslit does not use browser cloud sync, cookies or any other tracking technology.</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Item</th><th>What it contains</th><th>How to remove it</th></tr></thead>
+          <tbody>
+            <tr><td>Appearance settings</td><td>Your theme and any custom theme you design (its name and colours), font, text size, spacing, corner roundness, background and motion options, sidebar width, Week or List time table choice, semester length, and your on/off choices for the CMS, the LMS and each feature</td><td>Settings &rsaquo; Privacy &amp; data &rsaquo; Reset all settings</td></tr>
+            <tr><td>Assignment reminder note <em>(optional, on by default)</em></td><td>For each course: its name, the semester, and the titles and deadlines of assignments you have not submitted. It is used only to show a reminder on other LMS pages, and old entries expire on their own</td><td>Turn reminders off (this deletes it) or press Forget remembered assignments in Settings &rsaquo; Portals</td></tr>
+            <tr><td>Tip flags</td><td>A few yes/no facts: whether the welcome was shown, whether a tour replay was requested, and which one-time hints you dismissed</td><td>Settings &rsaquo; Guide &rsaquo; Show the hints again, or Reset all settings</td></tr>
+          </tbody>
+        </table></div>
+        <p>The settings file you can export contains appearance choices only. It holds no student information.</p>
+      </section>
 
-  <h2>Fonts, files and updates</h2>
-  <p>All fonts and files ship inside the extension package. The settings preview uses invented sample pages and never connects to your university account. If the extension’s permissions or data practices change, this page and the extension’s own privacy page will be updated before the change ships.</p>
+      <section id="never">
+        <h2><small>4</small>What it never does</h2>
+        <ul class="list">
+          <li>It never sends anything to us or to anyone else. The extension makes no network requests, its security policy blocks all outgoing connections, and each release is checked to confirm that no code can make them.</li>
+          <li>It never collects, sells, shares or profiles personal information, and it shows no ads.</li>
+          <li>It never changes your marks, your submissions or the data the university shows you. It changes only how pages look and adds helpers on top.</li>
+          <li>It never loads code or fonts from the internet. Everything it needs is inside the extension.</li>
+        </ul>
+      </section>
 
-  <h2>Independence</h2>
-  <p>Campuslit is an independent student project, not affiliated with, endorsed by, or supported by Bahria University. The source code is on <a href="https://github.com/ahmedammad1709/campuslit">GitHub</a> under the MIT licence, so you can check every statement here.</p>
+      <section id="permissions">
+        <h2><small>5</small>Permissions</h2>
+        <p>Campuslit asks the browser for as little as possible:</p>
+        <ul class="list">
+          <li><b>Storage</b>, to remember the items in section 3 on this device.</li>
+          <li><b>Access to the two portals only</b> (<code>cms.bahria.edu.pk</code> and <code>lms.bahria.edu.pk</code>), so it can restyle them. It cannot run on any other website.</li>
+        </ul>
+        <p>It has no background process, no access to your tabs or browsing history, and no other permission.</p>
+      </section>
+
+      <section id="website">
+        <h2><small>6</small>This website</h2>
+        <p>This website describes Campuslit. It has no accounts, no forms, no cookies and no analytics, and it loads its fonts and images from itself. It is hosted on Vercel, which, like any web host, may keep standard server logs (such as your IP address, the time and the page requested) to run and protect the service, under <a href="https://vercel.com/legal/privacy-policy">its own privacy policy</a>. We do not receive or use those logs. Links to GitHub and other sites leave this website, and those sites have their own policies.</p>
+      </section>
+
+      <section id="portals">
+        <h2><small>7</small>The university portals</h2>
+        <p>The CMS and LMS belong to Bahria University and are run by it. This policy covers Campuslit only. How the university handles your information on its portals is governed by its own rules, and Campuslit does not change that. Campuslit cannot promise anything about what the portals themselves send or store.</p>
+      </section>
+
+      <section id="control">
+        <h2><small>8</small>Your control</h2>
+        <ul class="list">
+          <li>The toolbar button has one switch for everything, and one each for the CMS and the LMS. Switch it off and the original pages return at once.</li>
+          <li>Settings can turn off assignment reminders, quick search, tips and the opening animation, and can forget the reminder note, show the hints again, or reset everything.</li>
+          <li>Removing the extension from your browser deletes everything it stored on your device.</li>
+        </ul>
+      </section>
+
+      <section id="changes">
+        <h2><small>9</small>Changes and contact</h2>
+        <p>If Campuslit&rsquo;s handling of information ever changes, this page will be updated first and the effective date at the top will change. Every earlier version stays visible in the project&rsquo;s public history on GitHub. If a change would involve collecting anything from users, it will be announced on this page and in the release notes before it ships.</p>
+        <p>Questions, concerns or requests: <a href="https://github.com/ahmedammad1709/campuslit/issues">open an issue on GitHub</a>.</p>
+      </section>
+    </article>
+  </div>
 </main>
-<footer><div class="wrap"><div class="foot"><a class="brand" href="index.html"><img src="assets/logo.svg" width="28" height="28" alt=""><span>campus<span>lit</span></span></a><nav aria-label="Footer"><a href="index.html">Home</a><a href="https://github.com/ahmedammad1709/campuslit">GitHub</a></nav></div></div></footer>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div><a class="brand" href="./"><img src="assets/logo.svg" width="30" height="30" alt=""><span>campus<span>lit</span></span></a><p>A free browser extension for Bahria University students on every campus.</p></div>
+      <div><h4>Campuslit</h4><ul><li><a href="./#features">What it does</a></li><li><a href="./#install">Install</a></li></ul></div>
+      <div><h4>Trust</h4><ul><li><a href="privacy">Privacy policy</a></li><li><a href="license">Licence</a></li><li><a href="https://github.com/ahmedammad1709/campuslit">Source code</a></li></ul></div>
+      <div><h4>Help</h4><ul><li><a href="./#faq">FAQ</a></li><li><a href="https://github.com/ahmedammad1709/campuslit/issues">Report a problem</a></li><li><a href="https://github.com/ahmedammad1709/campuslit/releases">Downloads</a></li></ul></div>
+    </div>
+    <p class="fine">Campuslit is an independent student project and is not affiliated with, endorsed by, or supported by Bahria University. &ldquo;Bahria University&rdquo; is named only to say which websites the extension works on. &copy; 2026 Campuslit contributors, released under the <a href="license">MIT Licence</a>.</p>
+  </div>
+</footer>
 </body>
 </html>
