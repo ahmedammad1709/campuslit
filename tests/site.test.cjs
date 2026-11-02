@@ -175,12 +175,24 @@ test('the licence page carries the exact text of the LICENSE file', () => {
   for (const name of ['Plus Jakarta Sans', 'Manrope', 'Sora', 'Inter', 'Bootstrap', 'AdminLTE', 'Font Awesome']) assert.ok(fonts.includes(name), 'third-party notice: ' + name);
 });
 
+test('the privacy policy numbers match the code: the reminder note expires after 150 days', () => {
+  const code = fs.readFileSync(path.resolve(__dirname, '..', 'extension', 'deadlines.js'), 'utf8');
+  assert.match(code, /KEEP = 150 \* DAY/, 'the code keeps entries for 150 days');
+  assert.match(code, /SNOOZE = 8 \* HOUR/, 'a closed reminder is hidden for 8 hours');
+  const policy = read('privacy.html');
+  assert.ok(policy.includes('150 days') && policy.includes('8 hours'));
+  const headings = [...policy.matchAll(/<h2><small>(\d+)<\/small>/g)].map(m => +m[1]);
+  assert.deepEqual(headings, headings.map((_, i) => i + 1), 'sections are numbered 1, 2, 3 without gaps');
+  const ids = [...policy.matchAll(/<section id="([a-z]+)"/g)].map(m => m[1]), toc = [...policy.matchAll(/<li><a href="#([a-z]+)">/g)].map(m => m[1]);
+  assert.deepEqual(toc, ids, 'the contents list matches the sections, in order');
+});
+
 test('the privacy policy matches what the extension really stores and requests', () => {
   const policy = decode(read('privacy.html').replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ');
   const manifest = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'extension', 'manifest.json'), 'utf8'));
   assert.deepEqual(manifest.permissions, ['storage']);
   for (const match of manifest.content_scripts[0].matches) { const host = match.replace('*://', '').replace('/*', ''); assert.ok(policy.includes(host), 'policy names ' + host); }
-  for (const phrase of ['No accounts, no analytics, no tracking', 'never reads your password', 'reminder note', 'Tip flags', 'Reset all settings', 'Forget remembered assignments', 'not made, endorsed or supported', 'Effective 2 November 2026', 'Vercel', 'does not use browser cloud sync'])
+  for (const phrase of ['Security', 'Children', 'Kept for', '150 days', 'Your choices and rights', 'public history on GitHub', 'content security policy', 'No accounts, no analytics, no tracking', 'never reads your password', 'reminder note', 'Tip flags', 'Reset all settings', 'Forget remembered assignments', 'not made, endorsed or supported', 'Effective 2 November 2026', 'Vercel', 'does not use browser cloud sync'])
     assert.ok(policy.toLowerCase().includes(phrase.toLowerCase()), 'policy says: ' + phrase);
   assert.match(manifest.content_security_policy.extension_pages, /connect-src 'none'/, 'the claim "no network" is enforced by the extension');
   // every key the extension saves has to be disclosed
