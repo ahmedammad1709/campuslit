@@ -6,14 +6,20 @@ const status = document.getElementById('status');
 const system = matchMedia('(prefers-color-scheme: dark)');
 
 function el(tag, cls, text) { const n = document.createElement(tag); if (cls) n.className = cls; if (text) n.textContent = text; return n; }
-// A theme is shown as a round swatch (sidebar colour on the left, page colour on the right, accent dot) and its name.
+// A theme is a small picture of the portal in its own colours (the same drawing the settings page uses), with its name under it.
+function sample(p) {
+  const s = el('span', 'theme-sample'); s.setAttribute('aria-hidden', 'true');
+  for (const [k, v] of [['bg', p.bg], ['nav', p.nav], ['surface', p.surface], ['accent', p.accent], ['ink', p.ink], ['navink', p.navInk]]) s.style.setProperty('--sw-' + k, v);
+  const nav = el('span', 'ts-nav'); nav.append(document.createElement('i'), document.createElement('i'), document.createElement('i'));
+  const main = el('span', 'ts-main'), cards = el('span', 'ts-cards'); cards.append(document.createElement('i'), document.createElement('i'));
+  main.append(el('i', 'ts-bar'), cards, el('i', 'ts-btn'));
+  s.append(nav, main);
+  return s;
+}
 function swatch(p, name, pressed, title) {
   const b = el('button', 'pop-swatch'); b.type = 'button'; b.title = title; b.setAttribute('aria-pressed', String(pressed));
-  const dot = el('span', 'pop-dot'); dot.setAttribute('aria-hidden', 'true');
-  dot.style.setProperty('--d-nav', p.nav); dot.style.setProperty('--d-bg', p.bg); dot.style.setProperty('--d-accent', p.accent);
-  dot.append(el('i'));
-  if (pressed) { const c = el('span', 'pop-check'); c.innerHTML = StudioIcons.svg('check'); dot.append(c); }
-  b.append(dot, el('span', 'pop-name', name));
+  b.append(sample(p), el('span', 'pop-name', name));
+  if (pressed) { const c = el('span', 'pop-check'); c.setAttribute('aria-hidden', 'true'); c.innerHTML = StudioIcons.svg('check'); b.append(c); }
   return b;
 }
 function render() {
@@ -22,18 +28,21 @@ function render() {
   document.getElementById('system').checked = settings.mode === 'system';
   const grid = document.getElementById('themes'); grid.replaceChildren();
   for (const [id, theme] of Object.entries(B.themes)) {
-    const b = swatch(theme, theme.name, settings.theme === id, theme.name + ' · ' + theme.description);
+    const b = swatch(theme, theme.name, settings.theme === id, theme.name + ' \u00b7 ' + theme.description);
     b.addEventListener('click', () => save({ theme: id, accent: '', mode: 'preset' }));
     grid.append(b);
   }
-  // the seventh: the theme the user designs
+  // the seventh, on a row of its own: the one theme the user designs (or the way to start it)
   const c = settings.custom;
   let b;
-  if (c) { b = swatch(B.deriveCustom(c), c.name, settings.theme === 'custom', c.name + ' · your custom theme'); b.addEventListener('click', () => save({ theme: 'custom', accent: '' })); }
-  else {
+  if (c) {
+    b = swatch(B.deriveCustom(c), c.name, settings.theme === 'custom', c.name + ' \u00b7 your custom theme');
+    b.insertBefore(el('span', 'pop-note', 'Your theme'), b.querySelector('.pop-check'));   // the tick stays at the far end
+    b.addEventListener('click', () => save({ theme: 'custom', accent: '' }));
+  } else {
     b = el('button', 'pop-swatch empty'); b.type = 'button'; b.title = 'Design your own theme'; b.setAttribute('aria-pressed', 'false'); b.setAttribute('aria-label', 'Create your own custom theme');
-    const dot = el('span', 'pop-dot'); dot.setAttribute('aria-hidden', 'true'); dot.innerHTML = StudioIcons.svg('plus');
-    b.append(dot, el('span', 'pop-name', 'Custom')); b.addEventListener('click', openStudio);
+    const plus = el('span', 'theme-sample'); plus.setAttribute('aria-hidden', 'true'); plus.innerHTML = StudioIcons.svg('plus');
+    b.append(plus, el('span', 'pop-name', 'Custom'), el('span', 'pop-note', 'Design your own')); b.addEventListener('click', openStudio);
   }
   b.classList.add('custom');
   grid.append(b);
