@@ -143,9 +143,9 @@ test('the home page says plainly what Campuslit is, who it is for, and that it i
 test('the home page stays short: few words, one idea per section, no section repeated', () => {
   const html = pages[0].html, text = decode(html.replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim();
   assert.ok(text.split(' ').length < 1150, 'home page words: ' + text.split(' ').length);
-  const sections = [...html.matchAll(/<(?:section|div)[^>]*\sid="(features|install|faq|trust)"/g)].map(m => m[1]);
-  assert.deepEqual(sections, ['features', 'install', 'trust', 'faq'], 'sections, in order');
-  assert.ok((html.match(/<h2[\s>]/g) || []).length <= 5, 'at most five headed sections');
+  const sections = [...html.matchAll(/<(?:section|div)[^>]*\sid="(features|themes|install|faq|trust)"/g)].map(m => m[1]);
+  assert.deepEqual(sections, ['features', 'themes', 'install', 'trust', 'faq'], 'sections, in order');
+  assert.ok((html.match(/<h2[\s>]/g) || []).length <= 6, 'at most six headed sections');
   const questions = [...html.matchAll(/<summary>([^<]+)<\/summary>/g)].map(m => m[1]);
   assert.ok(questions.length <= 10 && new Set(questions).size === questions.length, 'distinct, few questions');
 });
@@ -153,7 +153,7 @@ test('the home page stays short: few words, one idea per section, no section rep
 test('the feature tabs are wired for keyboard and screen-reader use, and work without JavaScript', () => {
   const html = pages[0].html;
   const tabs = [...html.matchAll(/<button class="tab" role="tab"[^>]*>/g)].map(m => m[0]);
-  assert.ok(tabs.length >= 5 && tabs.length <= 7, tabs.length + ' tabs');
+  assert.ok(tabs.length >= 4 && tabs.length <= 7, tabs.length + ' tabs');
   assert.equal(tabs.filter(t => /aria-selected="true"/.test(t)).length, 1, 'exactly one tab starts selected');
   for (const tab of tabs) {
     const id = tab.match(/\sid="([^"]+)"/)[1], panel = tab.match(/aria-controls="([^"]+)"/)[1];

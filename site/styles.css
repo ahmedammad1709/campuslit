@@ -112,11 +112,14 @@ section { padding: 96px 0 0; }
 .card p { margin-top: 11px; font-size: 16px; color: var(--muted); }
 .card p + p { margin-top: 10px; }
 
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
-.chip { display: inline-flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 16px 0 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font: 700 15px/1 "Plus Jakarta Sans", system-ui, sans-serif; cursor: pointer; transition: border-color .2s, box-shadow .2s, transform .2s var(--ease); }
+.theme-stage { display: grid; gap: 26px; }
+.chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.theme-stage .chips { justify-content: center; }
+.theme-note { text-align: center; color: var(--muted); font-size: 15.5px; }
+.chip { display: inline-flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 20px 0 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font: 700 15px/1 "Plus Jakarta Sans", system-ui, sans-serif; cursor: pointer; transition: border-color .2s, box-shadow .2s, transform .2s var(--ease); }
 .chip:hover { border-color: #b9c8e6; transform: translateY(-1px); }
 .chip[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(47, 91, 234, .15); }
-.chip i { width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, var(--a) 50%, var(--b) 50%); box-shadow: inset 0 0 0 1px rgba(14, 26, 51, .14); }
+.chip i { width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, var(--a) 50%, var(--b) 50%); box-shadow: inset 0 0 0 1px rgba(14, 26, 51, .14); }
 .chip[data-theme="bahria"] { --a: #0b1d40; --b: #2f5bea; } .chip[data-theme="crystal"] { --a: #f4f6fc; --b: #4263eb; } .chip[data-theme="midnight"] { --a: #1f2028; --b: #a5b5ff; }
 .chip[data-theme="linen"] { --a: #f5f2ec; --b: #80613d; } .chip[data-theme="grove"] { --a: #f0f5f2; --b: #2d7c5b; } .chip[data-theme="bloom"] { --a: #fcf0f6; --b: #b73c7d; } .chip[data-theme="custom"] { --a: #321a1f; --b: #e11d48; }
 

@@ -35,6 +35,7 @@
     <button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
     <nav class="nav-links" id="menu" aria-label="Main">
       <a href="#features">What it does</a>
+      <a href="#themes">Themes</a>
       <a href="#install">Install</a>
       <a href="#faq">FAQ</a>
       <a href="privacy">Privacy</a>
@@ -99,7 +100,6 @@
           <button class="tab" role="tab" type="button" id="t-attendance" aria-controls="p-attendance" aria-selected="false" tabindex="-1">Attendance</button>
           <button class="tab" role="tab" type="button" id="t-timetable" aria-controls="p-timetable" aria-selected="false" tabindex="-1">Time table</button>
           <button class="tab" role="tab" type="button" id="t-search" aria-controls="p-search" aria-selected="false" tabindex="-1">Quick search</button>
-          <button class="tab" role="tab" type="button" id="t-themes" aria-controls="p-themes" aria-selected="false" tabindex="-1">Themes</button>
           <button class="tab" role="tab" type="button" id="t-popup" aria-controls="p-popup" aria-selected="false" tabindex="-1">Toolbar popup</button>
         </div>
 
@@ -152,25 +152,6 @@
           </figure>
         </div>
 
-        <div class="tabpanel" role="tabpanel" id="p-themes" aria-labelledby="t-themes">
-          <div class="panel-text">
-            <h3>Pick a look, or design your own.</h3>
-            <p>Six hand-tuned themes and room for one of your own, with your choice of text size, spacing and typeface. One theme follows your device&rsquo;s dark mode.</p>
-            <div class="chips" role="group" aria-label="Choose a theme to preview">
-              <button class="chip" type="button" data-theme="bahria" aria-pressed="true"><i></i>Bahria</button>
-              <button class="chip" type="button" data-theme="crystal" aria-pressed="false"><i></i>Crystal</button>
-              <button class="chip" type="button" data-theme="midnight" aria-pressed="false"><i></i>Midnight</button>
-              <button class="chip" type="button" data-theme="linen" aria-pressed="false"><i></i>Linen</button>
-              <button class="chip" type="button" data-theme="grove" aria-pressed="false"><i></i>Grove</button>
-              <button class="chip" type="button" data-theme="bloom" aria-pressed="false"><i></i>Bloom</button>
-              <button class="chip" type="button" data-theme="custom" aria-pressed="false"><i></i>Yours</button>
-            </div>
-          </div>
-          <figure class="frame"><div class="frame-bar"><i></i><i></i><i></i><span>lms.bahria.edu.pk</span><b></b></div>
-            <img id="theme-shot" loading="lazy" decoding="async" src="assets/shots/lms-bahria.webp" width="2040" height="1275" alt="The LMS dashboard in the Bahria theme.">
-          </figure>
-        </div>
-
         <div class="tabpanel" role="tabpanel" id="p-popup" aria-labelledby="t-popup">
           <div class="panel-text">
             <h3>Everything one click away.</h3>
@@ -182,6 +163,33 @@
             <img loading="lazy" decoding="async" src="assets/shots/popup-tour.webp" width="720" height="1120" alt="A step of the Campuslit tour pointing at the theme choices, with a Skip tour button.">
           </div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ themes ============ -->
+  <section id="themes" aria-labelledby="themes-title">
+    <div class="wrap">
+      <div class="section-head center reveal">
+        <p class="kicker">Make it yours</p>
+        <h2 id="themes-title">Pick a look, or design your own.</h2>
+        <p>Six hand-tuned themes and room for one of your own, with your choice of text size, spacing and typeface. One setting follows your device&rsquo;s dark mode.</p>
+      </div>
+      <div class="theme-stage reveal">
+        <div class="chips" role="group" aria-label="Choose a theme to preview">
+          <button class="chip" type="button" data-theme="bahria" aria-pressed="true"><i></i>Bahria</button>
+          <button class="chip" type="button" data-theme="crystal" aria-pressed="false"><i></i>Crystal</button>
+          <button class="chip" type="button" data-theme="midnight" aria-pressed="false"><i></i>Midnight</button>
+          <button class="chip" type="button" data-theme="linen" aria-pressed="false"><i></i>Linen</button>
+          <button class="chip" type="button" data-theme="grove" aria-pressed="false"><i></i>Grove</button>
+          <button class="chip" type="button" data-theme="bloom" aria-pressed="false"><i></i>Bloom</button>
+          <button class="chip" type="button" data-theme="custom" aria-pressed="false"><i></i>Yours</button>
+        </div>
+        <figure class="frame">
+          <div class="frame-bar"><i></i><i></i><i></i><span>lms.bahria.edu.pk</span><b></b></div>
+          <img id="theme-shot" loading="lazy" decoding="async" src="assets/shots/lms-bahria.webp" width="2040" height="1275" alt="The LMS dashboard in the Bahria theme.">
+        </figure>
+        <p class="theme-note">Settings, with a live preview, open from the Campuslit button in your browser toolbar.</p>
       </div>
     </div>
   </section>
@@ -269,7 +277,7 @@
         <a class="brand" href="#top"><img src="assets/logo.svg" width="30" height="30" alt=""><span>campus<span>lit</span></span></a>
         <p>A free browser extension for Bahria University students on every campus.</p>
       </div>
-      <div><h4>Campuslit</h4><ul><li><a href="#features">What it does</a></li><li><a href="#install">Install</a></li></ul></div>
+      <div><h4>Campuslit</h4><ul><li><a href="#features">What it does</a></li><li><a href="#themes">Themes</a></li><li><a href="#install">Install</a></li></ul></div>
       <div><h4>Trust</h4><ul><li><a href="privacy">Privacy policy</a></li><li><a href="license">Licence</a></li><li><a href="https://github.com/ahmedammad1709/campuslit">Source code</a></li></ul></div>
       <div><h4>Help</h4><ul><li><a href="#faq">FAQ</a></li><li><a href="https://github.com/ahmedammad1709/campuslit/issues">Report a problem</a></li><li><a href="https://github.com/ahmedammad1709/campuslit/releases">Downloads</a></li></ul></div>
     </div>

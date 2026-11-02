@@ -58,10 +58,10 @@ await ev("document.getElementById('t-attendance').focus(); 0");
 await call('Input.dispatchKeyEvent', {type: 'rawKeyDown', key: 'ArrowRight', code: 'ArrowRight', windowsVirtualKeyCode: 39}); await call('Input.dispatchKeyEvent', {type: 'keyUp', key: 'ArrowRight', code: 'ArrowRight', windowsVirtualKeyCode: 39});
 assert.equal(await ev("document.querySelector('.tabpanel:not([hidden])').id + ':' + document.activeElement.id"), 'p-timetable:t-timetable', 'the arrow key moves to the next tab and focuses it');
 await call('Input.dispatchKeyEvent', {type: 'rawKeyDown', key: 'End', code: 'End', windowsVirtualKeyCode: 35}); await call('Input.dispatchKeyEvent', {type: 'keyUp', key: 'End', code: 'End', windowsVirtualKeyCode: 35});
-assert.equal(await ev("document.querySelector('.tabpanel:not([hidden])').id"), 'p-popup');
+assert.equal(await ev("document.querySelector('.tabpanel:not([hidden])').id"), 'p-popup', 'End goes to the last tab');
 await ev("document.getElementById('t-assignments').click(); 0");
 // the home page is short
-assert.ok(await ev("document.documentElement.scrollHeight") < 6200, 'desktop page height: ' + await ev("document.documentElement.scrollHeight"));
+assert.ok(await ev("document.documentElement.scrollHeight") < 6800, 'desktop page height: ' + await ev("document.documentElement.scrollHeight"));
 // themes gallery
 await ev("document.querySelector('.chip[data-theme=midnight]').click(); 0");
 assert.match(await ev("document.getElementById('theme-shot').getAttribute('src')"), /lms-midnight\.webp$/);
@@ -81,7 +81,7 @@ assert.equal(await ev("document.querySelector('.site-header').classList.contains
 
 // mobile menu
 await open('/', 390, 844);
-assert.ok(await ev("document.documentElement.scrollHeight") < 8200, 'phone page height: ' + await ev("document.documentElement.scrollHeight"));
+assert.ok(await ev("document.documentElement.scrollHeight") < 9000, 'phone page height: ' + await ev("document.documentElement.scrollHeight"));
 assert.equal(await ev("getComputedStyle(document.querySelector('.nav-links')).display"), 'none', 'menu hidden on a phone');
 await ev("document.querySelector('.menu-btn').click(); 0");
 assert.equal(await ev("getComputedStyle(document.querySelector('.nav-links')).display"), 'flex');
