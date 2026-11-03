@@ -100,6 +100,6 @@ Suggested captions (the stores let you add one per screenshot): 1 "Reminders for
 
 1. **Firefox add-on ID.** The build currently uses `campuslit@local.invalid`, a development placeholder. The ID is permanent once published (it ties updates and saved settings together). Choose it once, in `scripts/build.mjs`, e.g. `campuslit@<a domain or name you control>`.
 2. **Public contact.** Chrome shows the developer's contact e-mail on the listing and requires it to be verified. Decide which address to use. The support URL above can be the GitHub issues page.
-3. **Version number.** The package is `0.3.0`. Stores accept that; if you would rather launch as `1.0.0`, change `version` in `package.json` and `extension/manifest.json` (the release check refuses a mismatch).
+3. **Version number.** The first public release is `1.0.0` (set in `package.json` and `extension/manifest.json`; the release check refuses a mismatch). Every later store update must use a higher number.
 4. **Developer accounts.** Chrome Web Store (one-time registration fee), Edge Add-ons (free), Firefox Add-ons (free). Chrome also asks whether you are a trader (a hobby project that is free and unmonetised is normally a non-trader).
 5. **Trademark.** The name contains no university name or logo and the listing says "Unofficial". Keep it that way: do not add the university emblem to store images.

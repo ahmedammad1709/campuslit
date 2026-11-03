@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Campuslit — a calmer CMS & LMS",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "description": "A calmer CMS and LMS for Bahria students: themes, attendance planner, assignment reminders, quick search. Unofficial; private.",
   "permissions": ["storage"],
   "web_accessible_resources": [{"resources": ["fonts/inter-latin.woff2", "fonts/jakarta-latin.woff2", "fonts/manrope-latin.woff2", "fonts/sora-latin.woff2"], "matches": ["*://cms.bahria.edu.pk/*", "*://lms.bahria.edu.pk/*"]}],
