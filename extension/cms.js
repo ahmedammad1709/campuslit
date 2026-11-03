@@ -21,8 +21,32 @@
     if (text) node.textContent = text;
     owned.add(node); return node;
   }
+  // The narrowest the sidebar may be: the narrowest width at which the header block (emblem and the campus or university name) still fits without being cut off.
+  // It is measured, not guessed, because the name differs per campus and the text size and font are the student's own choice.
+  const COMFORT = 16;
+  let narrowest = 0;
+  function measureNarrowest() {
+    const box = document.querySelector('#header .navbar-header');
+    if (!box || !box.offsetWidth) return 200;                       // no header to protect (hidden, or a phone layout)
+    const root = document.documentElement, before = root.style.getPropertyValue('--bs-side');
+    root.classList.add('bs-instant');                              // no easing while measuring, so each width is real at once
+    // the header block clips its contents, and each name link clips its own text (a fixed-height link whose text wraps to a fourth line spills over its edge without the block noticing), so both are checked
+    const names = [...box.querySelectorAll('a.navbar-brand')].filter(n => n.id !== 'aSideBar');
+    const fits = w => {
+      root.style.setProperty('--bs-side', w + 'px');
+      if (box.scrollWidth > box.clientWidth + 1 || box.scrollHeight > box.clientHeight + 1) return false;
+      return names.every(n => !n.offsetWidth || (n.scrollWidth <= n.clientWidth + 1 && n.scrollHeight <= n.clientHeight + 1));
+    };
+    let lo = 200, hi = 420;
+    while (lo < hi) { const mid = (lo + hi) >> 1; if (fits(mid)) hi = mid; else lo = mid + 1; }
+    if (before) root.style.setProperty('--bs-side', before); else root.style.removeProperty('--bs-side');
+    root.classList.remove('bs-instant');
+    return Math.min(420, lo + COMFORT);   // a little air beside the name, so it never looks squeezed against the search button
+  }
+  function minSide() { if (!narrowest) narrowest = measureNarrowest(); return narrowest; }
+  function forgetNarrowest() { narrowest = 0; }
   function setSide(px, save) {
-    const w = Math.round(Math.min(420, Math.max(200, px)));
+    const w = Math.round(Math.min(420, Math.max(minSide(), px)));
     document.documentElement.style.setProperty('--bs-side', w + 'px');
     if (resizer) resizer.setAttribute('aria-valuenow', String(w));
     if (save && store && store.local) { try { store.local.set({ [SIDE_KEY]: w }); } catch (e) { /* width just will not persist */ } }
@@ -37,6 +61,7 @@
     resizer.setAttribute('aria-valuemin', '200'); resizer.setAttribute('aria-valuemax', '420'); resizer.tabIndex = 0;
     side.append(resizer);
     resizer.addEventListener('pointerdown', e => {
+      forgetNarrowest(); resizer.setAttribute('aria-valuemin', String(minSide()));
       e.preventDefault(); resizer.setPointerCapture(e.pointerId); resizer.classList.add('dragging'); document.documentElement.classList.add('bs-dragging');
       const move = ev => setSide(ev.clientX, false);
       const up = () => { resizer.removeEventListener('pointermove', move); resizer.removeEventListener('pointerup', up); resizer.classList.remove('dragging'); document.documentElement.classList.remove('bs-dragging'); setSide(currentSide(), true); };
@@ -45,7 +70,7 @@
     resizer.addEventListener('dblclick', () => { document.documentElement.style.removeProperty('--bs-side'); if (store && store.local) store.local.remove(SIDE_KEY); });
     resizer.addEventListener('keydown', e => {
       if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
-      e.preventDefault(); setSide(currentSide() + (e.key === 'ArrowRight' ? 16 : -16), true);
+      e.preventDefault(); forgetNarrowest(); setSide(currentSide() + (e.key === 'ArrowRight' ? 16 : -16), true);
     });
     if (store && store.local) store.local.get(SIDE_KEY).then(d => { if (Number.isFinite(d[SIDE_KEY])) setSide(d[SIDE_KEY], false); }).catch(() => {});
   }

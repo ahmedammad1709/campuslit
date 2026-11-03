@@ -69,10 +69,10 @@
     & .sidebar-menu > li > a > span { white-space: normal; overflow-wrap: anywhere; }
     & .main-sidebar { overflow: hidden; }
     @media (min-width: 768px) {
-      & .sidebar-mini:not(.sidebar-collapse) .main-sidebar, & .sidebar-mini:not(.sidebar-collapse) .main-header .logo { width: var(--bs-side); }
-      & .sidebar-mini:not(.sidebar-collapse) .content-wrapper, & .sidebar-mini:not(.sidebar-collapse) .main-footer, & .sidebar-mini:not(.sidebar-collapse) .main-header .navbar { margin-left: var(--bs-side); }
-      & .sidebar-mini.sidebar-collapse .main-sidebar, & .sidebar-mini.sidebar-collapse .main-header .logo { width: var(--bs-mini); }
-      & .sidebar-mini.sidebar-collapse .content-wrapper, & .sidebar-mini.sidebar-collapse .main-footer, & .sidebar-mini.sidebar-collapse .main-header .navbar { margin-left: var(--bs-mini); }
+      & .sidebar-mini:not(.sidebar-collapse) .main-sidebar, & .sidebar-mini:not(.sidebar-collapse) .main-header .logo { width: var(--bs-side) !important; }
+      & .sidebar-mini:not(.sidebar-collapse) .content-wrapper, & .sidebar-mini:not(.sidebar-collapse) .main-footer, & .sidebar-mini:not(.sidebar-collapse) .main-header .navbar { margin-left: var(--bs-side) !important; }
+      & .sidebar-mini.sidebar-collapse .main-sidebar, & .sidebar-mini.sidebar-collapse .main-header .logo { width: var(--bs-mini) !important; }   /* AdminLTE pins the rail at 50px with !important; the logo block and the page margin must agree with it */
+      & .sidebar-mini.sidebar-collapse .content-wrapper, & .sidebar-mini.sidebar-collapse .main-footer, & .sidebar-mini.sidebar-collapse .main-header .navbar { margin-left: var(--bs-mini) !important; }   /* AdminLTE sets the page margin to 50px with !important when collapsed */
       & .sidebar-mini.sidebar-collapse .main-header .logo { padding: 0; justify-content: center; }
       & .sidebar-mini.sidebar-collapse .main-header .logo .logo-lg { display: none !important; }
       & .sidebar-mini.sidebar-collapse .main-header .logo .logo-mini { display: flex !important; }
@@ -80,6 +80,12 @@
       & .sidebar-mini.sidebar-collapse .sidebar-menu > li > a > .fa { margin: 0; width: auto; }
       & .sidebar-mini.sidebar-collapse .sidebar-menu > li.active:not([data-bs-demote]) > a::before, & .sidebar-mini.sidebar-collapse .sidebar-menu > li[data-bs-current] > a::before { left: -10px; }
       & .sidebar-mini.sidebar-collapse .bs-resizer { display: none; }
+      /* The rail, the header's logo block and the page margin all follow the same width, on the same clock, so they never disagree:
+         the same easing when the menu is toggled, and no easing at all while the edge is being dragged (otherwise each one lags behind the pointer by a different amount). */
+      & body:not(.hold-transition) .main-sidebar { transition: transform .3s ease-in-out, width .22s var(--bs-ease) !important; }
+      & body:not(.hold-transition) .main-header .logo { transition: width .22s var(--bs-ease) !important; }
+      & body:not(.hold-transition) :is(.content-wrapper, .main-footer, .main-header .navbar) { transition: margin-left .22s var(--bs-ease) !important; }
+      &.bs-dragging body :is(.main-sidebar, .main-header .logo, .content-wrapper, .main-footer, .main-header .navbar), &.bs-instant body :is(.main-sidebar, .main-header .logo, .content-wrapper, .main-footer, .main-header .navbar) { transition: none !important; }   /* while dragging, and when a saved width is applied as the page opens */
     }
     /* ---------- Content frame ---------- */
     & .content-wrapper, & .right-side, & .main-footer { background: var(--bs-bg) !important; border: 0 !important; }

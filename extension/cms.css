@@ -390,6 +390,7 @@
     &[data-bs-motion="true"] div#pageContent > div.container-fluid > :nth-child(3) { animation-delay: .1s; }
 
     /* ---------- Sidebar resize handle ---------- */
+    &.bs-instant :is(#header .navbar-header, aside#sideBar, aside#sideBar + div#pageContent, footer#footer), &.bs-dragging :is(#header .navbar-header, aside#sideBar, aside#sideBar + div#pageContent, footer#footer) { transition: none !important; }   /* measuring the narrowest width, and dragging, happen without easing */
     & .bs-resizer { position: absolute; top: 0; right: -1px; bottom: 0; width: 8px; z-index: 900; cursor: col-resize; touch-action: none; }
     & .bs-resizer::after { content: ""; position: absolute; top: 0; bottom: 0; right: 0; width: 2px; background: var(--bs-accent); opacity: 0; transition: opacity .15s; }
     & .bs-resizer:hover::after, & .bs-resizer:focus-visible::after, & .bs-resizer.dragging::after { opacity: .9; }
