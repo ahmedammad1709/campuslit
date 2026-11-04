@@ -36,7 +36,7 @@
 
 ## Before the first submission
 
-1. Choose the permanent Firefox add-on ID (currently the development placeholder `campuslit@local.invalid` in `scripts/build.mjs`). It cannot change after publishing.
+1. Choose the permanent Firefox add-on ID (now `campuslit@campuslit-bu.vercel.app` in `scripts/build.mjs`). It cannot change after publishing.
 2. The site is live at https://campuslit-bu.vercel.app/ (Vercel, root directory `site`); its `/privacy` page is the privacy-policy URL. Make the GitHub repository public and publish a release first, or the site's Download buttons and source links lead nowhere.
 3. Decide the public contact address for the Chrome listing (see `docs/STORE_LISTING.md`, "Decisions only the publisher can make").
 4. Let a few real students try a release build first: the live portals can differ from the saved pages the extension was built against. Ask them to look at the Assignments page with an open assignment, the Time Table page, the Attendance page, and Ctrl+K.

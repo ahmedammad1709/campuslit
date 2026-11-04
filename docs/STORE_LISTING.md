@@ -98,7 +98,7 @@ Suggested captions (the stores let you add one per screenshot): 1 "Reminders for
 
 ## Decisions only the publisher can make
 
-1. **Firefox add-on ID.** The build currently uses `campuslit@local.invalid`, a development placeholder. The ID is permanent once published (it ties updates and saved settings together). Choose it once, in `scripts/build.mjs`, e.g. `campuslit@<a domain or name you control>`.
+1. **Firefox add-on ID.** The build uses `campuslit@campuslit-bu.vercel.app`, chosen before the first Firefox upload. The ID is permanent once published (it ties updates and saved settings together). Choose it once, in `scripts/build.mjs`, e.g. `campuslit@<a domain or name you control>`.
 2. **Public contact.** Chrome shows the developer's contact e-mail on the listing and requires it to be verified. Decide which address to use. The support URL above can be the GitHub issues page.
 3. **Version number.** The first public release was `1.0.0`; `1.0.1` renames the listing (title and summary) and refreshes the screenshots (set in `package.json` and `extension/manifest.json`; the release check refuses a mismatch). Every later store update must use a higher number.
 4. **Developer accounts.** Chrome Web Store (one-time registration fee), Edge Add-ons (free), Firefox Add-ons (free). Chrome also asks whether you are a trader (a hobby project that is free and unmonetised is normally a non-trader).
