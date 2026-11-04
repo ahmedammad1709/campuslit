@@ -8,8 +8,8 @@ changes, change the text here in the same commit.
 
 | Field | Value |
 | --- | --- |
-| Name | Campuslit — a calmer CMS & LMS |
-| Summary (manifest description, 126 of 132 characters) | A calmer CMS and LMS for Bahria students: themes, attendance planner, assignment reminders, quick search. Unofficial; private. |
+| Name | Campuslit: Bahria University LMS & CMS Redesign |
+| Summary (manifest description, 126 of 132 characters) | Redesign the Bahria University LMS and CMS: themes, attendance planner, due-date reminders, quick search. Unofficial; private. |
 | Category | Education (Chrome, Edge) / Other (Firefox) |
 | Language | English |
 | Support URL | https://github.com/ahmedammad1709/campuslit/issues |
@@ -23,7 +23,7 @@ changes, change the text here in the same commit.
 Use this as plain text (the stores do not render Markdown).
 
 ```
-Campuslit gives the Bahria University student CMS and LMS a calmer, cleaner look, and adds a few helpers that use what the pages already show.
+Campuslit (also written Campus Lit) redesigns the Bahria University student LMS and CMS: a calmer, cleaner look for the portals you already use, plus a few helpers that use what the pages already show. Same logins, same data, for every Bahria campus.
 
 IT IS UNOFFICIAL. Campuslit is made by a student. It is not made, endorsed or supported by Bahria University. It only runs on cms.bahria.edu.pk and lms.bahria.edu.pk, and you can switch it off for either portal (or both) from the toolbar button.
 
@@ -100,6 +100,6 @@ Suggested captions (the stores let you add one per screenshot): 1 "Reminders for
 
 1. **Firefox add-on ID.** The build currently uses `campuslit@local.invalid`, a development placeholder. The ID is permanent once published (it ties updates and saved settings together). Choose it once, in `scripts/build.mjs`, e.g. `campuslit@<a domain or name you control>`.
 2. **Public contact.** Chrome shows the developer's contact e-mail on the listing and requires it to be verified. Decide which address to use. The support URL above can be the GitHub issues page.
-3. **Version number.** The first public release is `1.0.0` (set in `package.json` and `extension/manifest.json`; the release check refuses a mismatch). Every later store update must use a higher number.
+3. **Version number.** The first public release was `1.0.0`; `1.0.1` renames the listing (title and summary) and refreshes the screenshots (set in `package.json` and `extension/manifest.json`; the release check refuses a mismatch). Every later store update must use a higher number.
 4. **Developer accounts.** Chrome Web Store (one-time registration fee), Edge Add-ons (free), Firefox Add-ons (free). Chrome also asks whether you are a trader (a hobby project that is free and unmonetised is normally a non-trader).
 5. **Trademark.** The name contains no university name or logo and the listing says "Unofficial". Keep it that way: do not add the university emblem to store images.

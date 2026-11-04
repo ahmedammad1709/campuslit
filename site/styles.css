@@ -306,3 +306,5 @@ td:first-child { color: var(--ink); font-weight: 700; }
 .prose .cta-box .btn { margin-top: 18px; }
 .prose details { margin-top: 12px; }
 @media (max-width: 640px) { .facts-list > div { grid-template-columns: 1fr; gap: 2px; } }
+
+.cta-row.left { justify-content: flex-start; margin-top: 26px; }
