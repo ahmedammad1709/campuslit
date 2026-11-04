@@ -9,6 +9,7 @@ changes, change the text here in the same commit.
 | Field | Value |
 | --- | --- |
 | Name | Campuslit: Bahria University LMS & CMS Redesign |
+| Name inside the Firefox package | Campuslit: Bahria LMS & CMS Redesign (Firefox allows 45 characters in the manifest name; `scripts/build.mjs` sets it). On the AMO form you may type the full name above (limit 50). |
 | Summary (manifest description, 126 of 132 characters) | Redesign the Bahria University LMS and CMS: themes, attendance planner, due-date reminders, quick search. Unofficial; private. |
 | Category | Education (Chrome, Edge) / Other (Firefox) |
 | Language | English |
