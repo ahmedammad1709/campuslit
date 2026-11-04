@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Campuslit marquee</title>
+<meta name="viewport" content="width=1400">
+<style>
+  @font-face { font-family: "Jakarta"; src: url("/fonts/jakarta-latin.woff2") format("woff2"); font-weight: 200 800; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1400px; height: 560px; overflow: hidden; background: #0b1d40; }
+  body { position: relative; font-family: "Jakarta", system-ui, sans-serif; color: #fff;
+         background: radial-gradient(900px 520px at 8% -10%, #1f4fa8 0%, rgba(31, 79, 168, 0) 62%), radial-gradient(700px 420px at 100% 100%, rgba(242, 184, 75, .22), rgba(242, 184, 75, 0) 60%), #0b1d40; }
+  .brand { position: absolute; left: 96px; top: 84px; display: flex; align-items: center; gap: 18px; font-size: 34px; font-weight: 800; letter-spacing: -.03em; }
+  .brand img { width: 58px; height: 58px; border-radius: 16px; box-shadow: 0 10px 28px -8px rgba(0, 0, 0, .55); }
+  .brand span span { font-weight: 400; opacity: .75; }
+  h1 { position: absolute; left: 96px; top: 190px; margin: 0; width: 640px; font-size: 64px; line-height: 1.04; font-weight: 800; letter-spacing: -.045em; }
+  h1 em { font-style: normal; color: #f2b84b; }
+  p { position: absolute; left: 96px; bottom: 84px; margin: 0; font-size: 24px; opacity: .8; }
+  .shot { position: absolute; left: 790px; top: 74px; width: 700px; border-radius: 18px; overflow: hidden; border: 1px solid rgba(255, 255, 255, .2); box-shadow: 0 40px 80px -20px rgba(0, 0, 0, .6); }
+  .shot img { display: block; width: 100%; }
+</style>
+</head>
+<body>
+  <div class="brand"><img src="/brand/logo.svg" alt=""><span>campus<span>lit</span></span></div>
+  <h1>Your Bahria portals, finally <em>pleasant</em>.</h1>
+  <p>Free &middot; Open source &middot; Every Bahria campus</p>
+  <div class="shot"><img src="/site/assets/shots/lms-bahria.webp" alt=""></div>
+</body>
+</html>

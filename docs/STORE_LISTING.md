@@ -68,7 +68,7 @@ There are no other permissions, no host permissions beyond those two content-scr
 ## Data-use answers
 
 - Does the extension collect or transmit user data? **No.** Nothing leaves the browser: it has no network access (`connect-src 'none'`, no `fetch`, no remote scripts or fonts).
-- Data types to tick (Chrome "Privacy practices"): **none**. The extension reads portal page text on the device to draw its extra screens and keeps only appearance settings and the optional reminder note, locally.
+- Data types to tick (Chrome "Privacy practices"): **Website content** and **Personally identifiable information**. Chrome's user-data FAQ counts any handling of user data, including data that is only processed or stored on the device and never sent anywhere, so the form must say what the extension touches: it reads text the portal already shows (course names, attendance hours, assignment titles and deadlines, the class schedule, menu links: *website content*, with a short note of open assignments kept locally) and the student's first name for the greeting (*personally identifiable information*, held in memory only). Leave authentication, financial, health, location, web history, personal communications and user activity **unticked**: it never reads passwords or form entries, and it logs no keystrokes or clicks. The privacy policy (sections 2 and 3) describes exactly this.
 - Certify: not sold to third parties, not used for purposes unrelated to the single purpose, not used for creditworthiness or lending.
 - Firefox: `data_collection_permissions` is `required: ["none"]` (already in the Firefox build).
 - Remote code: **No.**

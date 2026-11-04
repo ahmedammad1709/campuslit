@@ -1,6 +1,7 @@
 // Makes the images for the store listings from the invented sample pages (never from a signed-in portal):
 //   dist/release/store/screenshot-1..6.jpg   1280x800, no transparency (Chrome Web Store, Edge Add-ons, Firefox Add-ons)
 //   dist/release/store/promo-small.png       440x280 (Chrome Web Store small promo tile)
+//   dist/release/store/promo-marquee.png     1400x560 (Chrome Web Store large promo tile, optional)
 //   npm run store-assets
 import { createServer } from 'node:http';
 import { spawn } from 'node:child_process';
@@ -18,7 +19,7 @@ await mkdir(out, { recursive: true });
 const server = createServer(async (req, res) => {
   try {
     const p = decodeURIComponent(new URL(req.url, 'http://x').pathname);
-    const base = p.startsWith('/brand/') ? root : extension, file = path.resolve(base, '.' + p);
+    const base = p.startsWith('/brand/') || p.startsWith('/site/') ? root : extension, file = path.resolve(base, '.' + p);
     if (!file.startsWith(base + path.sep)) { res.statusCode = 403; return res.end(); }
     res.setHeader('content-type', types[path.extname(file)] || 'application/octet-stream'); res.end(await readFile(file));
   } catch { res.statusCode = 404; res.end('not found'); }
@@ -70,5 +71,9 @@ await open('/options.html'); await sleep(1200); await save('screenshot-6.jpg');
 // the small promo tile, drawn from the logo
 await call('Emulation.setDeviceMetricsOverride', { width: 440, height: 280, deviceScaleFactor: 1, mobile: false });
 await open('/brand/store/promo-small.html'); await sleep(500); await save('promo-small.png', 'png');
+
+// the large promo tile (optional in the store), drawn from the logo and the LMS picture
+await call('Emulation.setDeviceMetricsOverride', { width: 1400, height: 560, deviceScaleFactor: 1, mobile: false });
+await open('/brand/store/promo-marquee.html'); await sleep(600); await save('promo-marquee.png', 'png');
 
 ws.close(); chrome.kill(); server.close(); process.exit(0);
