@@ -17,7 +17,7 @@ EMBLEM = 'data:image/svg+xml,' + urllib.parse.quote(
     '<path d="M32 12 48 20v14c0 10-7 16-16 20-9-4-16-10-16-20V20z" fill="#0b1d40"/><path d="M24 31h16M32 23v16" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>')
 AVATAR = 'data:image/svg+xml,' + urllib.parse.quote(
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#e7ebf5"/><circle cx="32" cy="25" r="11" fill="#9aa6c4"/><path d="M10 60c2-14 12-20 22-20s20 6 22 20z" fill="#9aa6c4"/></svg>')
-NAME = 'Ayesha Khan'
+NAME = 'Ammad Khan'
 ENROLL = '02-000000-000'
 
 # ------------------------------------------------------------------ LMS
