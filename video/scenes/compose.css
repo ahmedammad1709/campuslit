@@ -71,3 +71,46 @@ body { font-family: "Jakarta", system-ui, sans-serif; color: #fff; -webkit-font-
 #chips span { padding: 14px 32px; border-radius: 999px; background: rgba(255, 255, 255, .1); border: 2px solid rgba(255, 255, 255, .22); font-size: 34px; font-weight: 700; }
 #site { margin-top: 56px; padding: 22px 50px; border-radius: 999px; background: #f2b84b; color: #0b1d40; font-size: 48px; font-weight: 800; letter-spacing: -.02em; }
 #fine { position: absolute; left: 0; right: 0; bottom: 430px; text-align: center; font-size: 26px; color: #8fa0c6; font-weight: 600; }
+
+/* landscape (1920x1080: LinkedIn, YouTube, the website): the window fills the frame, captions sit over its lower edge on a soft scrim */
+#orbs, #scrim, #bar, #shine { display: none; }
+html.land, html.land body { width: 1920px; height: 1080px; }
+html.land #frame { width: 1920px; height: 1080px; background: radial-gradient(1300px 900px at 6% -12%, #1f4fa8 0%, rgba(31, 79, 168, 0) 62%), radial-gradient(1000px 800px at 100% 115%, rgba(242, 184, 75, .2), rgba(242, 184, 75, 0) 60%), #0b1d40; perspective: 2600px; perspective-origin: 50% 40%; }
+html.land #orbs { display: block; position: absolute; inset: 0; overflow: hidden; }
+html.land #orbs i { position: absolute; border-radius: 50%; filter: blur(90px); }
+html.land #orbA { width: 760px; height: 760px; background: #2f5bea; opacity: .5; }
+html.land #orbB { width: 620px; height: 620px; background: #f2b84b; opacity: .22; }
+html.land #orbC { width: 700px; height: 700px; background: #7a4dff; opacity: .26; }
+html.land #glow { left: 200px; right: 200px; top: 120px; height: 860px; }
+html.land #grid { -webkit-mask-image: radial-gradient(ellipse at 50% 50%, #000 0, transparent 75%); mask-image: radial-gradient(ellipse at 50% 50%, #000 0, transparent 75%); }
+html.land #win { left: 240px; top: 63px; width: 1440px; height: 870px; transform-origin: 50% 50%; transform: scale(1.08); box-shadow: 0 70px 140px -30px rgba(0, 0, 0, .7), 0 0 0 1px rgba(255, 255, 255, .2); }
+html.land #view { width: 1440px; height: 810px; }
+html.land .pg { width: 1440px; height: 810px; }
+html.land .cam { width: 1440px; height: 1100px; }
+html.land .cam iframe { width: 1440px; height: 1100px; }
+html.land #shine { display: block; position: absolute; inset: 0; z-index: 9; pointer-events: none; opacity: 0; background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, .34) 50%, transparent 62%); }
+html.land #scrim { display: block; position: absolute; left: 0; right: 0; bottom: 0; height: 460px; z-index: 19; pointer-events: none; background: linear-gradient(to bottom, rgba(5, 12, 30, 0) 0%, rgba(5, 12, 30, 0) 38%, rgba(5, 12, 30, .6) 70%, rgba(5, 12, 30, .9) 100%); }
+html.land #dock { bottom: 150px; }
+html.land #bar { display: block; position: absolute; left: 0; right: 0; bottom: 0; height: 6px; z-index: 25; background: rgba(255, 255, 255, .1); }
+html.land #bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #2f5bea, #f2b84b); }
+html.land #caps { left: 160px; right: 160px; top: 740px; height: 290px; align-items: flex-end; }
+html.land .cap { top: 0; bottom: 0; align-content: flex-end; font-size: 88px; gap: 0 34px; line-height: 1.08; text-shadow: 0 4px 0 rgba(0, 0, 0, .25), 0 10px 40px rgba(0, 0, 0, .8); }
+html.land .cap .w { display: inline-block; opacity: .38; }
+html.land .cap .w.seen { opacity: 1; }
+html.land .cap .w.sm { font-size: 60px; }
+html.land .pg.install { justify-content: flex-start; padding-top: 44px; }
+html.land .pg.install > svg { width: 132px; height: 132px; margin-bottom: 18px; border-radius: 32px; }
+html.land .pg.install h1 { font-size: 88px; }
+html.land .pg.install p { margin-top: 10px; font-size: 32px; }
+html.land .pg.install .row { margin: 22px 0 30px; }
+html.land .pg.install .btn { width: 560px; height: 100px; border-radius: 50px; font-size: 42px; }
+html.land #caps.endmode { top: 868px; height: 130px; }
+html.land #caps.endmode .cap { justify-content: center; align-content: center; font-size: 60px; }
+html.land #end { z-index: 21; display: grid; grid-template-columns: auto auto; justify-content: center; align-content: center; align-items: center; column-gap: 100px; padding: 0 0 190px; background: radial-gradient(1200px 800px at 50% 30%, #1f4fa8 0, rgba(31, 79, 168, 0) 65%), radial-gradient(900px 700px at 100% 100%, rgba(242, 184, 75, .22), rgba(242, 184, 75, 0) 60%), #0b1d40; }
+html.land #caps { z-index: 26; }
+html.land #mark { grid-column: 1; grid-row: 1 / span 4; width: 360px; height: 360px; }
+html.land #word { grid-column: 2; margin: 0; font-size: 148px; line-height: 1; }
+html.land #tag { grid-column: 2; margin-top: 10px; font-size: 42px; }
+html.land #chips { grid-column: 2; margin-top: 36px; }
+html.land #site { grid-column: 2; justify-self: start; margin-top: 40px; }
+html.land #fine { bottom: 40px; }

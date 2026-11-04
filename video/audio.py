@@ -16,6 +16,10 @@ FFMPEG = os.path.join(TOOLS, "ffmpeg", "bin", "ffmpeg.exe")
 scene = sys.argv[1] if len(sys.argv) > 1 else "look"
 cfg = json.load(open(os.path.join(ROOT, "video", "script.json"), encoding="utf8"))
 sc = cfg[scene]
+if "extends" in sc:  # a scene that is another scene with a few lines changed (e.g. "linkedin" = "full" with its own closing line)
+    base = dict(cfg[sc["extends"]]); change = sc.get("lines", {})
+    base["lines"] = [dict(l, **change.get(l["id"], {})) for l in base["lines"]]
+    sc = {**base, **{k: v for k, v in sc.items() if k not in ("extends", "lines")}}
 out = os.path.join(ROOT, "video", "out", scene); os.makedirs(out, exist_ok=True)
 
 def run(*cmd):

@@ -43,5 +43,6 @@
       { "id": "ding", "kind": "ding", "at": 26.6 },
       { "id": "end", "kind": "hit", "at": 28.35 }
     ]
-  }
+  },
+  "linkedin": { "extends": "full", "lines": { "outro": { "text": "Campuslit. For Bahria students. Link in the comments." } } }
 }

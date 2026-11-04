@@ -3,7 +3,9 @@
 (function () {
   'use strict';
   const $ = id => document.getElementById(id);
-  const VIEW = { w: 1000, h: 1120 };
+  const LAND = document.documentElement.classList.contains('land');          // landscape 1920x1080 (LinkedIn): the window fills the frame, captions along the bottom
+  const VIEW = LAND ? { w: 1440, h: 810, pw: 1440, ph: 1100 } : { w: 1000, h: 1120, pw: 1000, ph: 1120 };   // w,h: what the window shows; pw,ph: the page behind it (the camera pans over it)
+  const OFF = VIEW.w + 100, CX = VIEW.w / 2, CY = VIEW.h / 2;
   const E = { lin: u => u, out: u => 1 - Math.pow(1 - u, 3), in: u => u * u * u, io: u => (u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2), back: u => { const c = 1.70158; return 1 + (c + 1) * Math.pow(u - 1, 3) + c * Math.pow(u - 1, 2); } };
   // keys: [[time, value, easing-into-this-key], ...]
   function track(keys, t) {
@@ -18,7 +20,8 @@
   const ramp = (t, a, d, ease) => (E[ease || 'out'])(clamp01((t - a) / d));
   const settle = ms => new Promise(r => setTimeout(r, ms));
 
-  const WIN_S = .88;                               // the browser window is drawn a little smaller to leave room for captions inside Instagram's safe area
+  const WIN_S = LAND ? 1.08 : .88;                  // the browser window is drawn a little smaller to leave room for captions (portrait: inside Instagram's safe area)
+  const CUR = LAND ? [[1560, 860], [1540, 870]] : [[840, 1240], [860, 1250]];   // where the cursor first appears (themes, install)
   const SL = .55;                                  // how long a slide between pages takes
   const DOT_THEMES = ['navy', 'classic', 'midnight', 'pearl', 'sage', 'rose'];
   let T = null, ready = false, btnPos = [0, 0];                      // T: the timeline, built from the sound
@@ -53,7 +56,7 @@
     let handle = null;
     if (withHandle) { handle = document.createElement('div'); handle.className = 'handle'; handle.innerHTML = '<b></b>'; cam.append(handle); }
     $('view').append(el);
-    return (G[name] = { name, url, el, cam, handle, off: [[0, 1100]], S: [[0, 1]], X: [[0, 500]], Y: [[0, 560]], wipe: null, pos: 0 });
+    return (G[name] = { name, url, el, cam, handle, off: [[0, OFF]], S: [[0, 1]], X: [[0, CX]], Y: [[0, CY]], wipe: null, pos: 0 });
   }
 
   // ---------------------------------------------------------------- the timeline (all times come from the sound)
@@ -69,8 +72,8 @@
     const order = [['lms', null, sx.slide1], ['cms', sx.slide1, sx.slide2], ['tt', sx.slide2, sx.slide3], ['theme', sx.slide3, sx.slide4], ['due', sx.slide4, sx.slide5], ['att', sx.slide5, sx.slide6], ['srch', sx.slide6, sx.slide7], ['install', sx.slide7, sx.end]];
     for (const [name, inAt, outAt] of order) {
       const g = G[name], keys = [];
-      if (inAt === null) keys.push([0, 0]); else keys.push([0, 1100], [inAt + .05, 1100], [inAt + .05 + SL, 0, 'io']);
-      if (outAt) keys.push([outAt + .05, 0], [outAt + .05 + SL, -1100, 'io']);
+      if (inAt === null) keys.push([0, 0]); else keys.push([0, OFF], [inAt + .05, OFF], [inAt + .05 + SL, 0, 'io']);
+      if (outAt) keys.push([outAt + .05, 0], [outAt + .05 + SL, -OFF, 'io']);
       g.off = keys; g.inAt = inAt; g.outAt = outAt;
     }
     // ----- LMS: stock page, push in, wipe to Campuslit, tour of the new dashboard
@@ -97,6 +100,26 @@
     G.att.S = [[0, 1.0], [sx.slide5 + .7, 1.0], [sx.slide5 + 1.5, 1.4, 'io']];
     G.att.X = [[0, 500], [sx.slide5 + .7, 500], [sx.slide5 + 1.5, 630, 'io']]; G.att.Y = [[0, 560], [sx.slide5 + .7, 560], [sx.slide5 + 1.5, 420, 'io']];
     G.srch.S = [[0, 1.0], [sx.key - .1, 1.0], [sx.key + .7, 1.5, 'io']]; G.srch.X = [[0, 500]]; G.srch.Y = [[0, 560], [sx.key - .1, 560], [sx.key + .7, 300, 'io']];
+    if (LAND) landCams(sx, w1, w2);
+  }
+  // landscape: the pages show their wide desktop layout, so the cameras are tuned again (centres are in page pixels, 1440 wide)
+  function landCams(sx, w1, w2) {
+    for (const g of Object.values(G)) { g.S = [[0, 1]]; g.X = [[0, CX]]; g.Y = [[0, CY]]; }
+    const tin = sx.slide2 + .05 + SL;
+    // LMS: stock page pushes in, wipe, then the new dashboard (greeting and course cards)
+    G.lms.S = [[0, 1.0], [w1 + 1.9, 1.0], [w1 + 2.55, 1.25], [sx.slide1, 1.25]];
+    G.lms.X = [[0, CX], [w1 + 1.9, CX], [w1 + 2.55, 820], [sx.slide1, 860]];
+    G.lms.Y = [[0, CY], [w1 + 1.9, CY], [w1 + 2.55, 330], [sx.slide1, 400]];
+    G.cms.S = [[0, 1.0], [w2 + 1.7, 1.0], [sx.slide2, 1.2, 'io']];
+    G.cms.X = [[0, CX], [w2 + 1.7, CX], [sx.slide2, 800, 'io']]; G.cms.Y = [[0, CY], [w2 + 1.7, CY], [sx.slide2, 340, 'io']];
+    G.tt.S = [[0, 1.0], [tin + .5, 1.0], [sx.slide3, 1.2, 'io']];
+    G.tt.X = [[0, CX], [tin + .5, CX], [sx.slide3, 850, 'io']]; G.tt.Y = [[0, CY], [tin + .5, CY], [sx.slide3, 345, 'io']];
+    G.due.S = [[0, 1.0], [sx.slide4 + .7, 1.0], [sx.slide4 + 1.5, 1.6, 'io']];
+    G.due.X = [[0, CX], [sx.slide4 + .7, CX], [sx.slide4 + 1.5, 700, 'io']]; G.due.Y = [[0, CY], [sx.slide4 + .7, CY], [sx.slide4 + 1.5, 250, 'io']];
+    G.att.S = [[0, 1.0], [sx.slide5 + .7, 1.0], [sx.slide5 + 1.5, 1.45, 'io']];
+    G.att.X = [[0, CX], [sx.slide5 + .7, CX], [sx.slide5 + 1.5, 790, 'io']]; G.att.Y = [[0, CY], [sx.slide5 + .7, CY], [sx.slide5 + 1.5, 390, 'io']];
+    G.srch.S = [[0, 1.0], [sx.key - .1, 1.0], [sx.key + .7, 1.5, 'io']];
+    G.srch.X = [[0, CX], [sx.key - .1, CX], [sx.key + .7, 720, 'io']]; G.srch.Y = [[0, CY], [sx.key - .1, CY], [sx.key + .7, 270, 'io']];
   }
 
   // ---------------------------------------------------------------- per-frame state
@@ -109,14 +132,14 @@
       g.el.style.transform = `translateX(${off}px)`;
       if (Math.abs(off) < VIEW.w / 2) urlNow = g.url;
       const s = track(g.S, t);
-      const cx = Math.min(VIEW.w - VIEW.w / 2 / s, Math.max(VIEW.w / 2 / s, track(g.X, t)));
-      const cy = Math.min(VIEW.h - VIEW.h / 2 / s, Math.max(VIEW.h / 2 / s, track(g.Y, t)));
+      const cx = Math.min(VIEW.pw - VIEW.w / 2 / s, Math.max(VIEW.w / 2 / s, track(g.X, t)));
+      const cy = Math.min(VIEW.ph - VIEW.h / 2 / s, Math.max(VIEW.h / 2 / s, track(g.Y, t)));
       g.cam.style.transform = `translate(${VIEW.w / 2 - cx * s}px, ${VIEW.h / 2 - cy * s}px) scale(${s})`;
       if (g.wipe) {
         const h = track(g.wipe, t), top = g.cam.querySelectorAll('iframe')[1];
         if (top) top.style.clipPath = `inset(0 ${(1 - h) * 100}% 0 0)`;
         g.handle.style.display = h > .002 && h < .998 ? 'block' : 'none';
-        g.handle.style.left = (h * 1000) + 'px';
+        g.handle.style.left = (h * VIEW.pw) + 'px';
         g.handle.style.transform = `scaleX(${1 / Math.max(.5, s)})`;
       }
     }
@@ -125,6 +148,7 @@
   }
   function setCaptions(t) {
     const host = $('caps');
+    host.classList.toggle('endmode', LAND && t >= T.sx.end);      // landscape: captions drop under the closing card
     let n = 0;
     for (const c of T.caps) {
       if (t < c.t0 || t > c.t1) continue;
@@ -138,7 +162,11 @@
       const a = E.out(Math.min(1, age / .22)), b = Math.min(1, left / .16);
       el.style.opacity = String(Math.min(a, b));
       el.style.transform = `translateY(${(1 - a) * 22}px) scale(${.94 + .06 * a})`;
-      el.querySelectorAll('.w').forEach(w => w.classList.toggle('on', t >= +w.dataset.t && t < Math.max(+w.dataset.e, +w.dataset.t + .25)));
+      el.querySelectorAll('.w').forEach(w => {
+        const t0 = +w.dataset.t;
+        w.classList.toggle('on', t >= t0 && t < Math.max(+w.dataset.e, t0 + .25));
+        if (LAND) { w.classList.toggle('seen', t >= t0 - .02); const u = (t - t0) / .32; w.style.transform = u > 0 && u < 1 ? `scale(${1 + .06 * Math.sin(Math.PI * u)}) translateY(${-6 * Math.sin(Math.PI * u)}px)` : ''; }
+      });
       n++;
     }
     for (let i = n; i in capEls; i++) capEls[i].style.display = 'none';
@@ -168,9 +196,9 @@
     // custom accent sweeps through green, blue, violet, pink
     hueKeys = [[0, 150], [s.custom + .05, 150], [s.custom + .75, 215, 'io'], [s.custom + 1.35, 280, 'io'], [s.slide4 - .05, 335, 'io']];
     // cursor: arrives at each dot just before its click, then follows the slider knob
-    const cx = [[0, 840]], cy = [[0, 1240]];
+    const cx = [[0, CUR[0][0]]], cy = [[0, CUR[0][1]]];
     const startAt = T.sx.slide3 + .3;
-    cx.push([startAt, 840]); cy.push([startAt, 1240]);
+    cx.push([startAt, CUR[0][0]]); cy.push([startAt, CUR[0][1]]);
     clicks = [];
     seq.slice(1).forEach(q => { const p = T.dotPos[q.dot]; const a = q.t - .08; cx.push([a, p[0], 'io']); cy.push([a, p[1], 'io']); cx.push([q.t + .12, p[0]]); cy.push([q.t + .12, p[1]]); clicks.push([q.t, p[0], p[1]]); });
     const knob = t => trackBox.x0 + (trackBox.x1 - trackBox.x0) * ((track(hueKeys, t) % 360) / 360);
@@ -237,7 +265,7 @@
     g.el.style.transform = 'none';
     const box = $('frame').getBoundingClientRect(), r = $('btn').getBoundingClientRect();
     btnPos = [r.left - box.left + r.width / 2, r.top - box.top + r.height / 2];
-    g.el.style.transform = 'translateX(1100px)';
+    g.el.style.transform = `translateX(${OFF}px)`;
   }
   function setInstall(t) {
     const s = T.sx, btn = $('btn'), added = t >= s.click;
@@ -255,7 +283,7 @@
     const a = s.slide7 + .35, b = s.click - .12;
     if (t >= a - .3 && t < s.end) {
       show = ramp(t, a - .3, .3, 'lin') * (1 - ramp(t, s.click + .5, .3, 'lin'));
-      x = track([[a, 860], [b, btnPos[0] + 40, 'io']], t); y = track([[a, 1250], [b, btnPos[1] + 20, 'io']], t);
+      x = track([[a, CUR[1][0]], [b, btnPos[0] + 40, 'io']], t); y = track([[a, CUR[1][1]], [b, btnPos[1] + 20, 'io']], t);
     }
     const cu = $('cursor'); cu.style.opacity = String(show);
     const down = [...clicks, [s.click, 0, 0]].some(c => Math.abs(t - c[0] - .04) < .08);
@@ -270,14 +298,36 @@
   function setEnd(t) {
     const e = T.sx.end, u = ramp(t, e - .1, .5, 'io');
     $('end').style.opacity = String(u);
-    const w = $('win'); w.style.opacity = String(1 - u); w.style.transform = `scale(${WIN_S * (1 - .06 * u)})`;
+    if (!LAND) { const w = $('win'); w.style.opacity = String(1 - u); w.style.transform = `scale(${WIN_S * (1 - .06 * u)})`; }
     $('ring').style.strokeDasharray = '1'; $('ring').style.strokeDashoffset = String(1 - ramp(t, e + .15, .85, 'io'));
     const d = ramp(t, e + 1.0, .5, 'back'); $('dot').setAttribute('r', String(8.5 * d));
     const mk = $('mark'); const pop = ramp(t, e - .05, .6, 'back'); mk.style.transform = `scale(${.6 + .4 * pop})`; mk.style.opacity = String(Math.min(1, pop * 2));
     const rise = (id, at) => { const el = $(id), v = ramp(t, e + at, .5, 'out'); el.style.opacity = String(v); el.style.transform = `translateY(${(1 - v) * 34}px)`; };
     rise('word', .5); rise('tag', .7); rise('chips', .9); rise('site', 1.1); rise('fine', 1.4);
   }
+  function setWindow(t) {
+    const w = $('win'), s = T.sx, endU = ramp(t, s.end - .1, .5, 'io');
+    const e = ramp(t, 0, 2.2, 'out'), tilt = 1 - e;
+    const calm = Math.max(ramp(t, s.slide3 - .3, .4, 'lin') * (1 - ramp(t, s.slide4 + .2, .4, 'lin')), ramp(t, s.slide7 - .2, .4, 'lin'));   // no sway while the cursor has to hit the dock and the button
+    const fl = 1 - calm;
+    let ry = -17 * tilt + fl * 1.2 * Math.sin(t * .9), rx = 13 * tilt + fl * .7 * Math.sin(t * .7 + 1), sc = WIN_S * (.84 + .16 * e), dz = -140 * tilt;
+    let sw = 0; for (let i = 1; i <= 7; i++) { const u = (t - s['slide' + i] - .05) / SL; if (u > 0 && u < 1) sw = Math.max(sw, Math.sin(Math.PI * u)); }
+    ry += 6 * sw; sc *= 1 - .03 * sw;
+    if (t > s.hit1) sc *= 1 + .028 * Math.exp(-(t - s.hit1) * 7);
+    sc *= 1 - .06 * endU;
+    w.style.opacity = String(1 - endU);
+    w.style.transform = `translateZ(${dz}px) rotateX(${rx}deg) rotateY(${ry}deg) scale(${sc})`;
+    // glare sweeping over the window at every page change and both reveals
+    let sh = null; for (const a of [s.wipe1 + .15, s.wipe2 + .15, ...[1, 2, 3, 4, 5, 6, 7].map(i => s['slide' + i] + .05)]) { const u = (t - a) / .75; if (u > 0 && u < 1) sh = u; }
+    const el = $('shine'); el.style.opacity = sh === null ? '0' : String(.9 * Math.sin(Math.PI * sh)); el.style.transform = `translateX(${((sh || 0) * 2 - 1) * 100}%)`;
+  }
   function setBackdrop(t) {
+    if (LAND) {
+      $('orbA').style.transform = `translate(${240 + 120 * Math.sin(t * .31)}px, ${60 + 80 * Math.cos(t * .27)}px)`;
+      $('orbB').style.transform = `translate(${1180 + 140 * Math.cos(t * .23)}px, ${420 + 90 * Math.sin(t * .35)}px)`;
+      $('orbC').style.transform = `translate(${700 + 160 * Math.sin(t * .19 + 2)}px, ${-120 + 70 * Math.cos(t * .3)}px)`;
+      $('bar').firstElementChild.style.width = (100 * clamp01(t / T.duration)) + '%';
+    }
     $('glow').style.transform = `scale(${1 + .04 * Math.sin(t * 1.3)})`; $('glow').style.opacity = String(.72 + .1 * Math.sin(t * .9));
     $('grid').style.backgroundPosition = `0 ${(t * 9) % 72}px`;
   }
@@ -317,7 +367,7 @@
   };
   window.__frame = async function (t) {
     for (const g of Object.values(G)) await ensure(g, t >= g.need[0] && t <= g.need[1]);
-    setGroups(t); setCaptions(t); setBackdrop(t); setInstall(t); setCursor(t); setEnd(t);
+    setGroups(t); setCaptions(t); setBackdrop(t); setInstall(t); setCursor(t); setEnd(t); if (LAND) setWindow(t);
     const a = await setThemes(t), b = await setSearch(t);
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
     return a || b || true;

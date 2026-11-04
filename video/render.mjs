@@ -12,6 +12,8 @@ import path from 'node:path';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = Object.fromEntries(process.argv.slice(2).reduce((acc, a, i, all) => { if (a.startsWith('--')) acc.push([a.slice(2), all[i + 1] && !all[i + 1].startsWith('--') ? all[i + 1] : true]); return acc; }, []));
 const scene = args.scene || 'look', fps = Number(args.fps || 30);
+const land = args.layout === 'land';                   // --layout land: 1920x1080 for LinkedIn (default is the 1080x1920 portrait)
+const [W, H] = land ? [1920, 1080] : [1080, 1920];
 const tools = process.env.VIDEO_TOOLS || path.join(os.homedir(), 'campuslit-video');
 const ffmpeg = path.join(tools, 'ffmpeg', 'bin', 'ffmpeg.exe');
 const chromeExe = process.env.STUDIO_CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
@@ -43,11 +45,11 @@ const evaluate = async expression => { const r = await call('Runtime.evaluate', 
 
 try {
   await call('Runtime.enable'); await call('Page.enable');
-  await call('Emulation.setDeviceMetricsOverride', { width: 1080, height: 1920, deviceScaleFactor: 1, mobile: false });
+  await call('Emulation.setDeviceMetricsOverride', { width: W, height: H, deviceScaleFactor: 1, mobile: false });
   // every picture reads "Good morning", whatever time it is when this runs
   await call('Page.addScriptToEvaluateOnNewDocument', { source: 'Date.prototype.getHours = function () { return 10; };' });
   const isCover = Boolean(args.cover);                      // --cover: the Instagram cover image instead of the video
-  await call('Page.navigate', { url: base + '/__video/' + (isCover ? 'cover.html' : 'compose.html') });
+  await call('Page.navigate', { url: base + '/__video/' + (isCover ? 'cover.html' : 'compose.html' + (land ? '?layout=land' : '')) });
   for (let i = 0; i < 300; i++) { if (await evaluate(isCover ? 'window.__ready === true' : "typeof __init === 'function' && document.readyState === 'complete'")) break; await new Promise(r => setTimeout(r, 100)); }
   const duration = isCover ? 0 : await evaluate(`__init(${JSON.stringify(scene)})`);
   if (!isCover) console.log(`scene "${scene}": ${duration}s at ${fps} fps`);

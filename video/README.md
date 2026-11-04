@@ -28,6 +28,6 @@ node video/render.mjs --scene full --eval "document.title"                  # ru
 * `video/audio.py`: uses your recording for a line if `recordings/<id>.*` exists, otherwise the local voice; every line goes through the same clean-up chain (presence EQ, soft-word lift, compressor, loudness) so a human and a synthetic voice match; Whisper hears each line and times the captions word by word; `slowTail` slows a rushed last phrase; the sound effects are synthesised; the mix ducks the music under every voice and lands at about -14 LUFS. It also writes `mix_nomusic.wav` (voice and effects only) for laying a platform's trending sound underneath in the app.
 * `video/music.py`: an original 110 BPM track (pad, kick, clap, hats, bass, chord stabs, bell arpeggio) written as a function of a few numbers in `script.json`, so nothing needs a licence.
 * `video/scenes/compose.*`: the 1080x1920 canvas, the page groups with their cameras, the before/after wipes, the theme dock and circular reveals, the typed search, the install card, the closing card and the word-by-word captions. `video/render.mjs`: frame capture and encoding.
-* Output is H.264 + AAC, 1080x1920, 30 fps.
+* Output is H.264 + AAC, 1080x1920, 30 fps. For a landscape cut (LinkedIn) add `--layout land` to the render (1920x1080: captions left, window right); the `linkedin` scene in `script.json` is `full` with its own closing line ("Link in the comments"), built with `audio.py linkedin`.
 
 `video/out/` is git-ignored.
