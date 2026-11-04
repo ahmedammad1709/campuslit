@@ -40,7 +40,7 @@
 2. The site is live at https://campuslit-bu.vercel.app/ (Vercel, root directory `site`); its `/privacy` page is the privacy-policy URL. Make the GitHub repository public and publish a release first, or the site's Download buttons and source links lead nowhere.
 3. Decide the public contact address for the Chrome listing (see `docs/STORE_LISTING.md`, "Decisions only the publisher can make").
 4. Let a few real students try a release build first: the live portals can differ from the saved pages the extension was built against. Ask them to look at the Assignments page with an open assignment, the Time Table page, the Attendance page, and Ctrl+K.
-5. Refresh the `site/` screenshots (`node scripts/make-site-shots.mjs`) and replace the "Store listing coming soon" badges once a listing is live.
+5. Refresh the `site/` screenshots (`node scripts/make-site-shots.mjs`) and the Chrome Web Store listing is live (link in the site's install card and hero); replace the Firefox "coming soon" badge once that listing is live.
 
 ## Honest wording
 

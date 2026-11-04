@@ -34,7 +34,7 @@ Download `campuslit-chrome.zip` or `campuslit-firefox.zip` from the latest GitHu
 
 `npm run package` builds both browsers, audits every file that would ship (permissions, portal-only matching, no network or `eval`, no private files, no personal-data patterns, manifest limits), zips them with `manifest.json` at the root, reads each zip back to prove it matches, and writes `dist/release/campuslit-chrome.zip`, `campuslit-firefox.zip` and `SHA256SUMS.txt`. `npm run store-assets` makes the store screenshots and promo tile from the invented sample pages. The full checklist and the store listing text are in `docs/RELEASE.md` and `docs/STORE_LISTING.md`.
 
-Not yet on the Chrome Web Store or Firefox Add-ons.
+**Install:** [Campuslit on the Chrome Web Store](https://chromewebstore.google.com/detail/kldmhhiopdefjapkebnelablimikghio) (Chrome, Edge, Brave). Website: https://campuslit-bu.vercel.app/. Not yet on Firefox Add-ons.
 
 ## Privacy
 

@@ -291,3 +291,18 @@ td:first-child { color: var(--ink); font-weight: 700; }
   .toc ol { grid-template-columns: 1fr; }
   th, td { padding: 12px 14px; }
 }
+
+/* ---------- at a glance + landing pages ---------- */
+.facts-list { max-width: 860px; margin: 0 auto; display: grid; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); box-shadow: var(--shadow-s); overflow: hidden; }
+.facts-list > div { display: grid; grid-template-columns: 170px 1fr; gap: 18px; padding: 15px 24px; border-bottom: 1px solid var(--line); }
+.facts-list > div:last-child { border-bottom: 0; }
+.facts-list dt { font-size: 13px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding-top: 3px; }
+.facts-list dd { margin: 0; color: var(--ink); font-weight: 600; font-size: 16.5px; }
+.about-links { margin-top: 26px; text-align: center; color: var(--muted); font-size: 16px; }
+.prose .frame { margin-top: 22px; }
+.prose .cta-box { margin-top: 56px; padding: 30px 32px; border-radius: 18px; background: var(--navy); color: #fff; }
+.prose .cta-box h2 { color: #fff; display: block; }
+.prose .cta-box p { color: #c7d3ee; }
+.prose .cta-box .btn { margin-top: 18px; }
+.prose details { margin-top: 12px; }
+@media (max-width: 640px) { .facts-list > div { grid-template-columns: 1fr; gap: 2px; } }

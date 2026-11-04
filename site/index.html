@@ -3,28 +3,168 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Campuslit — a cleaner Bahria University CMS and LMS, on every campus</title>
-<meta name="description" content="Campuslit is a free browser extension for Bahria University students on every campus. It redraws the CMS and LMS you already use, with due-date countdowns, an attendance planner, a readable time table and quick search. Private, open source and unofficial.">
+<title>Campuslit: Free Bahria University LMS &amp; CMS Redesign Extension</title>
+<meta name="description" content="Campuslit (Campus Lit) is the free Chrome extension that redesigns the Bahria University LMS and CMS: themes, attendance planner, due-date reminders, a readable time table and quick search. Private and open source.">
 <meta name="theme-color" content="#0b1d40">
 <link rel="canonical" href="https://campuslit-bu.vercel.app/">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="application-name" content="Campuslit">
 <link rel="icon" href="assets/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preload" href="assets/fonts/jakarta-latin.woff2" as="font" type="font/woff2" crossorigin>
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Campuslit">
+<meta property="og:locale" content="en_PK">
 <meta property="og:url" content="https://campuslit-bu.vercel.app/">
-<meta property="og:title" content="Campuslit — a cleaner Bahria University CMS and LMS">
-<meta property="og:description" content="A free browser extension for Bahria students on every campus. Same data, same logins — a much nicer portal. Private and open source.">
+<meta property="og:title" content="Campuslit: Free Bahria University LMS and CMS Redesign Extension">
+<meta property="og:description" content="Redesign the Bahria University LMS and CMS in one click. Same logins, same data, a much nicer portal. Free, private and open source.">
 <meta property="og:image" content="https://campuslit-bu.vercel.app/assets/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Campuslit: the Bahria LMS dashboard before and after.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Campuslit — a cleaner Bahria University CMS and LMS">
-<meta name="twitter:description" content="A free browser extension for Bahria students on every campus. Private and open source.">
+<meta name="twitter:title" content="Campuslit: Free Bahria University LMS and CMS Redesign Extension">
+<meta name="twitter:description" content="Redesign the Bahria University LMS and CMS in one click. Free, private and open source.">
 <meta name="twitter:image" content="https://campuslit-bu.vercel.app/assets/og.png">
 <link rel="stylesheet" href="styles.css">
 <script src="script.js" defer></script>
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "WebSite",
+   "@id": "https://campuslit-bu.vercel.app/#website",
+   "url": "https://campuslit-bu.vercel.app/",
+   "name": "Campuslit",
+   "alternateName": [
+    "Campus Lit",
+    "CampusLit",
+    "Campuslit Bahria",
+    "Campuslit extension"
+   ],
+   "inLanguage": "en",
+   "description": "Free Chrome extension that redesigns the Bahria University LMS and CMS."
+  },
+  {
+   "@type": "SoftwareApplication",
+   "@id": "https://campuslit-bu.vercel.app/#app",
+   "name": "Campuslit",
+   "alternateName": [
+    "Campus Lit",
+    "CampusLit"
+   ],
+   "applicationCategory": "EducationalApplication",
+   "applicationSubCategory": "Browser extension",
+   "operatingSystem": "Windows, macOS, Linux, ChromeOS",
+   "browserRequirements": "Requires Chrome, Edge, Brave or Firefox 140+ on a computer",
+   "url": "https://campuslit-bu.vercel.app/",
+   "installUrl": "https://chromewebstore.google.com/detail/kldmhhiopdefjapkebnelablimikghio",
+   "downloadUrl": "https://chromewebstore.google.com/detail/kldmhhiopdefjapkebnelablimikghio",
+   "image": "https://campuslit-bu.vercel.app/assets/og.png",
+   "screenshot": "https://campuslit-bu.vercel.app/assets/shots/lms-bahria.webp",
+   "description": "Campuslit redesigns the Bahria University student LMS and CMS with themes, due-date reminders, an attendance planner, a readable week time table with calendar export and quick search. Free, private and open source.",
+   "featureList": [
+    "Six themes and a custom theme maker",
+    "Due soon card and assignment reminders",
+    "Attendance planner (75% rule)",
+    "Week time table with Add to calendar",
+    "Quick search with Ctrl+K"
+   ],
+   "license": "https://opensource.org/licenses/MIT",
+   "isAccessibleForFree": true,
+   "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+   },
+   "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "student",
+    "audienceType": "Bahria University students"
+   }
+  },
+  {
+   "@type": "FAQPage",
+   "@id": "https://campuslit-bu.vercel.app/#faq",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "What is Campuslit? Is it the same as Campus Lit?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes, the same thing: Campuslit, Campus Lit and CampusLit all mean this free, open-source browser extension that redesigns the Bahria University student CMS and LMS. It keeps your logins and data, and adds themes, an attendance planner, due-date reminders, a readable time table and quick search."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Is there a Chrome extension to redesign the Bahria University LMS and CMS?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes. Campuslit is on the Chrome Web Store and works in Chrome, Edge and Brave on a computer. It runs on lms.bahria.edu.pk and cms.bahria.edu.pk and is free."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How do I install Campuslit?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Open the Campuslit page on the Chrome Web Store, click Add to Chrome, then open your CMS or LMS and sign in as usual. The new look appears on its own. Pin the Campuslit button to your toolbar to change themes or switch it off."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Is Campuslit official?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No. It is an independent project made by students and is not made, endorsed or supported by Bahria University. The university’s name and emblem belong to the university, and are used here only to say which websites Campuslit works on."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Which campuses does it work for?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "All of them. Campuslit runs on the two student portals every campus uses, so it does not matter where you study. It was built using pages from one campus, so if a screen at yours looks wrong, tell us and it will be fixed."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Is it safe, and does it send my data anywhere?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "It changes how pages look. Forms, uploads and downloads still go to the university exactly as before, and your marks and submissions are never touched. Campuslit makes no network requests at all. On your device it keeps only your look, an optional note of open assignments so reminders work, and which tips you have seen. Switch it off from the toolbar button, or remove it, and the original portal is back. Details are in the privacy policy."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Can I rely on the attendance numbers?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Treat them as a helpful estimate. They are worked out from the hours the portal shows, your credit hours and the semester length you set. The university’s own records are what count."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Which browsers work? What about my phone?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Chrome, Edge and Brave (install from the Chrome Web Store) and Firefox 140 or newer, on a computer. Most phone browsers do not run extensions like this."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "The university changed its pages and something looks off.",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "That can happen. Switch Campuslit off for that portal and the page is back to normal, then report it on GitHub with a screenshot (hide your name and enrollment number first)."
+     }
+    }
+   ]
+  }
+ ]
+}
+</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -35,11 +175,13 @@
     <button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
     <nav class="nav-links" id="menu" aria-label="Main">
       <a href="#features">What it does</a>
+      <a href="bahria-lms">LMS</a>
+      <a href="bahria-cms">CMS</a>
       <a href="#themes">Themes</a>
       <a href="#install">Install</a>
       <a href="#faq">FAQ</a>
       <a href="privacy">Privacy</a>
-      <a class="btn btn-primary btn-sm" href="#install">Get Campuslit</a>
+      <a class="btn btn-primary btn-sm" href="https://chromewebstore.google.com/detail/kldmhhiopdefjapkebnelablimikghio" rel="noopener">Add to Chrome</a>
     </nav>
   </div>
 </header>
@@ -48,11 +190,11 @@
   <!-- ============ hero ============ -->
   <section class="hero" aria-labelledby="hero-title">
     <div class="wrap">
-      <span class="eyebrow"><i></i> Free for Bahria University students on every campus</span>
-      <h1 id="hero-title">Your Bahria portals, finally <em>pleasant</em> to use.</h1>
-      <p class="lede">Campuslit is a free browser extension that redraws the student CMS and LMS you already use. Same logins, same data, with a cleaner look, due-date countdowns, an attendance planner and a time table you can read.</p>
+      <span class="eyebrow"><i></i> Free Chrome extension for Bahria University students, every campus</span>
+      <h1 id="hero-title">The Bahria University LMS and CMS, finally <em>pleasant</em> to use.</h1>
+      <p class="lede">Campuslit (also written Campus Lit) is a free Chrome extension that redesigns the student CMS and LMS you already use. Same logins, same data, with a cleaner look, due-date countdowns, an attendance planner and a time table you can read.</p>
       <div class="cta-row">
-        <a class="btn btn-primary" href="#install">Get Campuslit</a>
+        <a class="btn btn-primary" href="https://chromewebstore.google.com/detail/kldmhhiopdefjapkebnelablimikghio" rel="noopener">Add to Chrome, it is free</a>
         <a class="btn btn-glass" href="#features">See what it does</a>
       </div>
       <ul class="trust">
@@ -85,6 +227,28 @@
       <p><b>Unofficial.</b> Made by students. Not made, endorsed or supported by Bahria University.</p>
     </div>
   </div>
+
+  <!-- ============ what is it ============ -->
+  <section id="about" aria-labelledby="about-title">
+    <div class="wrap">
+      <div class="section-head center reveal">
+        <p class="kicker">At a glance</p>
+        <h2 id="about-title">What is Campuslit?</h2>
+        <p><b>Campuslit</b> (sometimes written <b>Campus Lit</b> or <b>CampusLit</b>) is a free, open-source browser extension that redesigns the Bahria University student <b>LMS</b> and <b>CMS</b>. It is the quickest way to get a cleaner Bahria portal: install it once and your existing logins and data look new.</p>
+      </div>
+      <dl class="facts-list reveal">
+        <div><dt>Name</dt><dd>Campuslit (also Campus Lit, CampusLit)</dd></div>
+        <div><dt>What it is</dt><dd>A browser extension that restyles the Bahria University LMS and CMS</dd></div>
+        <div><dt>Works on</dt><dd>lms.bahria.edu.pk and cms.bahria.edu.pk, for students of every Bahria campus</dd></div>
+        <div><dt>Features</dt><dd>Six themes and a custom theme, due-date reminders, attendance planner, week time table with calendar export, quick search (Ctrl+K)</dd></div>
+        <div><dt>Price</dt><dd>Free, no sign-up, no ads</dd></div>
+        <div><dt>Browsers</dt><dd>Chrome, Edge and Brave (from the Chrome Web Store); Firefox 140+ (manual)</dd></div>
+        <div><dt>Privacy</dt><dd>Makes no network requests, collects nothing, open source (MIT)</dd></div>
+        <div><dt>Official?</dt><dd>No. Independent student project, not affiliated with Bahria University</dd></div>
+      </dl>
+      <p class="about-links reveal">Read more: <a href="bahria-lms">Bahria University LMS redesign</a> &middot; <a href="bahria-cms">Bahria University CMS: attendance planner and time table</a> &middot; <a href="privacy">Privacy policy</a></p>
+    </div>
+  </section>
 
   <!-- ============ features, one at a time ============ -->
   <section id="features" aria-labelledby="features-title">
@@ -200,14 +364,14 @@
       <div class="section-head center reveal">
         <p class="kicker">Get Campuslit</p>
         <h2 id="install-title">Add it in a minute. Then sign in as usual.</h2>
-        <p>Campuslit runs in browsers on a computer. It is free, with no sign-up. After installing, open your CMS or LMS and the new look is there.</p>
+        <p>Campuslit runs in browsers on a computer. It is free, with no sign-up. Click <b>Add to Chrome</b>, then open your CMS or LMS and the new look is there.</p>
       </div>
       <div class="install">
         <article class="card reveal">
-          <span class="badge">Chrome Web Store: in review</span>
+          <span class="badge ok">Chrome Web Store: live</span>
           <h3>Chrome, Edge and Brave</h3>
-          <p>Until the store listing is live, install from the download in four clicks.</p>
-          <a class="btn btn-primary" href="https://github.com/ahmedammad1709/campuslit/releases/latest">Download for Chrome</a>
+          <p>One click from the official store. Edge and Brave can install from the Chrome Web Store too.</p>
+          <a class="btn btn-primary" href="https://chromewebstore.google.com/detail/kldmhhiopdefjapkebnelablimikghio" rel="noopener">Add to Chrome</a>
         </article>
         <article class="card reveal">
           <span class="badge">Firefox Add-ons: coming soon</span>
@@ -217,8 +381,8 @@
         </article>
       </div>
       <div class="install-steps">
-        <details class="reveal"><summary>Steps for Chrome, Edge or Brave</summary><div class="details-body"><ol>
-          <li>Download <code>campuslit-chrome.zip</code> from the latest release and unzip it somewhere you will keep it.</li>
+        <details class="reveal"><summary>Prefer to install by hand? (Chrome, Edge or Brave)</summary><div class="details-body"><ol>
+          <li>Download <code>campuslit-chrome.zip</code> from the <a href="https://github.com/ahmedammad1709/campuslit/releases/latest">latest release</a> and unzip it somewhere you will keep it.</li>
           <li>Open <code>chrome://extensions</code> (or <code>edge://extensions</code>) and switch on <b>Developer mode</b>.</li>
           <li>Click <b>Load unpacked</b> and choose the unzipped folder, then pin Campuslit to your toolbar.</li></ol></div></details>
         <details class="reveal"><summary>Steps for Firefox</summary><div class="details-body"><ol>
@@ -259,11 +423,14 @@
         <h2 id="faq-title">Good to know.</h2>
       </div>
       <div class="faq">
+        <details class="reveal"><summary>What is Campuslit? Is it the same as Campus Lit?</summary><div class="details-body"><p>Yes, the same thing: Campuslit, Campus Lit and CampusLit all mean this free, open-source browser extension that redesigns the Bahria University student CMS and LMS. It keeps your logins and data, and adds themes, an attendance planner, due-date reminders, a readable time table and quick search.</p></div></details>
+        <details class="reveal"><summary>Is there a Chrome extension to redesign the Bahria University LMS and CMS?</summary><div class="details-body"><p>Yes. Campuslit is on the <a href="https://chromewebstore.google.com/detail/kldmhhiopdefjapkebnelablimikghio" rel="noopener">Chrome Web Store</a> and works in Chrome, Edge and Brave on a computer. It runs on lms.bahria.edu.pk and cms.bahria.edu.pk and is free.</p></div></details>
+        <details class="reveal"><summary>How do I install Campuslit?</summary><div class="details-body"><p>Open the <a href="https://chromewebstore.google.com/detail/kldmhhiopdefjapkebnelablimikghio" rel="noopener">Campuslit page on the Chrome Web Store</a>, click Add to Chrome, then open your CMS or LMS and sign in as usual. The new look appears on its own. Pin the Campuslit button to your toolbar to change themes or switch it off.</p></div></details>
         <details class="reveal"><summary>Is Campuslit official?</summary><div class="details-body"><p>No. It is an independent project made by students and is not made, endorsed or supported by Bahria University. The university&rsquo;s name and emblem belong to the university, and are used here only to say which websites Campuslit works on.</p></div></details>
         <details class="reveal"><summary>Which campuses does it work for?</summary><div class="details-body"><p>All of them. Campuslit runs on the two student portals every campus uses, so it does not matter where you study. It was built using pages from one campus, so if a screen at yours looks wrong, <a href="https://github.com/ahmedammad1709/campuslit/issues">tell us</a> and it will be fixed.</p></div></details>
         <details class="reveal"><summary>Is it safe, and does it send my data anywhere?</summary><div class="details-body"><p>It changes how pages look. Forms, uploads and downloads still go to the university exactly as before, and your marks and submissions are never touched. Campuslit makes no network requests at all. On your device it keeps only your look, an optional note of open assignments so reminders work, and which tips you have seen. Switch it off from the toolbar button, or remove it, and the original portal is back. Details are in the <a href="privacy">privacy policy</a>.</p></div></details>
         <details class="reveal"><summary>Can I rely on the attendance numbers?</summary><div class="details-body"><p>Treat them as a helpful estimate. They are worked out from the hours the portal shows, your credit hours and the semester length you set. The university&rsquo;s own records are what count.</p></div></details>
-        <details class="reveal"><summary>Which browsers work? What about my phone?</summary><div class="details-body"><p>Chrome, Edge, Brave and Firefox 140 or newer, on a computer. Most phone browsers do not run extensions like this.</p></div></details>
+        <details class="reveal"><summary>Which browsers work? What about my phone?</summary><div class="details-body"><p>Chrome, Edge and Brave (install from the Chrome Web Store) and Firefox 140 or newer, on a computer. Most phone browsers do not run extensions like this.</p></div></details>
         <details class="reveal"><summary>The university changed its pages and something looks off.</summary><div class="details-body"><p>That can happen. Switch Campuslit off for that portal and the page is back to normal, then <a href="https://github.com/ahmedammad1709/campuslit/issues">report it on GitHub</a> with a screenshot (hide your name and enrollment number first).</p></div></details>
       </div>
     </div>
@@ -277,7 +444,7 @@
         <a class="brand" href="#top"><img src="assets/logo.svg" width="30" height="30" alt=""><span>campus<span>lit</span></span></a>
         <p>A free browser extension for Bahria University students on every campus.</p>
       </div>
-      <div><h4>Campuslit</h4><ul><li><a href="#features">What it does</a></li><li><a href="#themes">Themes</a></li><li><a href="#install">Install</a></li></ul></div>
+      <div><h4>Campuslit</h4><ul><li><a href="#features">What it does</a></li><li><a href="bahria-lms">Bahria LMS redesign</a></li><li><a href="bahria-cms">Bahria CMS redesign</a></li><li><a href="#themes">Themes</a></li><li><a href="https://chromewebstore.google.com/detail/kldmhhiopdefjapkebnelablimikghio" rel="noopener">Chrome Web Store</a></li></ul></div>
       <div><h4>Trust</h4><ul><li><a href="privacy">Privacy policy</a></li><li><a href="license">Licence</a></li><li><a href="https://github.com/ahmedammad1709/campuslit">Source code</a></li></ul></div>
       <div><h4>Help</h4><ul><li><a href="#faq">FAQ</a></li><li><a href="https://github.com/ahmedammad1709/campuslit/issues">Report a problem</a></li><li><a href="https://github.com/ahmedammad1709/campuslit/releases">Downloads</a></li></ul></div>
     </div>
