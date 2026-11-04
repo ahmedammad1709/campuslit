@@ -1,0 +1,35 @@
+/* The Instagram cover (1080x1920). Instagram's profile grid shows the middle 3:4 (y 240-1680), so everything that matters sits inside it. */
+@font-face { font-family: "Jakarta"; src: url("/fonts/jakarta-latin.woff2") format("woff2"); font-weight: 200 800; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #0b1d40; }
+body { font-family: "Jakarta", system-ui, sans-serif; color: #fff; -webkit-font-smoothing: antialiased; }
+#frame { position: relative; width: 1080px; height: 1920px; overflow: hidden;
+  background: radial-gradient(1100px 900px at 15% -5%, #1f4fa8 0%, rgba(31, 79, 168, 0) 62%), radial-gradient(900px 800px at 100% 100%, rgba(242, 184, 75, .22), rgba(242, 184, 75, 0) 60%), #0b1d40; }
+#glow { position: absolute; left: 60px; right: 60px; top: 640px; height: 900px; border-radius: 80px; background: radial-gradient(60% 60% at 50% 45%, rgba(47, 91, 234, .6), transparent 70%); filter: blur(70px); opacity: .85; }
+#grid { position: absolute; inset: 0; opacity: .35; background-image: linear-gradient(rgba(255, 255, 255, .06) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .06) 1px, transparent 1px); background-size: 72px 72px; -webkit-mask-image: radial-gradient(ellipse at 50% 40%, #000 0, transparent 72%); mask-image: radial-gradient(ellipse at 50% 40%, #000 0, transparent 72%); }
+
+#eyebrow { position: absolute; top: 262px; left: 50%; transform: translateX(-50%); white-space: nowrap; padding: 14px 36px; border-radius: 999px; background: rgba(255, 255, 255, .1); border: 2px solid rgba(255, 255, 255, .22); font-size: 34px; font-weight: 700; letter-spacing: .01em; color: #dbe4fb; }
+h1 { position: absolute; top: 340px; left: 0; right: 0; margin: 0; text-align: center; font-size: 140px; line-height: 1.02; font-weight: 800; letter-spacing: -.05em; text-shadow: 0 10px 50px rgba(0, 0, 0, .45); }
+h1 span { display: block; }
+h1 .gold { color: #f2b84b; }
+
+.win { position: absolute; left: 100px; width: 880px; height: 354px; border-radius: 28px; overflow: hidden; background: #fff; box-shadow: 0 50px 100px -30px rgba(0, 0, 0, .7), 0 0 0 1px rgba(255, 255, 255, .2); }
+#winBefore { top: 676px; }
+#winAfter { top: 1102px; height: 374px; box-shadow: 0 50px 110px -20px rgba(47, 91, 234, .75), 0 0 0 2px rgba(242, 184, 75, .9); }
+.bar { position: relative; z-index: 5; height: 44px; display: flex; align-items: center; gap: 9px; padding: 0 20px; background: #fbfcff; border-bottom: 1px solid #e1e7f3; }
+.bar i { width: 12px; height: 12px; border-radius: 50%; background: #dde3f0; }
+.bar span { position: absolute; left: 50%; transform: translateX(-50%); padding: 4px 20px; border-radius: 999px; background: #eef2fb; color: #566683; font-size: 17px; font-weight: 600; }
+.bar em { margin-left: auto; font-style: normal; font-size: 14px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #8a5a00; background: #fff4dc; border-radius: 999px; padding: 4px 11px; }
+.view { position: absolute; left: 0; top: 44px; width: 880px; height: 310px; overflow: hidden; background: #fff; }
+.view iframe { position: absolute; left: 0; top: 0; width: 1000px; height: 1120px; border: 0; transform: scale(.88); transform-origin: 0 0; background: #fff; }
+.tag { position: absolute; left: 70px; z-index: 6; padding: 10px 26px; border-radius: 999px; font-size: 30px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; box-shadow: 0 12px 30px rgba(0, 0, 0, .35); }
+.tag.before { top: 644px; background: #0b1d40; color: #fff; border: 2px solid rgba(255, 255, 255, .35); }
+#after { height: 330px; }
+.tag.after { top: 1070px; background: #f2b84b; color: #0b1d40; }
+#arrow { position: absolute; left: 50%; top: 1008px; width: 84px; height: 84px; margin-left: -42px; border-radius: 50%; background: #fff; box-shadow: 0 14px 40px rgba(0, 0, 0, .45); z-index: 7; padding: 18px; }
+#arrow svg { width: 100%; height: 100%; }
+
+#sub { position: absolute; top: 1512px; left: 0; right: 0; margin: 0; text-align: center; font-size: 42px; font-weight: 600; letter-spacing: -.01em; color: #c7d3ee; }
+#lock { position: absolute; top: 1580px; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: 18px; font-size: 60px; font-weight: 800; letter-spacing: -.04em; }
+#lock svg { width: 66px; height: 66px; border-radius: 18px; }
+#lock b { color: #f2b84b; font-weight: 800; }

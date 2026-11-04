@@ -1,0 +1,73 @@
+/* The 1080x1920 canvas for the Campuslit video. Every visual state is a pure function of time (see compose.js), so frames can be captured one by one. */
+@font-face { font-family: "Jakarta"; src: url("/fonts/jakarta-latin.woff2") format("woff2"); font-weight: 200 800; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #0b1d40; }
+body { font-family: "Jakarta", system-ui, sans-serif; color: #fff; -webkit-font-smoothing: antialiased; }
+#frame { position: relative; width: 1080px; height: 1920px; overflow: hidden;
+  background: radial-gradient(1100px 900px at 15% -5%, #1f4fa8 0%, rgba(31, 79, 168, 0) 62%), radial-gradient(900px 800px at 100% 100%, rgba(242, 184, 75, .20), rgba(242, 184, 75, 0) 60%), #0b1d40; }
+#glow { position: absolute; left: 90px; right: 90px; top: 300px; height: 900px; border-radius: 80px; background: radial-gradient(60% 60% at 50% 40%, rgba(47, 91, 234, .55), transparent 70%); filter: blur(70px); opacity: .8; }
+#grid { position: absolute; inset: 0; opacity: .35; background-image: linear-gradient(rgba(255, 255, 255, .06) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .06) 1px, transparent 1px); background-size: 72px 72px; -webkit-mask-image: radial-gradient(ellipse at 50% 30%, #000 0, transparent 70%); mask-image: radial-gradient(ellipse at 50% 30%, #000 0, transparent 70%); }
+
+/* the browser window the portal lives in */
+#win { position: absolute; left: 40px; top: 262px; width: 1000px; height: 1180px; border-radius: 30px; overflow: hidden; background: #fff; box-shadow: 0 60px 120px -30px rgba(0, 0, 0, .65), 0 0 0 1px rgba(255, 255, 255, .18); transform-origin: 50% 0; transform: scale(.88); }
+.bar { position: relative; z-index: 5; height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 22px; background: #fbfcff; border-bottom: 1px solid #e1e7f3; }
+.bar i { width: 14px; height: 14px; border-radius: 50%; background: #dde3f0; }
+.bar span { position: absolute; left: 50%; transform: translateX(-50%); padding: 6px 22px; border-radius: 999px; background: #eef2fb; color: #566683; font-size: 20px; font-weight: 600; }
+.bar em { margin-left: auto; font-style: normal; font-size: 16px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #8a5a00; background: #fff4dc; border-radius: 999px; padding: 5px 12px; }
+#view { position: absolute; left: 0; top: 60px; width: 1000px; height: 1120px; overflow: hidden; background: #fff; }
+
+/* page groups: each is a 1000x1120 stage with its own camera */
+.pg { position: absolute; left: 0; top: 0; width: 1000px; height: 1120px; overflow: hidden; background: #fff; }
+.cam { position: absolute; left: 0; top: 0; width: 1000px; height: 1120px; transform-origin: 0 0; will-change: transform; }
+.cam iframe { position: absolute; left: 0; top: 0; width: 1000px; height: 1120px; border: 0; background: #fff; }
+.handle { position: absolute; top: 0; bottom: 0; width: 6px; margin-left: -3px; background: #fff; box-shadow: 0 0 0 2px rgba(11, 29, 64, .25), 0 0 40px rgba(11, 29, 64, .55); display: none; }
+.handle b { position: absolute; top: 50%; left: 50%; width: 88px; height: 88px; margin: -44px; border-radius: 50%; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232f5bea' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 7-5 5 5 5M15 7l5 5-5 5'/%3E%3C/svg%3E") center / 46px no-repeat; box-shadow: 0 12px 40px rgba(11, 29, 64, .5); }
+
+/* captions: large, kept inside the area Instagram and TikTok leave free */
+#caps { position: absolute; left: 110px; right: 110px; top: 1332px; height: 190px; display: flex; align-items: flex-start; justify-content: center; text-align: center; pointer-events: none; z-index: 20; }
+.cap { position: absolute; left: 0; right: 0; top: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 0 16px; font-size: 68px; line-height: 1.12; font-weight: 800; letter-spacing: -.03em; text-shadow: 0 6px 30px rgba(0, 0, 0, .55); }
+.cap .w { color: #fff; transition: none; }
+.cap .w.on { color: #f2b84b; }
+.cap .w.sm { font-size: 46px; font-weight: 700; opacity: .9; }
+
+/* theme dock: floats over the bottom of the window */
+#dock { position: absolute; left: 50%; bottom: 36px; width: 780px; margin-left: -390px; height: 104px; border-radius: 52px; background: rgba(255, 255, 255, .97); box-shadow: 0 24px 60px rgba(8, 20, 50, .4), 0 0 0 1px rgba(11, 29, 64, .08); display: flex; align-items: center; padding: 0 30px 0 30px; gap: 18px; opacity: 0; z-index: 8; }
+#dots { display: flex; gap: 18px; align-items: center; }
+#dots i { width: 46px; height: 46px; border-radius: 50%; box-shadow: inset 0 0 0 2px rgba(11, 29, 64, .14); position: relative; flex: none; }
+#dots i.on::after { content: ""; position: absolute; inset: -8px; border-radius: 50%; border: 4px solid #2f5bea; }
+#dots i.plus { background: conic-gradient(#ef476f, #f2b84b, #3bb273, #2f9bea, #8a4fff, #ef476f); }
+#slider { position: absolute; left: 30px; right: 250px; top: 0; bottom: 0; display: flex; align-items: center; gap: 22px; opacity: 0; }
+#slider label { font-size: 26px; font-weight: 700; color: #3c4a68; letter-spacing: .02em; }
+#slider .track { position: relative; flex: 1; height: 22px; border-radius: 11px; background: linear-gradient(90deg, hsl(0 70% 55%), hsl(60 70% 55%), hsl(120 70% 50%), hsl(180 70% 50%), hsl(240 70% 60%), hsl(300 70% 55%), hsl(360 70% 55%)); }
+#slider .track b { position: absolute; top: 50%; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; background: #fff; box-shadow: 0 6px 18px rgba(8, 20, 50, .45), 0 0 0 4px #fff; }
+#tname { margin-left: auto; min-width: 210px; text-align: right; font-size: 36px; font-weight: 800; letter-spacing: -.02em; color: #0e1a33; }
+#keys { position: absolute; left: 50%; top: 50%; margin: -70px 0 0 -190px; width: 380px; height: 140px; display: flex; align-items: center; justify-content: center; gap: 18px; opacity: 0; pointer-events: none; z-index: 8; }
+#keys kbd { min-width: 128px; padding: 22px 30px; text-align: center; font: 800 52px "Jakarta", sans-serif; color: #0e1a33; background: #fff; border-radius: 24px; box-shadow: 0 10px 0 #c9d3ea, 0 26px 50px rgba(8, 20, 50, .45); }
+#keys span { font-size: 48px; font-weight: 800; color: #fff; text-shadow: 0 4px 14px rgba(0, 0, 0, .5); }
+
+/* the install card (a page of our own website) */
+.pg.install { background: radial-gradient(900px 700px at 80% 0, #e6edff, #f6f8fd 60%); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #0e1a33; }
+.pg.install > svg { width: 200px; height: 200px; margin-bottom: 36px; border-radius: 48px; filter: drop-shadow(0 24px 30px rgba(11, 29, 64, .28)); }
+.pg.install h1 { margin: 0; font-size: 104px; letter-spacing: -.045em; font-weight: 800; }
+.pg.install h1 span { color: #d99a1c; }
+.pg.install p { margin: 18px 0 0; font-size: 38px; color: #566683; font-weight: 600; letter-spacing: -.01em; }
+.pg.install .row { display: flex; gap: 16px; margin: 40px 0 56px; }
+.pg.install .row b { padding: 12px 26px; border-radius: 999px; background: #fff; border: 2px solid #dde5f6; font-size: 30px; color: #2f4f9a; font-weight: 700; }
+.pg.install .btn { position: relative; width: 640px; height: 120px; border-radius: 60px; background: #2f5bea; color: #fff; font-size: 48px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 18px; box-shadow: 0 24px 50px rgba(47, 91, 234, .45); }
+.pg.install .btn.added { background: #1f9d63; box-shadow: 0 24px 50px rgba(31, 157, 99, .45); }
+
+/* cursor and click ripple */
+#cursor { position: absolute; width: 64px; height: 64px; left: 0; top: 0; opacity: 0; pointer-events: none; z-index: 30; }
+#cursor svg { width: 64px; height: 64px; filter: drop-shadow(0 8px 12px rgba(0, 0, 0, .5)); }
+#ripple { position: absolute; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; border: 6px solid rgba(255, 255, 255, .95); box-shadow: 0 0 30px rgba(47, 91, 234, .8); opacity: 0; pointer-events: none; z-index: 29; }
+
+/* the closing card */
+#end { position: absolute; inset: 0; opacity: 0; display: flex; flex-direction: column; align-items: center; padding-top: 400px; background: radial-gradient(1000px 800px at 50% 28%, #1f4fa8 0, rgba(31, 79, 168, 0) 65%), radial-gradient(800px 700px at 100% 100%, rgba(242, 184, 75, .22), rgba(242, 184, 75, 0) 60%), #0b1d40; pointer-events: none; z-index: 10; }
+#mark { filter: drop-shadow(0 30px 50px rgba(0, 0, 0, .5)); border-radius: 70px; }
+#word { margin-top: 56px; font-size: 128px; font-weight: 800; letter-spacing: -.05em; }
+#word span { color: #f2b84b; }
+#tag { margin-top: 12px; font-size: 40px; font-weight: 600; color: #c7d3ee; letter-spacing: -.01em; }
+#chips { display: flex; gap: 18px; margin-top: 44px; }
+#chips span { padding: 14px 32px; border-radius: 999px; background: rgba(255, 255, 255, .1); border: 2px solid rgba(255, 255, 255, .22); font-size: 34px; font-weight: 700; }
+#site { margin-top: 56px; padding: 22px 50px; border-radius: 999px; background: #f2b84b; color: #0b1d40; font-size: 48px; font-weight: 800; letter-spacing: -.02em; }
+#fine { position: absolute; left: 0; right: 0; bottom: 430px; text-align: center; font-size: 26px; color: #8fa0c6; font-weight: 600; }

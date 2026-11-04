@@ -21,3 +21,5 @@ skills/
 .idea/
 .DS_Store
 Thumbs.db
+video/out/
+__pycache__/

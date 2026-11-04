@@ -1,0 +1,47 @@
+{
+  "voice": { "name": "af_heart", "speed": 1.05, "lang": "en-us" },
+  "respell": { "Bahria": "Bah-ree-ah", "Campuslit": "Campus-lit", "LMS": "L M S", "CMS": "C M S" },
+  "music": { "bpm": 110, "drop": 3.75, "breakdown": [25.05, 28.35], "fade": 33.0, "level": -17 },
+  "full": {
+    "duration": 34.2,
+    "lines": [
+      { "id": "hook", "text": "I just fixed the Bahria University portal. See it in action.", "at": 0.3, "smallSentences": [1], "slowTail": 0.88, "note": "Your own recording: recordings/hook.mp4 (or .m4a/.wav/.mp3) in the tools folder" },
+      { "id": "bot1", "text": "Same logins. Same data. A whole new look.", "at": 4.2 },
+      { "id": "cms", "text": "And the CMS too.", "at": 7.85 },
+      { "id": "tt", "text": "Your timetable. As a real calendar.", "at": 10.85 },
+      { "id": "themes", "text": "Pick a theme. Or make your own.", "at": 14.3 },
+      { "id": "due", "text": "Never miss a deadline.", "at": 19.95 },
+      { "id": "att", "text": "Plan your attendance.", "at": 21.75 },
+      { "id": "srch", "text": "Search anything.", "at": 23.55 },
+      { "id": "one", "text": "One click. Free. Private.", "at": 25.5 },
+      { "id": "outro", "text": "Campuslit. For Bahria students. Link in bio.", "at": 28.55, "note": "Optional: record outro.mp4 yourself" }
+    ],
+    "sfx": [
+      { "id": "riser", "kind": "riser", "at": 2.15 },
+      { "id": "wipe1", "kind": "whoosh", "at": 3.75 },
+      { "id": "hit1", "kind": "hit", "at": 3.9, "gain": -4 },
+      { "id": "slide1", "kind": "swish", "at": 7.4 },
+      { "id": "wipe2", "kind": "whoosh", "at": 9.0 },
+      { "id": "slide2", "kind": "swish", "at": 10.45 },
+      { "id": "slide3", "kind": "swish", "at": 13.95 },
+      { "id": "theme1", "kind": "tick", "at": 14.95 },
+      { "id": "theme2", "kind": "tick", "at": 15.6 },
+      { "id": "theme3", "kind": "tick", "at": 16.25 },
+      { "id": "theme4", "kind": "tick", "at": 16.9 },
+      { "id": "custom", "kind": "pop", "at": 17.55 },
+      { "id": "slide4", "kind": "swish", "at": 19.65 },
+      { "id": "slide5", "kind": "swish", "at": 21.45 },
+      { "id": "slide6", "kind": "swish", "at": 23.25 },
+      { "id": "key", "kind": "tick", "at": 23.95, "gain": 2 },
+      { "id": "type1", "kind": "tick", "at": 24.3, "gain": -8 },
+      { "id": "type2", "kind": "tick", "at": 24.42, "gain": -8 },
+      { "id": "type3", "kind": "tick", "at": 24.54, "gain": -8 },
+      { "id": "type4", "kind": "tick", "at": 24.66, "gain": -8 },
+      { "id": "type5", "kind": "tick", "at": 24.78, "gain": -8 },
+      { "id": "slide7", "kind": "swish", "at": 25.05 },
+      { "id": "click", "kind": "tick", "at": 26.55, "gain": 2 },
+      { "id": "ding", "kind": "ding", "at": 26.6 },
+      { "id": "end", "kind": "hit", "at": 28.35 }
+    ]
+  }
+}
