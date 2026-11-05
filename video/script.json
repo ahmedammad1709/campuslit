@@ -45,5 +45,5 @@
       { "id": "end", "kind": "hit", "at": 28.35 }
     ]
   },
-  "linkedin": { "extends": "full", "lines": { "hook": { "bot": true, "slowTail": null }, "outro": { "text": "Campuslit. For Bahria students. Link in the comments." } } }
+  "linkedin": { "extends": "full", "lines": { "hook": { "bot": true, "slowTail": null }, "one": { "text": "Free. No sign-up. Nothing leaves your browser." }, "outro": { "text": "Campuslit. For Bahria students. Link in the comments." } } }
 }
