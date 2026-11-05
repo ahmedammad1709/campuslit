@@ -36,7 +36,12 @@ def tts(text, path):
     global _kokoro
     from kokoro_onnx import Kokoro
     if _kokoro is None: _kokoro = Kokoro(os.path.join(TOOLS, "models", "kokoro-v1.0.onnx"), os.path.join(TOOLS, "models", "voices-v1.0.bin"))
-    samples, rate = _kokoro.create(spoken(text), voice=cfg["voice"]["name"], speed=cfg["voice"]["speed"], lang=cfg["voice"]["lang"])
+    over = cfg.get("phonemes", {})  # words the voice gets wrong when spelled out are given as sounds instead (e.g. Bahria)
+    if over:
+        ph = lambda t: _kokoro.tokenizer.phonemize(spoken(t), cfg["voice"]["lang"]) if t.strip() else ""
+        parts = [over[p] if p in over else ph(p) for p in re.split(r"(?<![A-Za-z])(" + "|".join(map(re.escape, over)) + r")(?![A-Za-z])", text)]
+        samples, rate = _kokoro.create(" ".join(p for p in parts if p), voice=cfg["voice"]["name"], speed=cfg["voice"]["speed"], lang=cfg["voice"]["lang"], is_phonemes=True)
+    else: samples, rate = _kokoro.create(spoken(text), voice=cfg["voice"]["name"], speed=cfg["voice"]["speed"], lang=cfg["voice"]["lang"])
     sf.write(path, samples, rate)
 
 # speechnorm lifts the soft words (a trailing "it", the end of a sentence) so nothing is swallowed; the EQ adds the presence that makes consonants carry over music
@@ -55,7 +60,7 @@ def slow_tail(raw, factor):
 lines = []
 for line in sc["lines"]:
     raw = os.path.join(out, line["id"] + "_raw.wav"); clean = os.path.join(out, line["id"] + ".wav")
-    mine = next((os.path.join(TOOLS, "recordings", line["id"] + ext) for ext in (".wav", ".m4a", ".mp4", ".mp3", ".ogg", ".flac") if os.path.exists(os.path.join(TOOLS, "recordings", line["id"] + ext))), None)
+    mine = None if line.get("bot") else next((os.path.join(TOOLS, "recordings", line["id"] + ext) for ext in (".wav", ".m4a", ".mp4", ".mp3", ".ogg", ".flac") if os.path.exists(os.path.join(TOOLS, "recordings", line["id"] + ext))), None)
     if mine: run("-i", mine, "-ac", "1", raw); source = "your recording"
     else: tts(line["text"], raw); source = "synthetic voice"
     if line.get("slowTail"): raw = slow_tail(raw, line["slowTail"])

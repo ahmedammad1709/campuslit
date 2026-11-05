@@ -1,6 +1,7 @@
 {
   "voice": { "name": "af_heart", "speed": 1.05, "lang": "en-us" },
-  "respell": { "Bahria": "Bah-ree-ah", "Campuslit": "Campus-lit", "LMS": "L M S", "CMS": "C M S" },
+  "phonemes": { "Bahria": "bˈɛɹijə" },
+  "respell": { "Campuslit": "Campus-lit", "LMS": "L M S", "CMS": "C M S" },
   "music": { "bpm": 110, "drop": 3.75, "breakdown": [25.05, 28.35], "fade": 33.0, "level": -17 },
   "full": {
     "duration": 34.2,
@@ -44,5 +45,5 @@
       { "id": "end", "kind": "hit", "at": 28.35 }
     ]
   },
-  "linkedin": { "extends": "full", "lines": { "outro": { "text": "Campuslit. For Bahria students. Link in the comments." } } }
+  "linkedin": { "extends": "full", "lines": { "hook": { "bot": true, "slowTail": null }, "outro": { "text": "Campuslit. For Bahria students. Link in the comments." } } }
 }
