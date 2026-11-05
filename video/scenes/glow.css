@@ -1,0 +1,110 @@
+/* "4 problems with the Bahria University Portal. All fixed." A 1920x1080 canvas; every visual state is a pure function of time (see glow.js). */
+@font-face { font-family: "Jakarta"; src: url("/fonts/jakarta-latin.woff2") format("woff2"); font-weight: 200 800; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #0b1d40; }
+body { font-family: "Jakarta", system-ui, sans-serif; color: #fff; -webkit-font-smoothing: antialiased; }
+#frame { position: relative; width: 1920px; height: 1080px; overflow: hidden; perspective: 2600px; perspective-origin: 50% 40%;
+  background: radial-gradient(1300px 900px at 6% -12%, #1f4fa8 0%, rgba(31, 79, 168, 0) 62%), radial-gradient(1000px 800px at 100% 115%, rgba(242, 184, 75, .2), rgba(242, 184, 75, 0) 60%), #0b1d40; }
+#orbs { position: absolute; inset: 0; overflow: hidden; }
+#orbs i { position: absolute; left: 0; top: 0; border-radius: 50%; filter: blur(90px); }
+#orbA { width: 760px; height: 760px; background: #2f5bea; opacity: .5; }
+#orbB { width: 620px; height: 620px; background: #f2b84b; opacity: .22; }
+#orbC { width: 700px; height: 700px; background: #7a4dff; opacity: .26; }
+#glow { position: absolute; left: 200px; right: 200px; top: 120px; height: 860px; border-radius: 80px; background: radial-gradient(60% 60% at 50% 40%, rgba(47, 91, 234, .55), transparent 70%); filter: blur(70px); opacity: .8; }
+#grid { position: absolute; inset: 0; opacity: .35; background-image: linear-gradient(rgba(255, 255, 255, .06) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .06) 1px, transparent 1px); background-size: 72px 72px; -webkit-mask-image: radial-gradient(ellipse at 50% 50%, #000 0, transparent 75%); mask-image: radial-gradient(ellipse at 50% 50%, #000 0, transparent 75%); }
+
+/* the browser window the portals live in */
+#win { position: absolute; left: 240px; top: 63px; width: 1440px; height: 870px; border-radius: 30px; overflow: hidden; background: #fff; transform-origin: 50% 50%; transform: scale(1.08); box-shadow: 0 70px 140px -30px rgba(0, 0, 0, .7), 0 0 0 1px rgba(255, 255, 255, .2); }
+.bar { position: relative; z-index: 5; height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 22px; background: #fbfcff; border-bottom: 1px solid #e1e7f3; }
+.bar i { width: 14px; height: 14px; border-radius: 50%; background: #dde3f0; }
+.bar span { position: absolute; left: 50%; transform: translateX(-50%); padding: 6px 22px; border-radius: 999px; background: #eef2fb; color: #566683; font-size: 20px; font-weight: 600; }
+.bar em { margin-left: auto; font-style: normal; font-size: 16px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #8a5a00; background: #fff4dc; border-radius: 999px; padding: 5px 12px; }
+/* what the viewer should know at a glance: which problem this is, and when it is fixed */
+#tag { margin-left: 18px; padding: 6px 16px; border-radius: 999px; font-size: 16px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #fff; background: #e5384b; opacity: 0; box-shadow: 0 6px 18px rgba(229, 56, 75, .45); }
+#tag.fixed { background: #1f9d63; box-shadow: 0 6px 18px rgba(31, 157, 99, .45); }
+#view { position: absolute; left: 0; top: 60px; width: 1440px; height: 810px; overflow: hidden; background: #fff; }
+.pg { position: absolute; left: 0; top: 0; width: 1440px; height: 810px; overflow: hidden; background: #fff; }
+.cam { position: absolute; left: 0; top: 0; width: 1440px; height: 1100px; transform-origin: 0 0; will-change: transform; }
+.cam iframe { position: absolute; left: 0; top: 0; width: 1440px; height: 1100px; border: 0; background: #fff; }
+.handle { position: absolute; top: 0; bottom: 0; width: 6px; margin-left: -3px; background: #fff; box-shadow: 0 0 0 2px rgba(11, 29, 64, .25), 0 0 40px rgba(11, 29, 64, .55); display: none; z-index: 3; }
+.handle b { position: absolute; top: 50%; left: 50%; width: 88px; height: 88px; margin: -44px; border-radius: 50%; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232f5bea' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 7-5 5 5 5M15 7l5 5-5 5'/%3E%3C/svg%3E") center / 46px no-repeat; box-shadow: 0 12px 40px rgba(11, 29, 64, .5); }
+#shine { position: absolute; inset: 0; z-index: 9; pointer-events: none; opacity: 0; background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, .34) 50%, transparent 62%); }
+
+/* problem markers drawn on top of the stock pages */
+.mk { position: absolute; z-index: 2; border: 5px solid #ff3d55; border-radius: 14px; box-shadow: 0 0 0 5px rgba(255, 61, 85, .22), 0 0 34px rgba(255, 61, 85, .5); opacity: 0; pointer-events: none; }
+.mk u { position: absolute; left: 24px; top: 0; transform: translateY(-100%) translateY(-12px); white-space: nowrap; text-decoration: none; background: #ff3d55; color: #fff; font-weight: 800; font-size: 26px; letter-spacing: -.01em; padding: 8px 18px; border-radius: 12px; box-shadow: 0 12px 28px rgba(229, 56, 75, .5); }
+.mk.below u { top: 100%; transform: translateY(12px); }
+.mk.in u { top: 96px; transform: none; }
+
+/* the chapter card: one number, one word, drawn over the whole frame */
+#card { position: absolute; inset: 0; z-index: 24; display: flex; align-items: center; justify-content: center; pointer-events: none; opacity: 0; background: radial-gradient(1100px 800px at 50% 40%, #1f4fa8 0, rgba(31, 79, 168, 0) 65%), #0b1d40; }
+#card .cn { display: flex; flex-direction: column; align-items: center; gap: 0; padding-bottom: 170px; }
+#cardkind { font-size: 40px; font-weight: 800; letter-spacing: .28em; text-transform: uppercase; color: #ff6b7e; }
+#cardnum { font-size: 420px; line-height: .95; font-weight: 800; letter-spacing: -.07em; color: #f2b84b; text-shadow: 0 30px 80px rgba(0, 0, 0, .5); }
+#carddots { display: flex; gap: 16px; margin-top: 8px; }
+#carddots i { width: 56px; height: 8px; border-radius: 4px; background: rgba(255, 255, 255, .22); }
+#carddots i.on { background: #f2b84b; }
+
+/* captions: large, along the bottom, on a soft scrim; spoken words light up */
+#scrim { position: absolute; left: 0; right: 0; bottom: 0; height: 460px; z-index: 19; pointer-events: none; background: linear-gradient(to bottom, rgba(5, 12, 30, 0) 0%, rgba(5, 12, 30, 0) 38%, rgba(5, 12, 30, .6) 70%, rgba(5, 12, 30, .9) 100%); }
+#caps { position: absolute; left: 160px; right: 160px; top: 740px; height: 290px; display: flex; align-items: flex-end; justify-content: center; text-align: center; pointer-events: none; z-index: 26; }
+#caps.endmode { top: 868px; height: 110px; }
+.cap { position: absolute; left: 0; right: 0; top: 0; bottom: 0; display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-end; gap: 0 34px; font-size: 88px; line-height: 1.08; font-weight: 800; letter-spacing: -.03em; text-shadow: 0 4px 0 rgba(0, 0, 0, .25), 0 10px 40px rgba(0, 0, 0, .8); }
+#caps.endmode .cap { align-content: center; font-size: 60px; }
+.cap .w { display: inline-block; color: #fff; opacity: .38; transition: none; }
+.cap .w.seen { opacity: 1; }
+.cap .w.on { color: #f2b84b; }
+.cap .w.sm { font-size: 60px; }
+
+/* the calendar file */
+#chip { position: absolute; right: 36px; top: 84px; z-index: 12; width: 420px; display: flex; gap: 16px; align-items: center; padding: 16px 20px; border-radius: 18px; background: #fff; color: #0e1a33; box-shadow: 0 24px 60px rgba(8, 20, 50, .45), 0 0 0 1px rgba(11, 29, 64, .1); opacity: 0; }
+#chip svg { flex: none; width: 46px; height: 46px; padding: 11px; border-radius: 12px; background: #e9efff; color: #2f5bea; }
+#chip div { flex: 1; min-width: 0; display: grid; gap: 2px; }
+#chip b { font-size: 20px; font-weight: 800; letter-spacing: -.01em; }
+#chip span { font-size: 15px; color: #566683; font-weight: 600; }
+#chip i { display: block; height: 6px; border-radius: 3px; background: #e1e7f3; overflow: hidden; margin-top: 4px; }
+#chip u { display: block; height: 100%; width: 0; background: #2f5bea; text-decoration: none; }
+#chip.done u { background: #1f9d63; }
+
+/* theme dock: floats over the window */
+#dock { position: absolute; left: 50%; bottom: 150px; width: 780px; margin-left: -390px; height: 104px; border-radius: 52px; background: rgba(255, 255, 255, .97); box-shadow: 0 24px 60px rgba(8, 20, 50, .4), 0 0 0 1px rgba(11, 29, 64, .08); display: flex; align-items: center; padding: 0 30px; gap: 18px; opacity: 0; z-index: 8; }
+#dots { display: flex; gap: 18px; align-items: center; }
+#dots i { width: 46px; height: 46px; border-radius: 50%; box-shadow: inset 0 0 0 2px rgba(11, 29, 64, .14); position: relative; flex: none; }
+#dots i.on::after { content: ""; position: absolute; inset: -8px; border-radius: 50%; border: 4px solid #2f5bea; }
+#dots i.plus { background: conic-gradient(#ef476f, #f2b84b, #3bb273, #2f9bea, #8a4fff, #ef476f); }
+#slider { position: absolute; left: 30px; right: 250px; top: 0; bottom: 0; display: flex; align-items: center; gap: 22px; opacity: 0; }
+#slider label { font-size: 26px; font-weight: 700; color: #3c4a68; letter-spacing: .02em; }
+#slider .track { position: relative; flex: 1; height: 22px; border-radius: 11px; background: linear-gradient(90deg, hsl(0 70% 55%), hsl(60 70% 55%), hsl(120 70% 50%), hsl(180 70% 50%), hsl(240 70% 60%), hsl(300 70% 55%), hsl(360 70% 55%)); }
+#slider .track b { position: absolute; top: 50%; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; background: #fff; box-shadow: 0 6px 18px rgba(8, 20, 50, .45), 0 0 0 4px #fff; }
+#tname { margin-left: auto; min-width: 210px; text-align: right; font-size: 36px; font-weight: 800; letter-spacing: -.02em; color: #0e1a33; }
+#keys { position: absolute; left: 50%; top: 50%; margin: -70px 0 0 -190px; width: 380px; height: 140px; display: flex; align-items: center; justify-content: center; gap: 18px; opacity: 0; pointer-events: none; z-index: 8; }
+#keys kbd { min-width: 128px; padding: 22px 30px; text-align: center; font: 800 52px "Jakarta", sans-serif; color: #0e1a33; background: #fff; border-radius: 24px; box-shadow: 0 10px 0 #c9d3ea, 0 26px 50px rgba(8, 20, 50, .45); }
+#keys span { font-size: 48px; font-weight: 800; color: #fff; text-shadow: 0 4px 14px rgba(0, 0, 0, .5); }
+
+/* the install card (a page of our own website) */
+.pg.install { background: radial-gradient(900px 700px at 80% 0, #e6edff, #f6f8fd 60%); display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 44px; text-align: center; color: #0e1a33; }
+.pg.install > svg { width: 132px; height: 132px; margin-bottom: 18px; border-radius: 32px; filter: drop-shadow(0 24px 30px rgba(11, 29, 64, .28)); }
+.pg.install h1 { margin: 0; font-size: 88px; letter-spacing: -.045em; font-weight: 800; }
+.pg.install h1 span { color: #d99a1c; }
+.pg.install p { margin: 10px 0 0; font-size: 32px; color: #566683; font-weight: 600; letter-spacing: -.01em; }
+.pg.install .row { display: flex; gap: 16px; margin: 22px 0 30px; }
+.pg.install .row b { padding: 12px 26px; border-radius: 999px; background: #fff; border: 2px solid #dde5f6; font-size: 30px; color: #2f4f9a; font-weight: 700; }
+.pg.install .btn { position: relative; width: 560px; height: 100px; border-radius: 50px; background: #2f5bea; color: #fff; font-size: 42px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 18px; box-shadow: 0 24px 50px rgba(47, 91, 234, .45); }
+.pg.install .btn.added { background: #1f9d63; box-shadow: 0 24px 50px rgba(31, 157, 99, .45); }
+
+#cursor { position: absolute; width: 64px; height: 64px; left: 0; top: 0; opacity: 0; pointer-events: none; z-index: 30; }
+#cursor svg { width: 64px; height: 64px; filter: drop-shadow(0 8px 12px rgba(0, 0, 0, .5)); }
+#ripple { position: absolute; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; border: 6px solid rgba(255, 255, 255, .95); box-shadow: 0 0 30px rgba(47, 91, 234, .8); opacity: 0; pointer-events: none; z-index: 29; }
+
+/* the closing card */
+#end { position: absolute; inset: 0; z-index: 21; opacity: 0; display: grid; grid-template-columns: auto auto; justify-content: center; align-content: center; align-items: center; column-gap: 100px; padding: 0 0 190px; pointer-events: none; background: radial-gradient(1200px 800px at 50% 30%, #1f4fa8 0, rgba(31, 79, 168, 0) 65%), radial-gradient(900px 700px at 100% 100%, rgba(242, 184, 75, .22), rgba(242, 184, 75, 0) 60%), #0b1d40; }
+#mark { grid-column: 1; grid-row: 1 / span 4; width: 360px; height: 360px; filter: drop-shadow(0 30px 50px rgba(0, 0, 0, .5)); border-radius: 70px; }
+#word { grid-column: 2; margin: 0; font-size: 148px; line-height: 1; font-weight: 800; letter-spacing: -.05em; }
+#word span { color: #f2b84b; }
+#tag2 { grid-column: 2; margin-top: 10px; font-size: 42px; font-weight: 600; color: #c7d3ee; letter-spacing: -.01em; }
+#chips { grid-column: 2; display: flex; gap: 18px; margin-top: 36px; }
+#chips span { padding: 14px 32px; border-radius: 999px; background: rgba(255, 255, 255, .1); border: 2px solid rgba(255, 255, 255, .22); font-size: 34px; font-weight: 700; }
+#site { grid-column: 2; justify-self: start; margin-top: 40px; padding: 22px 50px; border-radius: 999px; background: #f2b84b; color: #0b1d40; font-size: 48px; font-weight: 800; letter-spacing: -.02em; }
+#fine { position: absolute; left: 0; right: 0; bottom: 40px; text-align: center; font-size: 26px; color: #8fa0c6; font-weight: 600; }
+#bar { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; z-index: 40; background: rgba(255, 255, 255, .1); }
+#bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #2f5bea, #f2b84b); }

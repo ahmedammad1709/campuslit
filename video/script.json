@@ -1,49 +1,713 @@
 {
-  "voice": { "name": "af_heart", "speed": 1.05, "lang": "en-us" },
-  "phonemes": { "Bahria": "bˈɛɹijə" },
-  "respell": { "Campuslit": "Campus-lit", "LMS": "L M S", "CMS": "C M S" },
-  "music": { "bpm": 110, "drop": 3.75, "breakdown": [25.05, 28.35], "fade": 33.0, "level": -17 },
+  "voice": {
+    "name": "af_heart",
+    "speed": 1.05,
+    "lang": "en-us"
+  },
+  "phonemes": {
+    "Bahria": "bˈɛɹijə"
+  },
+  "respell": {
+    "Campuslit": "Campus-lit",
+    "LMS": "L M S",
+    "CMS": "C M S",
+    "Ctrl": "Control"
+  },
+  "music": {
+    "bpm": 110,
+    "drop": 3.75,
+    "breakdown": [
+      25.05,
+      28.35
+    ],
+    "fade": 33,
+    "level": -17
+  },
   "full": {
     "duration": 34.2,
     "lines": [
-      { "id": "hook", "text": "I just fixed the Bahria University portal. See it in action.", "at": 0.3, "smallSentences": [1], "slowTail": 0.88, "note": "Your own recording: recordings/hook.mp4 (or .m4a/.wav/.mp3) in the tools folder" },
-      { "id": "bot1", "text": "Same logins. Same data. A whole new look.", "at": 4.2 },
-      { "id": "cms", "text": "And the CMS too.", "at": 7.85 },
-      { "id": "tt", "text": "Your timetable. As a real calendar.", "at": 10.85 },
-      { "id": "themes", "text": "Pick a theme. Or make your own.", "at": 14.3 },
-      { "id": "due", "text": "Never miss a deadline.", "at": 19.95 },
-      { "id": "att", "text": "Plan your attendance.", "at": 21.75 },
-      { "id": "srch", "text": "Search anything.", "at": 23.55 },
-      { "id": "one", "text": "One click. Free. Private.", "at": 25.5 },
-      { "id": "outro", "text": "Campuslit. For Bahria students. Link in bio.", "at": 28.55, "note": "Optional: record outro.mp4 yourself" }
+      {
+        "id": "hook",
+        "text": "I just fixed the Bahria University portal. See it in action.",
+        "at": 0.3,
+        "smallSentences": [
+          1
+        ],
+        "slowTail": 0.88,
+        "note": "Your own recording: recordings/hook.mp4 (or .m4a/.wav/.mp3) in the tools folder"
+      },
+      {
+        "id": "bot1",
+        "text": "Same logins. Same data. A whole new look.",
+        "at": 4.2
+      },
+      {
+        "id": "cms",
+        "text": "And the CMS too.",
+        "at": 7.85
+      },
+      {
+        "id": "tt",
+        "text": "Your timetable. As a real calendar.",
+        "at": 10.85
+      },
+      {
+        "id": "themes",
+        "text": "Pick a theme. Or make your own.",
+        "at": 14.3
+      },
+      {
+        "id": "due",
+        "text": "Never miss a deadline.",
+        "at": 19.95
+      },
+      {
+        "id": "att",
+        "text": "Plan your attendance.",
+        "at": 21.75
+      },
+      {
+        "id": "srch",
+        "text": "Search anything.",
+        "at": 23.55
+      },
+      {
+        "id": "one",
+        "text": "One click. Free. Private.",
+        "at": 25.5
+      },
+      {
+        "id": "outro",
+        "text": "Campuslit. For Bahria students. Link in bio.",
+        "at": 28.55,
+        "note": "Optional: record outro.mp4 yourself"
+      }
     ],
     "sfx": [
-      { "id": "riser", "kind": "riser", "at": 2.15 },
-      { "id": "wipe1", "kind": "whoosh", "at": 3.75 },
-      { "id": "hit1", "kind": "hit", "at": 3.9, "gain": -4 },
-      { "id": "slide1", "kind": "swish", "at": 7.4 },
-      { "id": "wipe2", "kind": "whoosh", "at": 9.0 },
-      { "id": "slide2", "kind": "swish", "at": 10.45 },
-      { "id": "slide3", "kind": "swish", "at": 13.95 },
-      { "id": "theme1", "kind": "tick", "at": 14.95 },
-      { "id": "theme2", "kind": "tick", "at": 15.6 },
-      { "id": "theme3", "kind": "tick", "at": 16.25 },
-      { "id": "theme4", "kind": "tick", "at": 16.9 },
-      { "id": "custom", "kind": "pop", "at": 17.55 },
-      { "id": "slide4", "kind": "swish", "at": 19.65 },
-      { "id": "slide5", "kind": "swish", "at": 21.45 },
-      { "id": "slide6", "kind": "swish", "at": 23.25 },
-      { "id": "key", "kind": "tick", "at": 23.95, "gain": 2 },
-      { "id": "type1", "kind": "tick", "at": 24.3, "gain": -8 },
-      { "id": "type2", "kind": "tick", "at": 24.42, "gain": -8 },
-      { "id": "type3", "kind": "tick", "at": 24.54, "gain": -8 },
-      { "id": "type4", "kind": "tick", "at": 24.66, "gain": -8 },
-      { "id": "type5", "kind": "tick", "at": 24.78, "gain": -8 },
-      { "id": "slide7", "kind": "swish", "at": 25.05 },
-      { "id": "click", "kind": "tick", "at": 26.55, "gain": 2 },
-      { "id": "ding", "kind": "ding", "at": 26.6 },
-      { "id": "end", "kind": "hit", "at": 28.35 }
+      {
+        "id": "riser",
+        "kind": "riser",
+        "at": 2.15
+      },
+      {
+        "id": "wipe1",
+        "kind": "whoosh",
+        "at": 3.75
+      },
+      {
+        "id": "hit1",
+        "kind": "hit",
+        "at": 3.9,
+        "gain": -4
+      },
+      {
+        "id": "slide1",
+        "kind": "swish",
+        "at": 7.4
+      },
+      {
+        "id": "wipe2",
+        "kind": "whoosh",
+        "at": 9
+      },
+      {
+        "id": "slide2",
+        "kind": "swish",
+        "at": 10.45
+      },
+      {
+        "id": "slide3",
+        "kind": "swish",
+        "at": 13.95
+      },
+      {
+        "id": "theme1",
+        "kind": "tick",
+        "at": 14.95
+      },
+      {
+        "id": "theme2",
+        "kind": "tick",
+        "at": 15.6
+      },
+      {
+        "id": "theme3",
+        "kind": "tick",
+        "at": 16.25
+      },
+      {
+        "id": "theme4",
+        "kind": "tick",
+        "at": 16.9
+      },
+      {
+        "id": "custom",
+        "kind": "pop",
+        "at": 17.55
+      },
+      {
+        "id": "slide4",
+        "kind": "swish",
+        "at": 19.65
+      },
+      {
+        "id": "slide5",
+        "kind": "swish",
+        "at": 21.45
+      },
+      {
+        "id": "slide6",
+        "kind": "swish",
+        "at": 23.25
+      },
+      {
+        "id": "key",
+        "kind": "tick",
+        "at": 23.95,
+        "gain": 2
+      },
+      {
+        "id": "type1",
+        "kind": "tick",
+        "at": 24.3,
+        "gain": -8
+      },
+      {
+        "id": "type2",
+        "kind": "tick",
+        "at": 24.42,
+        "gain": -8
+      },
+      {
+        "id": "type3",
+        "kind": "tick",
+        "at": 24.54,
+        "gain": -8
+      },
+      {
+        "id": "type4",
+        "kind": "tick",
+        "at": 24.66,
+        "gain": -8
+      },
+      {
+        "id": "type5",
+        "kind": "tick",
+        "at": 24.78,
+        "gain": -8
+      },
+      {
+        "id": "slide7",
+        "kind": "swish",
+        "at": 25.05
+      },
+      {
+        "id": "click",
+        "kind": "tick",
+        "at": 26.55,
+        "gain": 2
+      },
+      {
+        "id": "ding",
+        "kind": "ding",
+        "at": 26.6
+      },
+      {
+        "id": "end",
+        "kind": "hit",
+        "at": 28.35
+      }
     ]
   },
-  "linkedin": { "extends": "full", "lines": { "hook": { "bot": true, "slowTail": null }, "one": { "text": "Free. No sign-up. Nothing leaves your browser." }, "outro": { "text": "Campuslit. For Bahria students. Link in the comments." } } }
+  "linkedin": {
+    "extends": "full",
+    "lines": {
+      "hook": {
+        "bot": true,
+        "slowTail": null
+      },
+      "one": {
+        "text": "Free. No sign-up. Nothing leaves your browser."
+      },
+      "outro": {
+        "text": "Campuslit. For Bahria students. Link in the comments."
+      }
+    }
+  },
+  "glowup": {
+    "duration": 54.6,
+    "music": {
+      "bpm": 120,
+      "drop": 5,
+      "breakdown": [
+        [
+          7,
+          9
+        ],
+        [
+          21.5,
+          23
+        ],
+        [
+          32.5,
+          34
+        ],
+        [
+          40.5,
+          42
+        ],
+        [
+          46,
+          49
+        ]
+      ],
+      "fade": 52.9,
+      "level": -17,
+      "pump": 0.55
+    },
+    "lines": [
+      {
+        "id": "hook",
+        "text": "Four things wrong with the Bahria University Portal. All fixed.",
+        "at": 0.5,
+        "bot": true
+      },
+      {
+        "id": "c1",
+        "text": "One. It looks old.",
+        "at": 5.15
+      },
+      {
+        "id": "c1b",
+        "text": "Now it looks like this.",
+        "at": 9.05
+      },
+      {
+        "id": "th1",
+        "text": "Six themes. Or make your own.",
+        "at": 12.15
+      },
+      {
+        "id": "th2",
+        "text": "Pick a colour, and the whole portal follows.",
+        "at": 15.3
+      },
+      {
+        "id": "c2",
+        "text": "Two. Your timetable is a wide grid.",
+        "at": 19.15
+      },
+      {
+        "id": "c2b",
+        "text": "Now it's a real calendar.",
+        "at": 23.05
+      },
+      {
+        "id": "c2c",
+        "text": "Download it to your own calendar.",
+        "at": 25
+      },
+      {
+        "id": "c3",
+        "text": "Three. Nothing reminds you.",
+        "at": 31.15
+      },
+      {
+        "id": "c3b",
+        "text": "Now it counts down every deadline.",
+        "at": 34.05
+      },
+      {
+        "id": "c3c",
+        "text": "And reminds you on every page.",
+        "at": 36.75
+      },
+      {
+        "id": "c4",
+        "text": "Four. You can't search.",
+        "at": 39.15
+      },
+      {
+        "id": "c4b",
+        "text": "Press Ctrl K, and search any page, on both portals.",
+        "at": 42.05
+      },
+      {
+        "id": "c5",
+        "text": "Add it to Chrome in one click.",
+        "at": 46.7
+      },
+      {
+        "id": "cta",
+        "text": "Campuslit. Free for Bahria students. Link in the comments.",
+        "at": 49.55
+      }
+    ],
+    "sfx": [
+      {
+        "id": "riser",
+        "kind": "riser",
+        "at": 3.4
+      },
+      {
+        "id": "card1",
+        "kind": "hit",
+        "at": 5
+      },
+      {
+        "id": "card1end",
+        "kind": "swish",
+        "at": 7
+      },
+      {
+        "id": "mk1a",
+        "kind": "pop",
+        "at": 7.5
+      },
+      {
+        "id": "mk1b",
+        "kind": "pop",
+        "at": 8
+      },
+      {
+        "id": "mk1c",
+        "kind": "pop",
+        "at": 8.5
+      },
+      {
+        "id": "wipe1",
+        "kind": "whoosh",
+        "at": 9
+      },
+      {
+        "id": "hw1",
+        "kind": "hit",
+        "at": 9.15,
+        "gain": -4
+      },
+      {
+        "id": "dockIn",
+        "kind": "mark",
+        "at": 12.5
+      },
+      {
+        "id": "th1",
+        "kind": "tick",
+        "at": 13
+      },
+      {
+        "id": "th2",
+        "kind": "tick",
+        "at": 13.5
+      },
+      {
+        "id": "th3",
+        "kind": "tick",
+        "at": 14
+      },
+      {
+        "id": "th4",
+        "kind": "tick",
+        "at": 14.5
+      },
+      {
+        "id": "custom",
+        "kind": "pop",
+        "at": 15
+      },
+      {
+        "id": "dockOut",
+        "kind": "mark",
+        "at": 18.5
+      },
+      {
+        "id": "card2",
+        "kind": "hit",
+        "at": 19
+      },
+      {
+        "id": "card2end",
+        "kind": "swish",
+        "at": 21.5
+      },
+      {
+        "id": "mk2a",
+        "kind": "pop",
+        "at": 22
+      },
+      {
+        "id": "mk2b",
+        "kind": "pop",
+        "at": 22.5
+      },
+      {
+        "id": "wipe2",
+        "kind": "whoosh",
+        "at": 23
+      },
+      {
+        "id": "hw2",
+        "kind": "hit",
+        "at": 23.15,
+        "gain": -4
+      },
+      {
+        "id": "click1",
+        "kind": "tick",
+        "at": 25.9,
+        "gain": 2
+      },
+      {
+        "id": "openPanel",
+        "kind": "mark",
+        "at": 25.95
+      },
+      {
+        "id": "goClick",
+        "kind": "tick",
+        "at": 27,
+        "gain": 2
+      },
+      {
+        "id": "chipIn",
+        "kind": "pop",
+        "at": 27.05
+      },
+      {
+        "id": "slideCal",
+        "kind": "swish",
+        "at": 28
+      },
+      {
+        "id": "fill1",
+        "kind": "tick",
+        "at": 28.7,
+        "gain": -6
+      },
+      {
+        "id": "fill2",
+        "kind": "tick",
+        "at": 28.821,
+        "gain": -6
+      },
+      {
+        "id": "fill3",
+        "kind": "tick",
+        "at": 28.943,
+        "gain": -6
+      },
+      {
+        "id": "fill4",
+        "kind": "tick",
+        "at": 29.064,
+        "gain": -6
+      },
+      {
+        "id": "fill5",
+        "kind": "tick",
+        "at": 29.186,
+        "gain": -6
+      },
+      {
+        "id": "fill6",
+        "kind": "tick",
+        "at": 29.307,
+        "gain": -6
+      },
+      {
+        "id": "fill7",
+        "kind": "tick",
+        "at": 29.429,
+        "gain": -6
+      },
+      {
+        "id": "fill8",
+        "kind": "tick",
+        "at": 29.55,
+        "gain": -6
+      },
+      {
+        "id": "fill9",
+        "kind": "tick",
+        "at": 29.671,
+        "gain": -6
+      },
+      {
+        "id": "fill10",
+        "kind": "tick",
+        "at": 29.793,
+        "gain": -6
+      },
+      {
+        "id": "fill11",
+        "kind": "tick",
+        "at": 29.914,
+        "gain": -6
+      },
+      {
+        "id": "fill12",
+        "kind": "tick",
+        "at": 30.036,
+        "gain": -6
+      },
+      {
+        "id": "card3",
+        "kind": "hit",
+        "at": 31
+      },
+      {
+        "id": "card3end",
+        "kind": "swish",
+        "at": 32.5
+      },
+      {
+        "id": "mk3a",
+        "kind": "pop",
+        "at": 33
+      },
+      {
+        "id": "mk3b",
+        "kind": "pop",
+        "at": 33.5
+      },
+      {
+        "id": "wipe3",
+        "kind": "whoosh",
+        "at": 34
+      },
+      {
+        "id": "hw3",
+        "kind": "hit",
+        "at": 34.15,
+        "gain": -4
+      },
+      {
+        "id": "slideRem",
+        "kind": "swish",
+        "at": 36.6
+      },
+      {
+        "id": "remPop",
+        "kind": "ding",
+        "at": 37.3
+      },
+      {
+        "id": "card4",
+        "kind": "hit",
+        "at": 39
+      },
+      {
+        "id": "card4end",
+        "kind": "swish",
+        "at": 40.5
+      },
+      {
+        "id": "mk4a",
+        "kind": "pop",
+        "at": 41
+      },
+      {
+        "id": "mk4b",
+        "kind": "pop",
+        "at": 41.5
+      },
+      {
+        "id": "wipe4",
+        "kind": "whoosh",
+        "at": 42
+      },
+      {
+        "id": "hw4",
+        "kind": "hit",
+        "at": 42.15,
+        "gain": -4
+      },
+      {
+        "id": "key1",
+        "kind": "tick",
+        "at": 42.75,
+        "gain": 2
+      },
+      {
+        "id": "k1t1",
+        "kind": "tick",
+        "at": 43.05,
+        "gain": -8
+      },
+      {
+        "id": "k1t2",
+        "kind": "tick",
+        "at": 43.17,
+        "gain": -8
+      },
+      {
+        "id": "k1t3",
+        "kind": "tick",
+        "at": 43.29,
+        "gain": -8
+      },
+      {
+        "id": "slideL",
+        "kind": "swish",
+        "at": 44
+      },
+      {
+        "id": "key2",
+        "kind": "tick",
+        "at": 44.55,
+        "gain": 2
+      },
+      {
+        "id": "k2t1",
+        "kind": "tick",
+        "at": 44.95,
+        "gain": -8
+      },
+      {
+        "id": "k2t2",
+        "kind": "tick",
+        "at": 45.07,
+        "gain": -8
+      },
+      {
+        "id": "k2t3",
+        "kind": "tick",
+        "at": 45.19,
+        "gain": -8
+      },
+      {
+        "id": "k2t4",
+        "kind": "tick",
+        "at": 45.31,
+        "gain": -8
+      },
+      {
+        "id": "k2t5",
+        "kind": "tick",
+        "at": 45.43,
+        "gain": -8
+      },
+      {
+        "id": "slideI",
+        "kind": "swish",
+        "at": 46
+      },
+      {
+        "id": "click",
+        "kind": "tick",
+        "at": 47.95,
+        "gain": 2
+      },
+      {
+        "id": "ding",
+        "kind": "ding",
+        "at": 48
+      },
+      {
+        "id": "end",
+        "kind": "hit",
+        "at": 49
+      }
+    ]
+  }
 }

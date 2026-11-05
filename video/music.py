@@ -58,9 +58,10 @@ def _put(buf, start, sig, gain=1.0):
 def render(duration, cfg, drop_to_end):
     """cfg: bpm, drop (seconds), breakdown [from, to], fade (seconds). Returns a stereo float array of `duration` seconds."""
     bpm = cfg.get("bpm", 110); beat = 60.0 / bpm; drop = cfg["drop"]
-    b0, b1 = cfg.get("breakdown", [1e9, 1e9]); fade = cfg.get("fade", duration - 1.2)
+    bd = cfg.get("breakdown", [1e9, 1e9]); bds = bd if isinstance(bd[0], list) else [bd]; b1 = max(b[1] for b in bds); fade = cfg.get("fade", duration - 1.2)
     n = int(duration * SR)
     kick, clap, hat, bass, chords, arp, pad = (np.zeros(n) for _ in range(7))
+    kick_times = []
     chord_notes = [[57, 60, 64], [53, 57, 60], [60, 64, 67], [55, 59, 62]]     # Am F C G
     roots = [33, 29, 36, 31]                                                    # A1 F1 C2 G1
     bar = 4 * beat
@@ -84,13 +85,13 @@ def render(duration, cfg, drop_to_end):
         pos = i / 4.0; tm = grid(pos)
         if tm >= duration: break
         bar_i = int(pos // 4); within = pos - bar_i * 4; ch = bar_i % 4
-        calm = b0 <= tm < b1
+        calm = any(b[0] <= tm < b[1] for b in bds)
         end_full = tm >= b1
         # kick: four on the floor (not in the breakdown)
         if i % 4 == 0 and not calm:
             m = int(.32 * SR); tt = np.arange(m) / SR
             y = np.sin(2 * np.pi * (46 * tt + 90 * (1 - np.exp(-tt * 35)) / 35)) * np.exp(-tt * 11) + .25 * np.sin(2 * np.pi * 120 * tt) * np.exp(-tt * 60)
-            _put(kick, tm, y, 1.0)
+            _put(kick, tm, y, 1.0); kick_times.append(tm)
         # clap on 2 and 4
         if i % 8 == 4 and not calm:
             m = int(.25 * SR); rng = np.random.default_rng(i)
@@ -122,6 +123,11 @@ def render(duration, cfg, drop_to_end):
     # drop: everything before it is just the pad; a short silence on the last beat sharpens the entry
     pre = np.clip((np.arange(n) / SR) / max(drop, .1), 0, 1)
     pad_gain = .45 + .5 * pre ** 2
+    if cfg.get("pump"):      # pads and chords duck on every kick, the way a produced track breathes
+        env = np.ones(n); m_ = int(.36 * SR); tt_ = np.arange(m_) / SR; dip = 1 - cfg["pump"] * np.exp(-tt_ / .11)
+        for kt in kick_times:
+            i = int(kt * SR); j = min(n, i + m_); env[i:j] = np.minimum(env[i:j], dip[:j - i])
+        pad = pad * env; chords = chords * env; arp = arp * (.5 + .5 * env)
     mix = pad * pad_gain + 1.0 * kick + clap + hat + bass + chords + arp
     gap0 = int((drop - beat * .5) * SR)
     mix[gap0:int(drop * SR)] *= np.linspace(1, 0.15, int(drop * SR) - gap0)         # the beat before the drop dips

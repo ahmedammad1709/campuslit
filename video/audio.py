@@ -130,13 +130,15 @@ def sfx(kind, path):
     else: raise SystemExit("unknown sound effect " + kind)
 effects = []
 for e in timing["sfx"]:
+    if e["kind"] == "mark": continue   # a silent marker: the picture uses its time, there is nothing to hear
     p = os.path.join(out, "sfx_" + e["id"] + ".wav"); sfx(e["kind"], p); effects.append((p, e["at"], e.get("gain", 0.0)))
 
 # ---------- 4. music: an original track synthesised in music.py ----------
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import music
 total = float(sc.get("duration") or 0)
-track = music.render(total, cfg["music"], None)
+mcfg = sc.get("music", cfg["music"])   # a scene may bring its own music settings
+track = music.render(total, mcfg, None)
 music_wav = os.path.join(out, "music_raw.wav"); sf.write(music_wav, track, 44100)
 
 # ---------- 5. the mix: voice on top, music ducked under it, effects between, one loudness for the whole video ----------
@@ -149,7 +151,7 @@ def bus(items, name, gain_db=0.0):
     return path
 voice_bus = bus([(l["path"], l["at"], 0.0) for l in lines], "voice_bus")
 sfx_bus = bus([(p, at, gain + 5.0) for p, at, gain in effects], "sfx_bus")
-lvl = cfg["music"].get("level", -17)
+lvl = mcfg.get("level", -17)
 mix = os.path.join(out, "mix.wav")
 run("-i", voice_bus, "-i", sfx_bus, "-i", music_wav, "-filter_complex",
     f"[0:a]asplit=2[v][k];[2:a]volume={lvl}dB,lowpass=f=15000[m];"
