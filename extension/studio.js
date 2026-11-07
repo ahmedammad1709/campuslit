@@ -20,7 +20,7 @@ const StudioUI = (() => {
     { key: 'gold', label: 'Highlight marker', hint: 'Marks the current page' }
   ];
   let ctx = null, root = null, built = false, undo = null, toastTimer = 0, armTimer = 0;
-  let qp = { brand: '#2f5bea', mode: 'light', side: 'deep' }, qpReady = false;
+  let qp = { brand: '#2f5bea', mode: 'light', side: 'deep' }, qpReady = false, lastQuick = 0, quickTimer = 0;
   const refs = { rows: {}, fine: {} };
 
   function el(tag, cls, text) { const n = document.createElement(tag); if (cls) n.className = cls; if (text) n.textContent = text; return n; }
@@ -80,6 +80,15 @@ const StudioUI = (() => {
     ctx.setCustom(next);
     toast(message, true);
   }
+  // Brand color, Mode and Sidebar style act the moment they change (the live preview follows), so nobody has to find the button.
+  // One Undo steps back over a whole burst of tweaks, for anyone who had edited colors by hand first.
+  function applyQuick(message) {
+    const s = ctx.get(), now = Date.now();
+    if (!undo || now - lastQuick > 2500) undo = { custom: s.custom, theme: s.theme };
+    lastQuick = now;
+    ctx.setCustom(B().generateCustom({ accent: qp.brand, mode: qp.mode, side: qp.side, name: currentName() }));
+    toast(message, true);
+  }
   function doUndo() {
     if (!undo) return;
     const u = undo; undo = null;
@@ -116,22 +125,22 @@ const StudioUI = (() => {
     refs.stripCells = ['Page', 'Cards', 'Sidebar', 'Text', 'Accent'].map(t => { const s = el('span', '', t); refs.strip.append(s); return s; });
 
     // quick palette
-    const quick = el('div', 'quick'); const qh = el('h4', '', 'Generate from a color'); quick.append(qh);
+    const quick = el('div', 'quick'); const qh = el('h4', '', 'Generate from a color'); quick.append(qh, el('p', 'quick-hint', 'Pick a color, a mode or a sidebar style and the palette updates right away. Undo is one click.'));
     const split = el('div', 'quick-split');
     const left = el('div'); left.append(el('span', 'field-label', 'Brand color')); left.firstChild.style.marginTop = '0';
-    const brand = colorControl('Brand', value => { qp.brand = value; brand.set(value); });
+    const brand = colorControl('Brand', value => { qp.brand = value; brand.set(value); clearTimeout(quickTimer); quickTimer = setTimeout(() => applyQuick('Palette updated from your color.'), 140); });
     refs.brand = brand; const pick = el('div', 'brand-pick'); pick.append(brand.sw, brand.hex); left.append(pick);
     const right = el('div'); const ml = el('span', 'field-label', 'Mode'); ml.style.marginTop = '0'; ml.id = 'qp-mode-label'; right.append(ml);
     refs.mode = el('div', 'segmented block'); refs.mode.setAttribute('role', 'group'); refs.mode.setAttribute('aria-labelledby', 'qp-mode-label');
     for (const [id, label, icon] of [['light', 'Light', 'sun'], ['dark', 'Dark', 'moon']]) {
-      const b = el('button', ''); b.type = 'button'; b.dataset.mode = id; b.append(ic(icon), document.createTextNode(label)); b.addEventListener('click', () => { qp.mode = id; syncQuick(); }); refs.mode.append(b);
+      const b = el('button', ''); b.type = 'button'; b.dataset.mode = id; b.append(ic(icon), document.createTextNode(label)); b.addEventListener('click', () => { qp.mode = id; syncQuick(); applyQuick(id === 'dark' ? 'Dark mode applied.' : 'Light mode applied.'); }); refs.mode.append(b);
     }
     right.append(refs.mode); split.append(left, right); quick.append(split);
     const sl = el('span', 'field-label', 'Sidebar style'); sl.id = 'qp-side-label'; quick.append(sl);
     refs.side = el('div', 'segmented block'); refs.side.setAttribute('role', 'group'); refs.side.setAttribute('aria-labelledby', 'qp-side-label');
-    for (const [id, label] of [['deep', 'Deep'], ['tinted', 'Tinted'], ['soft', 'Soft']]) { const b = el('button', '', label); b.type = 'button'; b.dataset.side = id; b.addEventListener('click', () => { qp.side = id; syncQuick(); }); refs.side.append(b); }
+    for (const [id, label] of [['deep', 'Deep'], ['tinted', 'Tinted'], ['soft', 'Soft']]) { const b = el('button', '', label); b.type = 'button'; b.dataset.side = id; b.addEventListener('click', () => { qp.side = id; syncQuick(); applyQuick('Sidebar style: ' + label + '.'); }); refs.side.append(b); }
     quick.append(refs.side);
-    const gen = btn('primary', 'Generate palette'), sur = btn('secondary', 'Random palette');
+    const gen = btn('primary', 'Regenerate palette'), sur = btn('secondary', 'Random palette');
     gen.addEventListener('click', () => bulk(B().generateCustom({ accent: qp.brand, mode: qp.mode, side: qp.side, name: currentName() }), 'New palette generated.'));
     sur.addEventListener('click', () => randomPalette(currentName()));
     const qb = el('div', 'btn-row'); qb.append(gen, sur); quick.append(qb);

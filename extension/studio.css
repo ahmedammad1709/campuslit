@@ -475,3 +475,5 @@ code { padding: 2px 7px; border-radius: 6px; background: var(--sunken); font-fam
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+
+.quick-hint { margin: -4px 0 14px; font-size: 13.5px; line-height: 1.45; color: var(--muted, #566683); }

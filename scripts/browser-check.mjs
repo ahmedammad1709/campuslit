@@ -164,7 +164,11 @@ try {
   await waitFor("document.querySelector('.a11y-summary').textContent.includes('need')",'undo brings the problem back');
   // generate a full palette from a brand color: dark + tinted sidebar
   await typeHex('brand','#e11d48');
-  await press('.quick [data-mode="dark"]');await press('.quick [data-side="tinted"]');
+  await press('.quick [data-mode="dark"]');
+  await waitFor(`${F}.documentElement.dataset.bsDark === 'true'`,'Dark applies the moment it is chosen, without pressing Generate');
+  const navDeep=await evaluate(`getComputedStyle(${F}.documentElement).getPropertyValue('--bs-nav')`);
+  await press('.quick [data-side="tinted"]');
+  await waitFor(`getComputedStyle(${F}.documentElement).getPropertyValue('--bs-nav') !== ${JSON.stringify(navDeep)}`,'the sidebar style changes the preview the moment it is chosen');
   await press('.quick .btn.primary');
   await waitFor(`${F}.documentElement.dataset.bsDark === 'true'`,'generated dark palette applied to preview');
   assert.equal(await summary(),'All checks pass','generated palettes are readable');

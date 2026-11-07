@@ -16,7 +16,7 @@ Same logins. Same data. A whole new look.</p>
 
 <p align="center">
   <img alt="Free" src="https://img.shields.io/badge/price-free-1f9d63?style=flat-square">
-  <img alt="Version 1.0.1" src="https://img.shields.io/badge/version-1.0.1-2f5bea?style=flat-square">
+  <img alt="Version 1.0.2" src="https://img.shields.io/badge/version-1.0.2-2f5bea?style=flat-square">
   <img alt="No network requests" src="https://img.shields.io/badge/network_requests-none-f2b84b?style=flat-square">
   <img alt="Manifest V3" src="https://img.shields.io/badge/Manifest-V3-555?style=flat-square">
   <a href="LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/licence-MIT-0b1d40?style=flat-square"></a>
