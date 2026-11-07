@@ -185,6 +185,7 @@ test('the status shows how long a sign-in really lasted', async () => {
   assert.equal(st.info.lms.lastOk, start + 9 * HOUR, 'the last good look is kept');
   assert.equal(st.info.lms.endedAt, start + 12 * HOUR, 'and the end is when it was first seen ended');
   assert.equal(st.session.lms, 'expired'); assert.equal(st.info.cms.endedAt, 0, 'the other portal is unaffected');
+  assert.match(st.info.lms.why, /\/index\.php \(200, has a password box\)/, 'it records what the portal answered, so a wrong guess can be told from a real sign-out');
   t.w.lmsSignedIn = true; t.w.now = start + 13 * HOUR; await t.emit('alarm', { name: 'bs-tick' }); await t.settle();
   st = await t.send({ bsNotify: 'status' });
   assert.equal(st.info.lms.since, start + 13 * HOUR); assert.equal(st.info.lms.endedAt, 0, 'signing in again starts a new stretch');

@@ -299,7 +299,7 @@ addEventListener('beforeunload', e => { if (isDirty()) { e.preventDefault(); e.r
   // how long a sign-in lasts, as seen by the checker: this is what tells us whether regular checks keep the portal session alive
   const span = ms => { const m = Math.max(1, Math.round(ms / 60000)); if (m < 60) return m + ' min'; const h = Math.floor(m / 60), r = m % 60; return h < 48 ? h + ' h' + (r ? ' ' + r + ' min' : '') : Math.round(h / 24) + ' days'; };
   const line = (name, state, i) => state === 'ok' && i.since ? name + ': signed in, working for ' + span(Date.now() - i.since) + ' (last good look ' + when(i.lastOk) + ')'
-    : state === 'expired' && i.endedAt ? name + ': session ended ' + when(i.endedAt) + (i.since && i.lastOk > i.since ? ', after at least ' + span(i.lastOk - i.since) + ' of working' : '') + '. Sign in again.'
+    : state === 'expired' && i.endedAt ? name + ': session ended ' + when(i.endedAt) + (i.since && i.lastOk > i.since ? ', after at least ' + span(i.lastOk - i.since) + ' of working' : '') + '. Sign in again.' + (i.why ? ' The portal answered with ' + i.why + '.' : '')
     : state === 'ok' ? name + ': signed in (the timer starts at the next look)'
     : state === 'expired' ? name + ': session ended. Sign in again.'
     : name + ': not checked yet';
