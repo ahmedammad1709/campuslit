@@ -32,7 +32,13 @@
     globalThis.BahriaQuickSearch?.mount({ enabled: settings.quickSearch });
     globalThis.BahriaTips?.mount({ enabled: settings.tips });
   }
-  api.storage.local.get(key).then(data => { settings = BahriaStudio.normalize(data[key]); loaded = true; render(); }).catch(() => { /* Leave the original portal intact if storage is unavailable. */ });
+  // With the optional notifications on, tell the background worker that a signed-in portal page was opened: that is the moment to catch up after a sign-in.
+  const inside = site === 'lms' ? /^\/student\//i : /^\/sys\//i;
+  function visit() {
+    if (window !== window.top || !settings.notify.enabled || !inside.test(location.pathname)) return;
+    try { const sent = api.runtime.sendMessage({ bsNotify: 'visit', portal: site }); if (sent && sent.catch) sent.catch(() => {}); } catch (e) { /* the worker is not there */ }
+  }
+  api.storage.local.get(key).then(data => { settings = BahriaStudio.normalize(data[key]); loaded = true; render(); visit(); }).catch(() => { /* Leave the original portal intact if storage is unavailable. */ });
   api.storage.onChanged.addListener((changes, area) => {
     if (area === 'local' && changes[key]) { settings = BahriaStudio.normalize(changes[key].newValue); loaded = true; render(); }
   });

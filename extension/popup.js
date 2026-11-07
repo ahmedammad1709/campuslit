@@ -54,14 +54,18 @@ function render() {
   renderAsk();
 }
 // The one-time question about notifications. Yes turns them on (the background worker then makes a silent first look); either answer is remembered, so it never nags.
+let askShown = false;
 function renderAsk() {
   const box = document.getElementById('notify-ask');
-  box.hidden = !(guide && BahriaGuide.wantsNotifyAsk(guide, settings.notify.enabled)) || !welcome.hidden || !tourBox.hidden;
-  if (!box.hidden) StudioIcons.render(box);
+  const show = !!(guide && settings.tips && BahriaGuide.wantsNotifyAsk(guide, settings.notify.enabled)) && welcome.hidden && tourBox.hidden;
+  box.hidden = !show;
+  if (show) { document.body.classList.add('is-welcome'); if (!askShown) { StudioIcons.render(box); document.getElementById('na-yes').focus({ preventScroll: true }); } }
+  else if (welcome.hidden) document.body.classList.remove('is-welcome');
+  askShown = show;
 }
 async function answerAsk(turnOn, then) {
   try { guide = await StudioStorage.updateGuide(BahriaGuide.markNotifyAsked); } catch { /* it may ask once more */ }
-  document.getElementById('notify-ask').hidden = true;
+  renderAsk();
   if (turnOn) await save({ notify: { ...settings.notify, enabled: true } }).then(() => { status.textContent = 'Notifications are on. Choose what you get in Settings.'; });
   if (then) then();
 }

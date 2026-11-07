@@ -483,10 +483,8 @@ code { padding: 2px 7px; border-radius: 6px; background: var(--sunken); font-fam
 #section-notifications .row + .group-note, #section-notifications .segmented + .group-note, #section-notifications .data-actions + .group-note, #section-notifications .group-note + .group-note { margin-top: 14px; }
 #section-notifications .data-actions { margin-top: 4px; }
 
-/* the one-time "get alerts?" card in the toolbar popup */
-.pop-ask { margin-top: 10px; padding: 12px 14px 10px; border: 1px solid #cfdcf8; border-radius: 14px; background: linear-gradient(100deg, #eef3ff, #fafcff); }
-.pop-ask h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 4px; font-size: 14px; font-weight: 800; color: var(--ink); }
-.pop-ask h2 [data-icon] { width: 16px; height: 16px; color: var(--accent); }
-.pop-ask p { margin: 0 0 10px; font-size: 12.5px; line-height: 1.5; color: var(--muted); }
-.pop-ask-actions { display: flex; gap: 8px; }
-.pop-ask .pop-link { margin-top: 8px; padding: 0; font-size: 12.5px; }
+/* the one-time "get alerts?" question in the toolbar popup: an overlay like the welcome */
+.pop-ask .w-ico.big { width: 46px; height: 46px; margin: 14px 0 8px; border-radius: 14px; }
+.pop-ask .w-ico.big svg { width: 24px; height: 24px; }
+.pop-ask .w-sub { max-width: 300px; margin-top: 6px; line-height: 1.45; }
+.pop-ask .na-note { max-width: 300px; margin: 10px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.45; }

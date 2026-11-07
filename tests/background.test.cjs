@@ -151,6 +151,26 @@ test('after a day closed: everything that changed is announced; a failed look be
   assert.match(found, /Quiz marks uploaded/); assert.match(found, /Absent marked/); assert.match(found, /New lecture note/);
 });
 
+test('signing back in catches up at once, and only for the portal that was opened', async () => {
+  const t = world();
+  await t.setPrefs(ALL); await t.settle();
+  t.w.lmsSignedIn = false; t.w.cmsSignedIn = false;                           // the next morning: both sessions have ended
+  t.w.now += 26 * HOUR; await t.emit('alarm', { name: 'bs-tick' }); await t.settle();
+  assert.deepEqual(t.titles().sort(), ['CMS session ended', 'LMS session ended']);
+  t.w.pages.quizzes.A = quizzes([row(['1', 'Quiz on loops', '', '3.000', ''])]);
+  t.w.pages.attendance = [{ code: 'CS 101', title: 'Data Structures', present: 18, absent: 5, total: 23, percentage: '78.3' }];
+  t.w.lmsSignedIn = true;                                                     // the student signs in to the LMS only
+  const cmsBefore = t.w.fetched.filter(u => u.includes('cms.bahria')).length;
+  t.w.now += 60000;
+  await t.send({ bsNotify: 'visit', portal: 'lms' }); await t.settle();
+  assert.ok(t.titles().some(x => /Quiz marks uploaded/.test(x)), 'the LMS news arrives straight after the sign-in, not at the next interval');
+  assert.ok(!t.titles().some(x => /Absent marked/.test(x)), 'the CMS was not looked at');
+  assert.equal(t.w.fetched.filter(u => u.includes('cms.bahria')).length, cmsBefore, 'no CMS request for an LMS visit');
+  t.w.cmsSignedIn = true; t.w.now += 6 * 60000;
+  await t.send({ bsNotify: 'visit', portal: 'cms' }); await t.settle();
+  assert.ok(t.titles().some(x => /Absent marked/.test(x)), 'and the CMS news arrives when the CMS is opened');
+});
+
 test('a kind that is switched off is not looked at, and starts fresh when switched on again', async () => {
   const t = world();
   await t.setPrefs({ ...ALL, quizzes: false, lectures: false, attendance: false }); await t.settle();

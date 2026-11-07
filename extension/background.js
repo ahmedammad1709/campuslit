@@ -146,9 +146,10 @@
   }
 
   // ---------- running ----------
+  let lastVisitCheck = 0;
   let chain = Promise.resolve();
   const exclusive = fn => (chain = chain.catch(() => {}).then(fn));
-  async function runCheck(why) {
+  async function runCheck(why, only) {          // only: 'lms' or 'cms' to look at one portal (a visit), otherwise both
     const n = (await readPrefs()).notify;
     if (!n.enabled) return { ok: false, off: true };
     const state = await loadState(), events = []; requests = 0;
@@ -159,8 +160,8 @@
     if (!n.attendance) state.attendance = null;
     let error = '';
     try {
-      if (n.assignments || n.quizzes || n.lectures || n.due2d || n.due24h || n.due7h) error = (await lmsPass(n, state, events)) || error;
-      if (n.attendance) error = (await cmsPass(n, state, events)) || error;
+      if (only !== 'cms' && (n.assignments || n.quizzes || n.lectures || n.due2d || n.due24h || n.due7h)) error = (await lmsPass(n, state, events)) || error;
+      if (only !== 'lms' && n.attendance) error = (await cmsPass(n, state, events)) || error;
     } catch (e) { error = 'Something went wrong while checking.'; }
     let shown = await announce(events, state);
     shown += await announceDue(n, state);
@@ -199,6 +200,15 @@
     if (!msg || typeof msg.bsNotify !== 'string' || sender.id !== api.runtime.id) return false;
     (async () => {
       if (msg.bsNotify === 'test') { const ok = await show({ id: 'test|' + Date.now(), title: 'Campuslit notifications work', body: 'You will see updates like this: new assignments, marks, lecture notes, attendance and deadlines.', url: LMS + 'Dashboard.php' }, null); return { ok }; }
+      if (msg.bsNotify === 'visit') {   // a signed-in portal page was opened: look at that portal now if it has been a while or its session had ended (a sign-in is the moment to catch up)
+        const portal = msg.portal === 'cms' ? 'cms' : 'lms';
+        exclusive(async () => {
+          const n = (await readPrefs()).notify; if (!n.enabled || Date.now() - lastVisitCheck < 5 * MINUTE) return;
+          const s = await loadState();
+          if (s.session[portal] !== 'ok' || Date.now() - s.lastRun > 30 * MINUTE) { lastVisitCheck = Date.now(); await runCheck('visit', portal); }
+        });
+        return { ok: true };
+      }
       if (msg.bsNotify === 'check') return exclusive(() => runCheck('manual'));
       if (msg.bsNotify === 'status') { const s = await loadState(); return { ok: true, lastRun: s.lastRun, last: s.last, session: s.session, courses: s.courses.length, attendance: s.attendance ? Object.keys(s.attendance).length : 0 }; }
       if (msg.bsNotify === 'forget') { await api.storage.local.remove(notifyStateKey); return { ok: true }; }
