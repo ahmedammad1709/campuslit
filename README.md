@@ -47,9 +47,10 @@ Drag the slider on the [website](https://campuslit-bu.vercel.app/) to compare. E
 | **Never miss a deadline** | A *Due soon* card counts down to your next assignment, and a small reminder follows you around the LMS. |
 | **Attendance, explained** | One bar per course and a plain line: how many hours you can still miss, or must attend, to finish above 75%. |
 | **A time table you can read** | A week calendar or day list with your next class on top, and *Add to calendar* for Google, Apple or Outlook. |
+| **Hear about it first** | Optional desktop notifications: attendance marked (present or absent), quiz marks uploaded, new assignments, new lecture notes, and deadline reminders 2 days, 24 hours and 7 hours before. Off until you turn them on. |
 | **Jump anywhere** | Press <kbd>Ctrl</kbd> + <kbd>K</kbd> (or <kbd>/</kbd>), type a few letters, press Enter. It forgives typos. |
 | **Make it yours** | Six hand-tuned themes and a custom-theme maker, with your own text size, spacing and typeface. |
-| **Private by design** | No accounts, no analytics, **no network requests at all**. It never reads your password or what you type. |
+| **Private by design** | No accounts, no analytics, **sends nothing to anyone**. It never reads your password or what you type. |
 
 ## See it
 
@@ -100,7 +101,7 @@ Switch it off from the toolbar button, or remove the extension, and the original
 
 ## Trust, in four lines
 
-- **It makes no network requests.** The extension has no server, no accounts and no analytics. Only your look settings, an optional short note of open assignments (for reminders, expires after 150 days) and a few "tip seen" flags stay on your device.
+- **It sends nothing to us or anyone else.** The extension has no server, no accounts and no analytics. Out of the box it makes no requests at all; only if you turn on the optional notifications does it open pages on the two portals, with your own sign-in. Only your look settings, optional notes (open assignments for reminders, what the notifications last saw) and a few "tip seen" flags stay on your device.
 - **It only runs on** `cms.bahria.edu.pk` and `lms.bahria.edu.pk`, and asks for the single browser permission `storage`.
 - **It changes how pages look**, not what they do. Forms, uploads, marks and submissions still go to the university exactly as before.
 - **It is open source (MIT)**, so you can check all of the above in this repository. Read the [privacy policy](https://campuslit-bu.vercel.app/privacy).
@@ -118,6 +119,7 @@ If a screen at your campus looks wrong, please [open an issue](https://github.co
 
 - **LMS** (`lms.bahria.edu.pk`): redesigned header, resizable sidebar that marks the page you are on, filter bars, tables, status pills and dropdowns; a dashboard with your courses as cards; tap-or-keyboard popovers instead of hover-only comments.
 - **CMS** (`cms.bahria.edu.pk`): a unified header and sidebar with icons, tidier tables, forms and modals, clear error alerts, a role-card landing page and a one-screen student sign-in.
+- **Notifications** (optional, off by default): in Settings, Notifications, choose what to hear about. While your browser is open and you are signed in, a small background worker looks at the same pages you would open (each course's assignments, quizzes and lecture notes on the LMS, and the CMS dashboard's attendance) every 1 to 8 hours, compares them with the last look on your device, and shows a desktop notification for what is new: attendance marked present or absent, quiz marks uploaded, a new assignment (or its marks), a new lecture note, and deadline reminders 2 days, 24 hours and 7 hours before. It uses your own session, never sees a password, and talks only to the two portals. If the session ends it tells you once.
 - **Assignments due-soon card**: on the LMS Assignments page, a card at the top names the next open deadline and counts it down ("due in 2 days 4 hrs"), with a status under each assignment (Submitted, Due in..., Closed). It covers the course selected on the page, because the portal shows one course at a time. It reads only what the page already shows and makes no requests.
 - **Quick search**: press Ctrl+K (Cmd+K on a Mac) or `/`, or tap the search button in the header, type a few letters and jump to any page in the menu. It understands related words ("gpa" finds Provisional Result, "homework" finds Assignments), forgives typos, shows which menu a page lives in, and only ever lists ordinary pages on bahria.edu.pk. It reads the menu links already on the page, keeps nothing and sends nothing; Settings can turn it off.
 - **Time table to calendar**: an "Add to calendar" button on the CMS Time Table page downloads your classes as a calendar file (`.ics`). Each class repeats weekly in Pakistan time until the end date you choose, with an optional reminder; opening the file again updates the events instead of duplicating them. The file is built in your browser from the schedule on the page and saved as a download; nothing is uploaded.
@@ -146,7 +148,7 @@ Download `campuslit-chrome.zip` or `campuslit-firefox.zip` from the latest GitHu
 
 ## Privacy
 
-No analytics, no accounts, no remote code or fonts, no network requests from the extension, no access to passwords or to the portals' own form values. Only appearance preferences are stored, in the browser's extension storage, plus the optional assignment-reminder note described above and a few yes/no flags for the tips you have seen. To redraw a few screens it reads figures the page already shows (greeting name, LMS course list, CMS attendance hours and time table) in memory only; nothing is saved or sent. Full text: `extension/privacy.html`.
+No analytics, no accounts, no remote code or fonts, nothing sent anywhere (with notifications off the extension makes no requests; with them on it only opens pages on the two portals, with your own session), no access to passwords or to the portals' own form values. Only appearance preferences are stored, in the browser's extension storage, plus the optional assignment-reminder note described above and a few yes/no flags for the tips you have seen. To redraw a few screens it reads figures the page already shows (greeting name, LMS course list, CMS attendance hours and time table) in memory only; nothing is saved or sent. Full text: `extension/privacy.html`.
 
 ## Repository layout
 

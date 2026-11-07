@@ -11,7 +11,18 @@
   };
   const CUSTOM_ESSENTIALS = ['bg', 'surface', 'nav', 'ink', 'accent'];
   const CUSTOM_OPTIONAL = ['soft', 'line', 'muted', 'navInk', 'gold'];
-  const defaults = { enabled: true, cms: true, lms: true, theme: 'navy', mode: 'preset', accent: '', font: 'jakarta', fontSize: 15, density: 'comfortable', radius: 10, motion: true, cleanBackground: false, custom: null, semesterWeeks: 16, reminders: true, quickSearch: true, tips: true, openingAnimation: true };
+  // Notifications are off until the student turns them on; every kind can then be chosen separately.
+  const NOTIFY_INTERVALS = [60, 120, 240, 480];            // minutes between looks at the portals
+  const notifyDefaults = { enabled: false, attendance: true, quizzes: true, assignments: true, lectures: true, due2d: true, due24h: true, due7h: true, sessionAlert: true, interval: 120 };
+  function normalizeNotify(raw) {
+    const n = { ...notifyDefaults };
+    if (raw && typeof raw === 'object') {
+      for (const key of Object.keys(notifyDefaults)) if (key !== 'interval' && typeof raw[key] === 'boolean') n[key] = raw[key];
+      if (NOTIFY_INTERVALS.includes(raw.interval)) n.interval = raw.interval;
+    }
+    return n;
+  }
+  const defaults = { notify: notifyDefaults, enabled: true, cms: true, lms: true, theme: 'navy', mode: 'preset', accent: '', font: 'jakarta', fontSize: 15, density: 'comfortable', radius: 10, motion: true, cleanBackground: false, custom: null, semesterWeeks: 16, reminders: true, quickSearch: true, tips: true, openingAnimation: true };
   const fonts = { jakarta: '"Bahria Jakarta", "Plus Jakarta Sans", "Segoe UI", sans-serif', manrope: '"Bahria Manrope", Manrope, "Segoe UI", sans-serif', sora: '"Bahria Sora", Sora, "Segoe UI", sans-serif', inter: '"Bahria Inter", Inter, Arial, sans-serif', system: '"Segoe UI", system-ui, sans-serif', humanist: '"Trebuchet MS", "Segoe UI", sans-serif', serif: 'Georgia, "Times New Roman", serif' };
   const HEX = /^#[0-9a-f]{6}$/i;
 
@@ -132,6 +143,7 @@
     for (const [key, min, max] of [['fontSize', 13, 19], ['radius', 0, 20], ['semesterWeeks', 8, 24]]) if (Number.isFinite(value[key])) s[key] = Math.min(max, Math.max(min, Math.round(value[key])));
     if (typeof value.accent === 'string' && HEX.test(value.accent)) s.accent = value.accent;
     s.custom = normalizeCustom(value.custom);
+    s.notify = normalizeNotify(value.notify);
     if (s.theme === 'custom' && !s.custom) s.theme = defaults.theme;
     return s;
   }
@@ -165,6 +177,6 @@
   }
   root.BahriaStudio = {
     power, fontFiles, themes, defaults, normalize, palette, apply, ratio, fonts, luminance,
-    CUSTOM_ESSENTIALS, CUSTOM_OPTIONAL, normalizeCustom, deriveCustom, customFromPalette, generateCustom, surpriseCustom, contrastReport, fixCustom, mix, toHsl, fromHsl, isDark
+    CUSTOM_ESSENTIALS, CUSTOM_OPTIONAL, NOTIFY_INTERVALS, normalizeNotify, normalizeCustom, deriveCustom, customFromPalette, generateCustom, surpriseCustom, contrastReport, fixCustom, mix, toHsl, fromHsl, isDark
   };
 })(globalThis);

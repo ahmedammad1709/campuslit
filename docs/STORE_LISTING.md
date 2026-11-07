@@ -34,12 +34,13 @@ WHAT YOU GET
 • Assignment reminder: a small popup on other LMS pages names the next assignment you have not submitted. Cross it away and it stays hidden for a few hours.
 • Attendance planner: for each course, how many hours you can still miss and finish above 75%, worked out from your credit hours and the semester length you choose.
 • Time table: a compact day board or a one-page week calendar, and an "Add to calendar" button that downloads your classes as a calendar file you can open in Google, Apple or Outlook calendar.
+• Notifications (optional, off until you turn them on): desktop alerts when attendance is marked present or absent, quiz marks are uploaded, a new assignment or lecture note appears, and 2 days, 24 hours and 7 hours before a deadline. You choose each one in settings.
 • Quick search: press Ctrl+K (Cmd+K on a Mac) or / to jump to any page in the portal's menu.
 • A short welcome and tour the first time you open it (skip it any time), and one small hint beside each new feature the first time it appears. Tips, the tour and the opening animation can all be switched off in settings.
 • A calmer sign-in page and portal chooser.
 
 PRIVATE BY DESIGN
-• Campuslit makes no network requests at all. There is no server, no account, no analytics and no remote code.
+• There is no server, no account, no analytics and no remote code. Campuslit sends nothing to us or to anyone else. With notifications off (the default) it makes no requests at all; if you turn them on, it opens pages on lms.bahria.edu.pk and cms.bahria.edu.pk with your own sign-in, and nowhere else.
 • It never reads your password or anything you type into the portal.
 • To draw the extra screens it reads text the page already shows (course names, attendance hours, deadlines), in your browser's memory only.
 • What it stores, on your device only: your appearance choices, and (only if you leave assignment reminders on) a short note of your open assignments (course, title, deadline), and a few yes/no flags for the tips you have seen. Settings has buttons to forget the note and to show the tips again, and turning reminders off deletes the note.
@@ -54,21 +55,24 @@ GOOD TO KNOW
 ## Single purpose (Chrome Web Store)
 
 Restyle the Bahria University student CMS and LMS in the browser, with a few helpers built from information those pages already show
-(attendance planner, assignment due dates and reminders, time-table export, page search).
+(attendance planner, assignment due dates and reminders, time-table export, page search) and, if the user turns it on, tell the user about new work, marks, attendance and deadlines with desktop notifications.
 
 ## Permission justifications
 
 | Permission | Why it is needed |
 | --- | --- |
 | `storage` | Remembers the chosen theme and layout options, the semester length for the attendance planner, the time-table view, and the optional assignment-reminder note. Everything stays in the browser's extension storage on this device. |
+| `notifications` | Shows the optional alerts the user chooses in settings (new assignments, marks, attendance, lecture notes, deadlines). Nothing is shown unless the user turns notifications on. |
+| `alarms` | Wakes the background worker every 15 minutes to work out deadline reminders and, at the interval the user chose (1 to 8 hours), look at the portals. |
+| Access to `lms.bahria.edu.pk` and `cms.bahria.edu.pk` (host permissions) | The background worker reads the same pages the student would open (assignments, quizzes, lecture notes, the CMS dashboard) with the browser's own signed-in session, to notice changes. It never signs in, never handles a password and contacts no other site. |
 | Access to `cms.bahria.edu.pk` and `lms.bahria.edu.pk` (content scripts) | The extension restyles these two sites and adds the helpers to them. It runs on no other site. |
 
-There are no other permissions, no host permissions beyond those two content-script matches, no background page, no remote code
-(`script-src 'self'`, `connect-src 'none'`).
+There are no other permissions, no host permissions beyond those two sites, no remote code
+(`script-src 'self'`, `connect-src` limited to `lms.bahria.edu.pk` and `cms.bahria.edu.pk`). The background worker is idle unless the user turns notifications on.
 
 ## Data-use answers
 
-- Does the extension collect or transmit user data? **No.** Nothing leaves the browser: it has no network access (`connect-src 'none'`, no `fetch`, no remote scripts or fonts).
+- Does the extension collect or transmit user data? **No.** Nothing is sent to the developer or any third party. The only network access is the optional notifications worker, which requests pages from `lms.bahria.edu.pk` and `cms.bahria.edu.pk` with the user's own session (`connect-src` is limited to those two hosts; `fetch` exists in `background.js` only; no remote scripts or fonts).
 - Data types to tick (Chrome "Privacy practices"): **Website content** and **Personally identifiable information**. Chrome's user-data FAQ counts any handling of user data, including data that is only processed or stored on the device and never sent anywhere, so the form must say what the extension touches: it reads text the portal already shows (course names, attendance hours, assignment titles and deadlines, the class schedule, menu links: *website content*, with a short note of open assignments kept locally) and the student's first name for the greeting (*personally identifiable information*, held in memory only). Leave authentication, financial, health, location, web history, personal communications and user activity **unticked**: it never reads passwords or form entries, and it logs no keystrokes or clicks. The privacy policy (sections 2 and 3) describes exactly this.
 - Certify: not sold to third parties, not used for purposes unrelated to the single purpose, not used for creditworthiness or lending.
 - Firefox: `data_collection_permissions` is `required: ["none"]` (already in the Firefox build).
@@ -84,7 +88,7 @@ You can still see everything it does without one:
 1. Install it and click the toolbar button, then "Open settings".
 2. The Themes page shows a live preview built from invented sample pages (sample page files are inside the package under preview/). Switch the Campus portal (CMS) / Learning portal (LMS) tabs, try the sidebar links, change themes, and for quick search click inside the preview and press Ctrl+K (or use the magnifier in the preview's header).
 3. The code is plain, unminified JavaScript (nothing is built, bundled or obfuscated; the build only copies the folder and adds the Firefox add-on ID). Source: https://github.com/ahmedammad1709/campuslit
-4. There is no network code. The manifest has connect-src 'none'; a release check (npm run package) fails if any script uses fetch, XMLHttpRequest, WebSocket, eval, or a web address outside the portals and the project page.
+4. Network code exists in one file only, background.js, and only for the optional notifications (off by default): it requests pages from lms.bahria.edu.pk and cms.bahria.edu.pk with the browser's own session and never contacts another site. The manifest's connect-src is limited to those two hosts, and a release check (npm run package) fails if any other script uses fetch, XMLHttpRequest, WebSocket or eval, if background.js names any other web address, or if a permission beyond storage, alarms and notifications is requested. To see the notifications without a student login, open Settings, Notifications, and press "Send a test notification".
 ```
 
 ## Images

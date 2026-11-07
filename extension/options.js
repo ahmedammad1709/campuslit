@@ -72,6 +72,7 @@ const SECTIONS = {
   text: ['Text & layout', 'Typeface, text size, spacing and how rounded the corners are.'],
   studio: ['Custom theme', 'Design a seventh theme. Pick a few colors and the rest is worked out for you.'],
   portals: ['Portals', 'Choose where Campuslit runs, and a couple of small extras.'],
+  notifications: ['Notifications', 'Choose what Campuslit tells you about: new work, marks, attendance and deadlines.'],
   guide: ['Guide', 'What Campuslit adds, and where to find it.'],
   privacy: ['Privacy & data', 'What Campuslit stores, and your controls.']
 };
@@ -97,7 +98,15 @@ $('goto-studio').addEventListener('click', () => showSection('studio', true, tru
 
 // ---------- controls <-> settings ----------
 const setPct = input => input.style.setProperty('--pct', ((input.value - input.min) / (input.max - input.min) * 100) + '%');
+const NOTIFY_SWITCHES = ['enabled', 'attendance', 'quizzes', 'assignments', 'lectures', 'due2d', 'due24h', 'due7h', 'sessionAlert'];
+function syncNotify() {
+  const n = settings.notify;
+  for (const key of NOTIFY_SWITCHES) $('n-' + key).checked = n[key];
+  document.querySelectorAll('#n-interval button').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.interval === n.interval)));
+  for (const id of ['n-kinds', 'n-due', 'n-how']) $(id).classList.toggle('is-off', !n.enabled);
+}
 function syncControls() {
+  syncNotify();
   for (const key of ['enabled', 'cms', 'lms', 'cleanBackground', 'motion', 'reminders', 'quickSearch', 'tips', 'openingAnimation']) $(key).checked = settings[key];
   $('font').value = settings.font; $('fontSize').value = settings.fontSize; $('radius').value = settings.radius; $('semesterWeeks').value = settings.semesterWeeks;
   setPct($('fontSize')); setPct($('radius')); setPct($('semesterWeeks')); $('weeks-output').textContent = settings.semesterWeeks + ' weeks';
@@ -195,6 +204,8 @@ document.querySelectorAll('#density-seg button').forEach(b => b.addEventListener
 $('system').addEventListener('change', e => { settings.mode = e.target.checked ? 'system' : 'preset'; renderAll(); updateDirty(); });
 system.addEventListener('change', () => { syncControls(); preview(); renderThemes(); });
 for (const key of ['cleanBackground', 'motion', 'reminders', 'quickSearch', 'tips', 'openingAnimation']) $(key).addEventListener('change', e => { settings[key] = e.target.checked; preview(); updateDirty(); });
+for (const key of NOTIFY_SWITCHES) $('n-' + key).addEventListener('change', e => { settings.notify = { ...settings.notify, [key]: e.target.checked }; syncNotify(); updateDirty(); });
+document.querySelectorAll('#n-interval button').forEach(b => b.addEventListener('click', () => { settings.notify = { ...settings.notify, interval: +b.dataset.interval }; syncNotify(); updateDirty(); }));
 for (const key of ['enabled', 'cms', 'lms']) $(key).addEventListener('change', e => { Object.assign(settings, B.power(settings, key, e.target.checked)); syncControls(); preview(); updateDirty(); });
 
 // ---------- save / export / import / reset ----------
@@ -278,4 +289,30 @@ addEventListener('beforeunload', e => { if (isDirty()) { e.preventDefault(); e.r
   try { settings = await StudioStorage.read(); baseline = JSON.stringify(settings); renderAll(); status('Your style stays on this browser.', false); }
   catch { renderAll(); status('Could not read saved preferences. Showing the default preview.', true); }
   showSection(location.hash.slice(1), false);
+})();
+
+// ---------- notifications: talk to the background worker ----------
+(function () {
+  const api = globalThis.browser || globalThis.chrome, live = StudioStorage.isExtension && api && api.runtime && api.runtime.sendMessage;
+  const ask = action => new Promise(resolve => { try { const r = api.runtime.sendMessage({ bsNotify: action }, res => resolve(res || { ok: false })); if (r && r.then) r.then(resolve, () => resolve({ ok: false })); } catch (e) { resolve({ ok: false }); } });
+  const when = t => { const m = Math.round((Date.now() - t) / 60000); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : Math.round(m / 1440) + ' days ago'; };
+  const say = (ok, session) => session === 'expired' ? 'sign in again' : ok ? 'signed in' : 'not seen yet';
+  async function showStatus() {
+    if (!live) return;
+    const st = await ask('status'), el = $('n-status');
+    if (!st.ok) { el.textContent = 'Not checked yet.'; return; }
+    el.textContent = (st.lastRun ? 'Last checked ' + when(st.lastRun) + (st.last && st.last.error ? ' (' + st.last.error + ')' : '') : 'Not checked yet') + '. Watching ' + st.courses + (st.courses === 1 ? ' course' : ' courses') + '. LMS: ' + say(true, st.session.lms) + '. CMS: ' + say(true, st.session.cms) + '.';
+  }
+  if (!live) { for (const id of ['n-test', 'n-check', 'n-forget']) $(id).disabled = true; $('n-hint').hidden = false; $('n-status').textContent = 'Not available in the browser preview.'; return; }
+  $('n-test').addEventListener('click', async () => { const r = await ask('test'); status(r.ok ? 'Test notification sent.' : 'Could not show a notification. Check your computer\'s notification settings.'); });
+  $('n-check').addEventListener('click', async () => {
+    $('n-check').disabled = true; $('n-status').textContent = 'Checking…';
+    const r = await ask('check'); $('n-check').disabled = false;
+    status(r.off ? 'Turn notifications on and save first.' : r.ok ? 'Checked. ' + (r.shown ? r.shown + ' new notification' + (r.shown === 1 ? '' : 's') + '.' : 'Nothing new.') : (r.error || 'Could not check right now.'));
+    showStatus();
+  });
+  $('n-forget').addEventListener('click', async () => { await ask('forget'); status('Forgot what it remembered. The next look starts fresh and announces nothing old.'); showStatus(); });
+  document.getElementById('nav-notifications').addEventListener('click', showStatus);
+  if (location.hash === '#notifications') showStatus();
+  addEventListener('hashchange', () => { if (location.hash === '#notifications') showStatus(); });
 })();

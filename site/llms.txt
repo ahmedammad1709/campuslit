@@ -7,7 +7,8 @@ Install: https://chromewebstore.google.com/detail/kldmhhiopdefjapkebnelablimikgh
 ## Key facts
 - Works for students of every Bahria University campus, on lms.bahria.edu.pk and cms.bahria.edu.pk only.
 - Features: six themes (Bahria, Crystal, Midnight, Linen, Grove, Bloom) and a custom-theme maker; Due soon card and assignment reminders on the LMS; attendance planner for the 75% rule and a week time table with Add to calendar on the CMS; quick search.
-- Private: makes no network requests, has no accounts or analytics, never reads passwords or form input. Open source under the MIT licence.
+- Private: sends nothing to anyone, has no accounts or analytics, never reads passwords or form input. Optional notifications (off by default) read only the two portals, using the browser's own sign-in. Open source under the MIT licence.
+- Optional notifications (off by default): attendance marked present or absent, quiz marks uploaded, new assignments, new lecture notes, and deadline reminders 2 days, 24 hours and 7 hours before.
 - Firefox 140+ is supported by manual install; the Add-ons listing is not live yet.
 
 ## Pages

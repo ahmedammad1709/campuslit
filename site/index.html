@@ -69,7 +69,8 @@
     "Due soon card and assignment reminders",
     "Attendance planner (75% rule)",
     "Week time table with Add to calendar",
-    "Quick search with Ctrl+K"
+    "Quick search with Ctrl+K",
+    "Optional desktop notifications: attendance, quiz marks, new assignments, lecture notes, deadline reminders"
    ],
    "license": "https://opensource.org/licenses/MIT",
    "isAccessibleForFree": true,
@@ -114,6 +115,14 @@
     },
     {
      "@type": "Question",
+     "name": "Does Campuslit send notifications about assignments, quiz marks and attendance?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes, optionally. In Settings, Notifications, you can turn on desktop alerts for new assignments, quiz marks, new lecture notes, attendance marked present or absent, and deadline reminders 2 days, 24 hours and 7 hours before. Campuslit looks at your portals every 1 to 8 hours while your browser is open and you are signed in, using your own session. It never sees your password and sends nothing to us. It is off until you switch it on."
+     }
+    },
+    {
+     "@type": "Question",
      "name": "Is Campuslit official?",
      "acceptedAnswer": {
       "@type": "Answer",
@@ -133,7 +142,7 @@
      "name": "Is it safe, and does it send my data anywhere?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "It changes how pages look. Forms, uploads and downloads still go to the university exactly as before, and your marks and submissions are never touched. Campuslit makes no network requests at all. On your device it keeps only your look, an optional note of open assignments so reminders work, and which tips you have seen. Switch it off from the toolbar button, or remove it, and the original portal is back. Details are in the privacy policy."
+      "text": "It changes how pages look. Forms, uploads and downloads still go to the university exactly as before, and your marks and submissions are never touched. Out of the box Campuslit makes no network requests at all. If you turn on the optional notifications, it opens pages on the two portals using your own sign-in, and nothing goes anywhere else. On your device it keeps only your look, an optional note of open assignments so reminders work, the optional notification note, and which tips you have seen. Switch it off from the toolbar button, or remove it, and the original portal is back. Details are in the privacy policy."
      }
     },
     {
@@ -200,7 +209,7 @@
       <ul class="trust">
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>Free and open source</li>
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>No accounts</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>Nothing leaves your browser</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>Nothing is sent to us or anyone else</li>
       </ul>
       <div class="hero-visual reveal">
         <figure class="frame big compare" data-compare data-sweep>
@@ -241,9 +250,10 @@
         <div><dt>What it is</dt><dd>A browser extension that restyles the Bahria University LMS and CMS</dd></div>
         <div><dt>Works on</dt><dd>lms.bahria.edu.pk and cms.bahria.edu.pk, for students of every Bahria campus</dd></div>
         <div><dt>Features</dt><dd>Six themes and a custom theme, due-date reminders, attendance planner, week time table with calendar export, quick search (Ctrl+K)</dd></div>
+        <div><dt>Alerts</dt><dd>Optional desktop notifications (off by default): attendance marked, quiz marks, new assignments, new lecture notes, and deadline reminders at 2 days, 24 hours and 7 hours</dd></div>
         <div><dt>Price</dt><dd>Free, no sign-up, no ads</dd></div>
         <div><dt>Browsers</dt><dd>Chrome, Edge and Brave (from the Chrome Web Store); Firefox 140+ (manual)</dd></div>
-        <div><dt>Privacy</dt><dd>Makes no network requests, collects nothing, open source (MIT)</dd></div>
+        <div><dt>Privacy</dt><dd>Sends nothing to anyone, collects nothing, open source (MIT)</dd></div>
         <div><dt>Official?</dt><dd>No. Independent student project, not affiliated with Bahria University</dd></div>
       </dl>
       <p class="about-links reveal">Read more: <a href="bahria-lms">Bahria University LMS redesign</a> &middot; <a href="bahria-cms">Bahria University CMS: attendance planner and time table</a> &middot; <a href="privacy">Privacy policy</a></p>
@@ -402,7 +412,7 @@
           <h2>It never sees your password, and it cannot send anything anywhere.</h2>
         </div>
         <ul class="band-list">
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>No server, no accounts, no analytics. The extension makes no network requests.</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>No server, no accounts, no analytics. It makes no requests at all unless you turn on notifications, and then only to the two portals.</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>It never reads what you type into a form.</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>Open source under the MIT licence, so anyone can check.</li>
         </ul>
@@ -426,9 +436,10 @@
         <details class="reveal"><summary>What is Campuslit? Is it the same as Campus Lit?</summary><div class="details-body"><p>Yes, the same thing: Campuslit, Campus Lit and CampusLit all mean this free, open-source browser extension that redesigns the Bahria University student CMS and LMS. It keeps your logins and data, and adds themes, an attendance planner, due-date reminders, a readable time table and quick search.</p></div></details>
         <details class="reveal"><summary>Is there a Chrome extension to redesign the Bahria University LMS and CMS?</summary><div class="details-body"><p>Yes. Campuslit is on the <a href="https://chromewebstore.google.com/detail/kldmhhiopdefjapkebnelablimikghio" rel="noopener">Chrome Web Store</a> and works in Chrome, Edge and Brave on a computer. It runs on lms.bahria.edu.pk and cms.bahria.edu.pk and is free.</p></div></details>
         <details class="reveal"><summary>How do I install Campuslit?</summary><div class="details-body"><p>Open the <a href="https://chromewebstore.google.com/detail/kldmhhiopdefjapkebnelablimikghio" rel="noopener">Campuslit page on the Chrome Web Store</a>, click Add to Chrome, then open your CMS or LMS and sign in as usual. The new look appears on its own. Pin the Campuslit button to your toolbar to change themes or switch it off.</p></div></details>
+        <details class="reveal"><summary>Does Campuslit send notifications about assignments, quiz marks and attendance?</summary><div class="details-body"><p>Yes, optionally. In Settings, Notifications, you can turn on desktop alerts for new assignments, quiz marks, new lecture notes, attendance marked present or absent, and deadline reminders 2 days, 24 hours and 7 hours before. Campuslit looks at your portals every 1 to 8 hours while your browser is open and you are signed in, using your own session. It never sees your password and sends nothing to us. It is off until you switch it on.</p></div></details>
         <details class="reveal"><summary>Is Campuslit official?</summary><div class="details-body"><p>No. It is an independent project made by students and is not made, endorsed or supported by Bahria University. The university&rsquo;s name and emblem belong to the university, and are used here only to say which websites Campuslit works on.</p></div></details>
         <details class="reveal"><summary>Which campuses does it work for?</summary><div class="details-body"><p>All of them. Campuslit runs on the two student portals every campus uses, so it does not matter where you study. It was built using pages from one campus, so if a screen at yours looks wrong, <a href="https://github.com/ahmedammad1709/campuslit/issues">tell us</a> and it will be fixed.</p></div></details>
-        <details class="reveal"><summary>Is it safe, and does it send my data anywhere?</summary><div class="details-body"><p>It changes how pages look. Forms, uploads and downloads still go to the university exactly as before, and your marks and submissions are never touched. Campuslit makes no network requests at all. On your device it keeps only your look, an optional note of open assignments so reminders work, and which tips you have seen. Switch it off from the toolbar button, or remove it, and the original portal is back. Details are in the <a href="privacy">privacy policy</a>.</p></div></details>
+        <details class="reveal"><summary>Is it safe, and does it send my data anywhere?</summary><div class="details-body"><p>It changes how pages look. Forms, uploads and downloads still go to the university exactly as before, and your marks and submissions are never touched. Out of the box Campuslit makes no network requests at all. If you turn on the optional notifications, it opens pages on the two portals using your own sign-in, and nothing goes anywhere else. On your device it keeps only your look, an optional note of open assignments so reminders work, the optional notification note, and which tips you have seen. Switch it off from the toolbar button, or remove it, and the original portal is back. Details are in the <a href="privacy">privacy policy</a>.</p></div></details>
         <details class="reveal"><summary>Can I rely on the attendance numbers?</summary><div class="details-body"><p>Treat them as a helpful estimate. They are worked out from the hours the portal shows, your credit hours and the semester length you set. The university&rsquo;s own records are what count.</p></div></details>
         <details class="reveal"><summary>Which browsers work? What about my phone?</summary><div class="details-body"><p>Chrome, Edge and Brave (install from the Chrome Web Store) and Firefox 140 or newer, on a computer. Most phone browsers do not run extensions like this.</p></div></details>
         <details class="reveal"><summary>The university changed its pages and something looks off.</summary><div class="details-body"><p>That can happen. Switch Campuslit off for that portal and the page is back to normal, then <a href="https://github.com/ahmedammad1709/campuslit/issues">report it on GitHub</a> with a screenshot (hide your name and enrollment number first).</p></div></details>

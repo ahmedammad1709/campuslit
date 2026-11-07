@@ -23,8 +23,16 @@ test('system appearance resolves to Midnight only in dark mode',()=>{
 });
 test('manifest is confined to both portals and storage',()=>{
   const m=JSON.parse(fs.readFileSync('extension/manifest.json','utf8'));
-  assert.deepEqual(m.permissions,['storage']);assert.deepEqual(m.content_scripts[0].matches,['*://cms.bahria.edu.pk/*','*://lms.bahria.edu.pk/*']);assert.equal(m.content_scripts[0].all_frames,true);assert.ok(m.content_security_policy.extension_pages.includes("connect-src 'none'"));
+  assert.deepEqual(m.permissions,['storage','alarms','notifications']);assert.deepEqual(m.host_permissions,['https://lms.bahria.edu.pk/*','https://cms.bahria.edu.pk/*']);assert.deepEqual(m.background,{service_worker:'background.js'});assert.deepEqual(m.content_scripts[0].matches,['*://cms.bahria.edu.pk/*','*://lms.bahria.edu.pk/*']);assert.equal(m.content_scripts[0].all_frames,true);assert.ok(m.content_security_policy.extension_pages.includes('connect-src https://lms.bahria.edu.pk https://cms.bahria.edu.pk;'));
   for(const file of [...m.content_scripts[0].js,...m.content_scripts[0].css,m.action.default_popup,m.options_ui.page]) assert.ok(fs.existsSync(path.join('extension',file)),file);
+});
+test('only the background worker can make requests, and it can only name the two portals',()=>{
+  const code=fs.readFileSync('extension/background.js','utf8');
+  assert.ok((code.match(/(?<![\w$.])fetch\s*\(/g)||[]).length===1,'one fetch call, inside get()');
+  assert.match(code,/const OURS = \/\^https:\\\/\\\/\(\?:lms\|cms\)\\\.bahria\\\.edu\\\.pk/,'every request is checked against the portals');
+  assert.match(code,/credentials: 'include'/);
+  for(const url of code.match(/https?:\/\/[^\s'"`)]+/g)||[]) assert.match(url,/^https:\/\/(?:lms|cms)\.bahria\.edu\.pk/,url);
+  assert.doesNotMatch(code,/XMLHttpRequest|WebSocket|sendBeacon|storage\.sync|document\.cookie|chrome\.cookies|eval\s*\(/);
 });
 test('runtime does not contain network clients, cookies, sync storage or form-value access',()=>{
   for(const file of ['content.js','themes.js','storage.js','options.js','popup.js']){

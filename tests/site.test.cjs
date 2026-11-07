@@ -133,7 +133,7 @@ test('the site map and robots file list every page and nothing else', () => {
 
 test('the home page says plainly what Campuslit is, who it is for, and that it is unofficial', () => {
   const text = decode(pages[0].html.replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ');
-  for (const phrase of ['free browser extension', 'every campus', 'Bahria University', 'Unofficial', 'cms.bahria.edu.pk', 'lms.bahria.edu.pk', 'Nothing leaves your browser', 'not made, endorsed or supported by Bahria University'])
+  for (const phrase of ['free browser extension', 'every campus', 'Bahria University', 'Unofficial', 'cms.bahria.edu.pk', 'lms.bahria.edu.pk', 'Nothing is sent to us or anyone else', 'not made, endorsed or supported by Bahria University'])
     assert.ok(text.includes(phrase), 'home page mentions: ' + phrase);
   assert.ok(/<h1[^>]*>[^<]*Bahria University LMS and CMS/.test(pages[0].html), 'the headline names the portals');
   assert.ok(/estimate/i.test(text), 'the attendance numbers are described as an estimate');
@@ -142,7 +142,7 @@ test('the home page says plainly what Campuslit is, who it is for, and that it i
 
 test('the home page stays short: few words, one idea per section, no section repeated', () => {
   const html = pages[0].html, text = decode(html.replace(/<script[\s\S]*?<\/script>/g, ' ').replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim();
-  assert.ok(text.split(' ').length < 1600, 'home page words: ' + text.split(' ').length);
+  assert.ok(text.split(' ').length < 1750, 'home page words: ' + text.split(' ').length);
   const sections = [...html.matchAll(/<(?:section|div)[^>]*\sid="(features|themes|install|faq|trust)"/g)].map(m => m[1]);
   assert.deepEqual(sections, ['features', 'themes', 'install', 'trust', 'faq'], 'sections, in order');
   assert.ok((html.match(/<h2[\s>]/g) || []).length <= 6, 'at most six headed sections');
@@ -190,11 +190,12 @@ test('the privacy policy numbers match the code: the reminder note expires after
 test('the privacy policy matches what the extension really stores and requests', () => {
   const policy = decode(read('privacy.html').replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ');
   const manifest = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'extension', 'manifest.json'), 'utf8'));
-  assert.deepEqual(manifest.permissions, ['storage']);
+  assert.deepEqual(manifest.permissions, ['storage', 'alarms', 'notifications']);
+  for (const word of ['Notifications', 'alarms', 'off by default', 'Forget what it remembers', 'never signs in for you']) assert.ok(policy.includes(word), 'policy says: ' + word);
   for (const match of manifest.content_scripts[0].matches) { const host = match.replace('*://', '').replace('/*', ''); assert.ok(policy.includes(host), 'policy names ' + host); }
-  for (const phrase of ['Security', 'Children', 'Kept for', '150 days', 'Your choices and rights', 'public history on GitHub', 'content security policy', 'No accounts, no analytics, no tracking', 'never reads your password', 'reminder note', 'Tip flags', 'Reset all settings', 'Forget remembered assignments', 'not made, endorsed or supported', 'Effective 2 November 2026', 'Vercel', 'does not use browser cloud sync'])
+  for (const phrase of ['Security', 'Children', 'Kept for', '150 days', 'Your choices and rights', 'public history on GitHub', 'content security policy', 'No accounts, no analytics, no tracking', 'never reads your password', 'reminder note', 'Tip flags', 'Reset all settings', 'Forget remembered assignments', 'not made, endorsed or supported', 'Effective 7 November 2026', 'Vercel', 'does not use browser cloud sync'])
     assert.ok(policy.toLowerCase().includes(phrase.toLowerCase()), 'policy says: ' + phrase);
-  assert.match(manifest.content_security_policy.extension_pages, /connect-src 'none'/, 'the claim "no network" is enforced by the extension');
+  assert.match(manifest.content_security_policy.extension_pages, /connect-src https:\/\/lms\.bahria\.edu\.pk https:\/\/cms\.bahria\.edu\.pk;/, 'the policy says requests go only to the two portals, and the extension enforces it');
   // every key the extension saves has to be disclosed
   const storage = fs.readFileSync(path.resolve(__dirname, '..', 'extension', 'storage.js'), 'utf8');
   assert.ok(/bahriaStudioPreferences/.test(storage) && /bahriaStudioReminders/.test(storage) && /BahriaGuide\.KEY/.test(storage), 'the extension saves exactly: settings, reminder note, tip flags');

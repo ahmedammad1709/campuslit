@@ -27,6 +27,7 @@
       <a id="nav-text" href="#text" data-section="text"><span data-icon="type"></span>Text &amp; layout</a>
       <a id="nav-studio" href="#studio" data-section="studio"><span data-icon="palette"></span>Custom theme<span class="nav-tag">New</span></a>
       <a id="nav-portals" href="#portals" data-section="portals"><span data-icon="layers"></span>Portals</a>
+      <a id="nav-notifications" href="#notifications" data-section="notifications"><span data-icon="bell"></span>Notifications<span class="nav-tag">New</span></a>
       <a id="nav-guide" href="#guide" data-section="guide"><span data-icon="spark"></span>Guide</a>
       <a id="nav-privacy" href="#privacy" data-section="privacy"><span data-icon="shield"></span>Privacy &amp; data</a>
     </nav>
@@ -183,6 +184,76 @@
         </section>
 
         <!-- Guide -->
+        <section class="panel" id="section-notifications" aria-labelledby="section-title" hidden>
+          <div class="group">
+            <div class="group-title"><h3>Notifications</h3></div>
+            <label class="row">
+              <span class="row-text"><strong>Send me notifications</strong><small>Off until you turn it on. Campuslit then looks at your portals now and then and tells you what changed.</small></span>
+              <input id="n-enabled" name="n-enabled" type="checkbox" role="switch"><span class="track" aria-hidden="true"></span>
+            </label>
+            <p class="group-note">How it works: while your browser is open and you are signed in to the LMS and CMS, Campuslit opens the same pages you would (your assignments, quizzes and lecture notes for each course, and the attendance on the CMS dashboard) and compares them with the last time. Everything stays in this browser. It never signs in for you and never sees your password. If your portal session ends, it says so once; sign in again to carry on. Remember to save your changes.</p>
+          </div>
+          <div class="group" id="n-kinds">
+            <div class="group-title"><h3>Tell me when</h3></div>
+            <label class="row">
+              <span class="row-text"><strong>Attendance is marked</strong><small>Present or absent, with your new percentage. Warns you at or below 75%.</small></span>
+              <input id="n-attendance" name="n-attendance" type="checkbox" role="switch" checked><span class="track" aria-hidden="true"></span>
+            </label>
+            <label class="row">
+              <span class="row-text"><strong>Quiz marks are uploaded</strong><small>Also when a new quiz is posted.</small></span>
+              <input id="n-quizzes" name="n-quizzes" type="checkbox" role="switch" checked><span class="track" aria-hidden="true"></span>
+            </label>
+            <label class="row">
+              <span class="row-text"><strong>A new assignment is posted</strong><small>Also when its marks arrive or the deadline is extended.</small></span>
+              <input id="n-assignments" name="n-assignments" type="checkbox" role="switch" checked><span class="track" aria-hidden="true"></span>
+            </label>
+            <label class="row">
+              <span class="row-text"><strong>A new lecture note appears</strong><small>A new week, or a new file on an existing week.</small></span>
+              <input id="n-lectures" name="n-lectures" type="checkbox" role="switch" checked><span class="track" aria-hidden="true"></span>
+            </label>
+          </div>
+          <div class="group" id="n-due">
+            <div class="group-title"><h3>Deadline reminders</h3></div>
+            <p class="group-note">For assignments you have not submitted. Tick the ones you want.</p>
+            <label class="row">
+              <span class="row-text"><strong>2 days before</strong><small>A first heads-up.</small></span>
+              <input id="n-due2d" name="n-due2d" type="checkbox" role="switch" checked><span class="track" aria-hidden="true"></span>
+            </label>
+            <label class="row">
+              <span class="row-text"><strong>24 hours before</strong><small>The day before it is due.</small></span>
+              <input id="n-due24h" name="n-due24h" type="checkbox" role="switch" checked><span class="track" aria-hidden="true"></span>
+            </label>
+            <label class="row">
+              <span class="row-text"><strong>7 hours before</strong><small>The last reminder.</small></span>
+              <input id="n-due7h" name="n-due7h" type="checkbox" role="switch" checked><span class="track" aria-hidden="true"></span>
+            </label>
+          </div>
+          <div class="group" id="n-how">
+            <div class="group-title"><h3>How often to look</h3></div>
+            <div class="segmented block" id="n-interval" role="group" aria-label="How often to look at the portals">
+              <button type="button" data-interval="60" aria-pressed="false">Every hour</button>
+              <button type="button" data-interval="120" aria-pressed="true">2 hours</button>
+              <button type="button" data-interval="240" aria-pressed="false">4 hours</button>
+              <button type="button" data-interval="480" aria-pressed="false">8 hours</button>
+            </div>
+            <p class="group-note">Gentle on the university's servers: a handful of page requests per look, spaced out. Deadline reminders are worked out on your device and are on time whatever you choose here.</p>
+            <label class="row">
+              <span class="row-text"><strong>Tell me when I need to sign in again</strong><small>One notice when a portal session ends, so alerts do not silently stop.</small></span>
+              <input id="n-sessionAlert" name="n-sessionAlert" type="checkbox" role="switch" checked><span class="track" aria-hidden="true"></span>
+            </label>
+          </div>
+          <div class="group">
+            <div class="group-title"><h3>Status</h3></div>
+            <p id="n-status" class="group-note" role="status">Not checked yet.</p>
+            <div class="data-actions">
+              <button id="n-test" class="btn secondary" type="button"><span data-icon="bell"></span>Send a test notification</button>
+              <button id="n-check" class="btn secondary" type="button"><span data-icon="reset"></span>Check now</button>
+              <button id="n-forget" class="btn secondary" type="button"><span data-icon="trash"></span>Forget what it remembers</button>
+            </div>
+            <p id="n-hint" class="group-note" hidden>Notifications run in the installed extension. In this browser preview the buttons are switched off.</p>
+            <p class="group-note">If a test notification does not appear, check that your computer allows notifications from your browser (on Windows: Settings, System, Notifications; turn off Focus assist for a moment).</p>
+          </div>
+        </section>
         <section class="panel" id="section-guide" aria-labelledby="section-title" hidden>
           <div class="group">
             <div class="group-title"><h3>What Campuslit adds</h3></div>
@@ -257,7 +328,7 @@
           <div class="group">
             <div class="group-title"><h3>What Campuslit does with your data</h3></div>
             <ul class="facts">
-              <li><span data-icon="check"></span><span>No accounts, no analytics, no tracking, and no requests to any server of ours.</span></li>
+              <li><span data-icon="check"></span><span>No accounts, no analytics, no tracking, and nothing sent to any server of ours. Only if you turn on notifications does Campuslit open pages on the two portals, with your own sign-in.</span></li>
               <li><span data-icon="check"></span><span>Only your appearance choices are stored, in this browser, plus the short assignment-reminder note described under Portals (which you can turn off or forget) and a few yes/no flags for the tips you have dismissed.</span></li>
               <li><span data-icon="check"></span><span>Passwords and form fields are never read. A few screens are redrawn from figures the page already shows (your first name, courses, attendance, time table); they stay in memory and are never saved or sent.</span></li>
             </ul>

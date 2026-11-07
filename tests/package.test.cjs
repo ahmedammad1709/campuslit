@@ -40,19 +40,19 @@ test('zip: a damaged archive is detected, not read as if it were fine', async ()
 
 // ---- the audit ----
 const MANIFEST = {
-  manifest_version: 3, name: 'Campuslit', version: '1.2.3', description: 'A short description.', permissions: ['storage'],
+  manifest_version: 3, name: 'Campuslit', version: '1.2.3', description: 'A short description.', permissions: ['storage', 'alarms', 'notifications'], host_permissions: ['https://cms.bahria.edu.pk/*', 'https://lms.bahria.edu.pk/*'], background: { service_worker: 'background.js' },
   web_accessible_resources: [{ resources: ['fonts/a.woff2'], matches: ['*://cms.bahria.edu.pk/*', '*://lms.bahria.edu.pk/*'] }],
   action: { default_popup: 'popup.html' }, options_ui: { page: 'options.html' }, icons: { 16: 'icons/icon-16.png' },
   content_scripts: [{ matches: ['*://cms.bahria.edu.pk/*', '*://lms.bahria.edu.pk/*'], js: ['content.js'], css: ['portal.css'] }],
-  content_security_policy: { extension_pages: "script-src 'self'; object-src 'none'; connect-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'" }
+  content_security_policy: { extension_pages: "script-src 'self'; object-src 'none'; connect-src https://lms.bahria.edu.pk https://cms.bahria.edu.pk; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'" }
 };
-const FIREFOX = { ...MANIFEST, browser_specific_settings: { gecko: { id: 'campuslit@example.org', strict_min_version: '140.0', data_collection_permissions: { required: ['none'] } } } };
+const FIREFOX = { ...MANIFEST, background: { scripts: ['background.js'] }, browser_specific_settings: { gecko: { id: 'campuslit@example.org', strict_min_version: '140.0', data_collection_permissions: { required: ['none'] } } } };
 function build(browser = 'chrome', change = () => {}) {
   const manifest = JSON.parse(JSON.stringify(browser === 'firefox' ? FIREFOX : MANIFEST));
   const files = new Map([
     ['popup.html', B('<!doctype html><link rel="stylesheet" href="portal.css"><script src="popup.js"></script>')], ['options.html', B('<!doctype html><a href="https://github.com/ahmedammad1709/campuslit">code</a>')],
     ['popup.js', B('el.innerHTML = icon("check");')], ['content.js', B("document.body.append(document.createTextNode('hi'));")], ['portal.css', B('a { background: url(fonts/a.woff2); } svg { fill: #fff }')],
-    ['icons/icon-16.png', Buffer.from([137, 80, 78, 71])], ['fonts/a.woff2', Buffer.from([1, 2, 3])]
+    ['background.js', B("importScripts('x.js'); fetch('https://lms.bahria.edu.pk/Student/Dashboard.php');")], ['icons/icon-16.png', Buffer.from([137, 80, 78, 71])], ['fonts/a.woff2', Buffer.from([1, 2, 3])]
   ]);
   const ctx = { manifest, files }; change(ctx);
   files.set('manifest.json', B(JSON.stringify(ctx.manifest)));
@@ -69,17 +69,20 @@ test('audit: a clean build passes for both browsers', async () => {
 test('audit: manifest mistakes are caught', async () => {
   const cases = [
     ['version that differs from package.json', c => { c.manifest.version = '9.9.9'; }, 'does not match'],
-    ['an extra permission', c => { c.manifest.permissions = ['storage', 'tabs']; }, 'permissions'],
-    ['host permissions', c => { c.manifest.host_permissions = ['<all_urls>']; }, 'host_permissions'],
-    ['a background script', c => { c.manifest.background = { service_worker: 'bg.js' }; }, 'background'],
+    ['an extra permission', c => { c.manifest.permissions = ['storage', 'alarms', 'notifications', 'tabs']; }, 'permissions'],
+    ['a missing permission', c => { c.manifest.permissions = ['storage']; }, 'permissions'],
+    ['host permissions for every site', c => { c.manifest.host_permissions = ['<all_urls>']; }, 'host_permissions'],
+    ['a third host', c => { c.manifest.host_permissions.push('https://example.com/*'); }, 'host_permissions'],
+    ['a different background script', c => { c.manifest.background = { service_worker: 'bg.js' }; }, 'background'],
     ['content scripts on every site', c => { c.manifest.content_scripts[0].matches = ['<all_urls>']; }, 'only the two Bahria portals'],
     ['an added site', c => { c.manifest.content_scripts[0].matches.push('*://example.com/*'); }, 'only the two Bahria portals'],
     ['an icon that is not in the package', c => { c.manifest.icons[48] = 'icons/missing.png'; }, 'icons/missing.png'],
     ['a content script that is not in the package', c => { c.manifest.content_scripts[0].js.push('gone.js'); }, 'gone.js'],
     ['a description over 132 characters', c => { c.manifest.description = 'x'.repeat(133); }, 'description'],
     ['a name over 75 characters', c => { c.manifest.name = 'x'.repeat(76); }, 'name'],
-    ['a CSP that allows connections', c => { c.manifest.content_security_policy.extension_pages = "script-src 'self'; connect-src https://x.example"; }, 'CSP'],
-    ['a CSP that allows eval', c => { c.manifest.content_security_policy.extension_pages = "script-src 'self' 'unsafe-eval'; connect-src 'none'"; }, 'CSP'],
+    ['a CSP that allows connections to another site', c => { c.manifest.content_security_policy.extension_pages = "script-src 'self'; connect-src https://lms.bahria.edu.pk https://cms.bahria.edu.pk https://x.example"; }, 'CSP'],
+    ['a CSP that allows any connection', c => { c.manifest.content_security_policy.extension_pages = "script-src 'self'; connect-src *"; }, 'CSP'],
+    ['a CSP that allows eval', c => { c.manifest.content_security_policy.extension_pages = "script-src 'self' 'unsafe-eval'; connect-src https://lms.bahria.edu.pk https://cms.bahria.edu.pk"; }, 'CSP'],
     ['fonts shared with every site', c => { c.manifest.web_accessible_resources[0].matches = ['<all_urls>']; }, 'web_accessible_resources'],
     ['manifest version 2', c => { c.manifest.manifest_version = 2; }, 'manifest_version']
   ];
@@ -96,6 +99,10 @@ test('audit: Firefox needs its ID and a no-data-collection declaration; Chrome m
 test('audit: anything that could send data or run remote or generated code is caught', async () => {
   const cases = [['fetch(', "fetch('https://x.example/a')"], ['XMLHttpRequest', 'new XMLHttpRequest()'], ['WebSocket', "new WebSocket('wss://x.example')"], ['sendBeacon', 'navigator.sendBeacon(u, d)'], ['eval()', 'eval(code)'], ['new Function()', "new Function('return 1')"], ['document.write()', 'document.write(x)']];
   for (const [word, code] of cases) assert.ok(mentions(await run(build('chrome', c => c.files.set('popup.js', B(code)))), word), word);
+  // the background worker may fetch and import its helpers, and nobody else; and it may only name the two portals
+  assert.ok(mentions(await run(build('chrome', c => c.files.set('content.js', B("fetch('https://lms.bahria.edu.pk/a')")))), 'fetch()'), 'a content script may not fetch');
+  assert.ok(mentions(await run(build('chrome', c => c.files.set('popup.js', B("importScripts('a.js')")))), 'importScripts'));
+  assert.ok(mentions(await run(build('chrome', c => c.files.set('background.js', B("fetch('https://x.example/a')")))), 'x.example'), 'the worker may not reach another site');
   assert.deepEqual(await run(build('chrome', c => c.files.set('popup.js', B("const s = prefetch(); el.retrieval = 1; evaluate(2); obj.fetch(1);")))), [], 'similar-looking names are not flagged');
 });
 

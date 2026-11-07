@@ -43,7 +43,7 @@
       <p class="kicker">Legal</p>
       <h1>Privacy Policy</h1>
       <p>Campuslit is built so that your information stays with you. This page explains exactly what the extension and this website do with it.</p>
-      <div class="doc-meta"><span>Effective 2 November 2026</span><span>Applies to the Campuslit extension 1.0 and this website</span><span>Version history is public on GitHub</span></div>
+      <div class="doc-meta"><span>Effective 7 November 2026</span><span>Applies to the Campuslit extension 1.1 and this website</span><span>Version history is public on GitHub</span></div>
     </div>
   </div>
 
@@ -57,6 +57,7 @@
         <li><a href="#stores">What it stores, and for how long</a></li>
         <li><a href="#never">What it never does</a></li>
         <li><a href="#permissions">Permissions</a></li>
+        <li><a href="#notify">Notifications</a></li>
         <li><a href="#security">Security</a></li>
         <li><a href="#website">This website</a></li>
         <li><a href="#portals">The university portals</a></li>
@@ -70,7 +71,7 @@
       <section id="glance" class="glance">
         <h2>At a glance</h2>
         <ul class="list">
-          <li><b>No accounts, no analytics, no tracking.</b> Campuslit has no server of its own and makes no network requests.</li>
+          <li><b>No accounts, no analytics, no tracking.</b> Campuslit has no server of its own and sends nothing to us or to anyone else. Out of the box it makes no network requests at all; only if you turn on notifications does it open pages on the two portals, with your own session (see Notifications below).</li>
           <li><b>It never reads your password</b> or anything you type into a form on the portals.</li>
           <li><b>It runs only on <code>cms.bahria.edu.pk</code> and <code>lms.bahria.edu.pk</code></b>, the student portals of Bahria University, and nowhere else.</li>
           <li><b>What it keeps stays on your device:</b> your appearance choices, an optional short note of open assignments so reminders work, and which tips you have seen.</li>
@@ -110,6 +111,7 @@
           <tbody>
             <tr><td>Appearance settings</td><td>Your theme and any custom theme you design (its name and colours), font, text size, spacing, corner roundness, background and motion options, sidebar width, Week or List time table choice, semester length, and your on/off choices for the CMS, the LMS and each feature</td><td>Until you reset them or remove the extension</td><td>Settings &rsaquo; Privacy &amp; data &rsaquo; Reset all settings</td></tr>
             <tr><td>Assignment reminder note <em>(optional, on by default)</em></td><td>For each course: its name, the semester, and the titles and deadlines of assignments you have not submitted. It is used only to show a reminder on other LMS pages</td><td>Each entry is deleted automatically after 150 days. A reminder you close is hidden for 8 hours</td><td>Turn reminders off (this deletes it) or press Forget remembered assignments in Settings &rsaquo; Portals</td></tr>
+            <tr><td>Notification note <em>(optional, off by default)</em></td><td>Only if you turn notifications on: for each course, the titles, marks and deadlines of assignments, quizzes and lecture notes; your present and absent hours for each course; and the notifications already shown</td><td>Until you turn notifications off, forget it, or remove the extension. Notices already shown are forgotten after 30 days</td><td>Settings &rsaquo; Notifications &rsaquo; Forget what it remembers, or turn notifications off</td></tr>
             <tr><td>Tip flags</td><td>A few yes/no facts: whether the welcome was shown, whether a tour replay was requested, and which one-time hints you dismissed</td><td>Until you reset them or remove the extension</td><td>Settings &rsaquo; Guide &rsaquo; Show the hints again, or Reset all settings</td></tr>
           </tbody>
         </table></div>
@@ -119,7 +121,7 @@
       <section id="never">
         <h2><small>4</small>What it never does</h2>
         <ul class="list">
-          <li>It never sends anything to us or to anyone else. The extension makes no network requests, its security policy blocks all outgoing connections, and each release is checked to confirm that no code can make them.</li>
+          <li>It never sends anything to us or to anyone else. Its security policy allows connections only to the two portals, and each release is checked to confirm that no code can reach anywhere else. With notifications off, it makes no requests at all.</li>
           <li>It never collects, sells, shares or profiles personal information, and it shows no ads.</li>
           <li>It never changes your marks, your submissions or the data the university shows you. It changes only how pages look and adds helpers on top.</li>
           <li>It never loads code or fonts from the internet. Everything it needs is inside the extension.</li>
@@ -131,35 +133,50 @@
         <p>Campuslit asks the browser for as little as possible:</p>
         <ul class="list">
           <li><b>Storage</b>, to remember the items in section 3 on this device.</li>
+          <li><b>Notifications</b> and <b>alarms</b>, to show the alerts you choose and to wake the checker on a timer. Nothing is shown or checked unless you turn notifications on.</li>
           <li><b>Access to the two portals only</b> (<code>cms.bahria.edu.pk</code> and <code>lms.bahria.edu.pk</code>), so it can restyle them. It cannot run on any other website.</li>
         </ul>
-        <p>It has no background process, no access to your tabs or browsing history, and no other permission.</p>
+        <p>It has a small background process that does nothing unless you turn notifications on, no access to your tabs or browsing history, and no other permission.</p>
       </section>
 
+      <section id="notify">
+        <h2><small>6</small>Notifications (optional)</h2>
+        <p>Notifications are <b>off by default</b>. If you turn them on in Settings, a small background process wakes up every 1 to 8 hours (your choice) while your browser is open and opens a handful of pages on the two portals: the same pages you would open yourself, namely your assignments, quizzes and lecture notes for each course on the LMS, and the attendance shown on the CMS dashboard. It compares them with the last time it looked and shows a notification on your computer when something is new.</p>
+        <ul class="list">
+          <li>It uses the portal session you are already signed in with. It never signs in for you, never asks for or sees your password, and cannot look once your session ends. It tells you once, so you can sign in again.</li>
+          <li>It talks only to <code>lms.bahria.edu.pk</code> and <code>cms.bahria.edu.pk</code>, never to us or to anyone else. The comparison happens on your device.</li>
+          <li>It keeps a note on your device of what it last saw: for each course the titles, marks and deadlines of assignments, quizzes and lecture notes; your present and absent hours for each course; and which notifications it has already shown. It is deleted when you turn notifications off, when you press <em>Forget what it remembers</em>, or when you remove the extension.</li>
+          <li>Notifications show course names, titles and marks on your screen. Anyone who can see your screen can read them; your computer&rsquo;s notification settings control that.</li>
+          <li>It is gentle on the university&rsquo;s servers: requests are spaced out, capped for each look, and none are made while your browser is closed.</li>
+        </ul>
+        <p>You can switch each kind of notification on or off separately in Settings &rsaquo; Notifications.</p>
+      </section>
+
+
       <section id="security">
-        <h2><small>6</small>Security</h2>
+        <h2><small>7</small>Security</h2>
         <p>Campuslit is designed so that a mistake cannot leak your information, because there is nowhere for it to go.</p>
         <ul class="list">
-          <li>Its pages follow a strict content security policy that blocks every outgoing connection and any code that is not packaged inside the extension.</li>
+          <li>Its pages follow a strict content security policy that blocks every outgoing connection except to the two portals, and any code that is not packaged inside the extension.</li>
           <li>Text it reads from the portals is shown as plain text, never as code, so a hostile page cannot use Campuslit to inject anything.</li>
-          <li>Every release is checked automatically before it is published: it must request no permission beyond storage, run only on the two portals, contain no network or dynamic-code calls, and contain no personal-data patterns.</li>
+          <li>Every release is checked automatically before it is published: it must request no permission beyond storage, notifications and alarms, reach only the two portals, allow network calls in one file only (the background checker) and only to those portals, contain no dynamic-code calls, and contain no personal-data patterns.</li>
           <li>The source code is public, so security researchers and students can read and test it.</li>
         </ul>
         <p>No software is perfect. If you find a weakness, please <a href="https://github.com/ahmedammad1709/campuslit/issues">open an issue</a> describing the problem without posting private details, and it will be fixed promptly.</p>
       </section>
 
       <section id="website">
-        <h2><small>7</small>This website</h2>
+        <h2><small>8</small>This website</h2>
         <p>This website describes Campuslit. It has no accounts, no forms, no cookies and no analytics, and it loads its fonts and images from itself. It is hosted on Vercel, which, like any web host, may keep standard server logs (such as your IP address, the time and the page requested) to run and protect the service, under <a href="https://vercel.com/legal/privacy-policy">its own privacy policy</a>. We do not receive or use those logs. Links to GitHub and other sites leave this website, and those sites have their own policies.</p>
       </section>
 
       <section id="portals">
-        <h2><small>8</small>The university portals</h2>
+        <h2><small>9</small>The university portals</h2>
         <p>The CMS and LMS belong to Bahria University and are run by it. This policy covers Campuslit only. How the university handles your information on its portals is governed by its own rules, and Campuslit does not change that. Campuslit cannot promise anything about what the portals themselves send or store.</p>
       </section>
 
       <section id="control">
-        <h2><small>9</small>Your choices and rights</h2>
+        <h2><small>10</small>Your choices and rights</h2>
         <ul class="list">
           <li>The toolbar button has one switch for everything, and one each for the CMS and the LMS. Switch it off and the original pages return at once.</li>
           <li>Settings can turn off assignment reminders, quick search, tips and the opening animation, and can forget the reminder note, show the hints again, or reset everything.</li>
@@ -169,13 +186,13 @@
       </section>
 
       <section id="children">
-        <h2><small>10</small>Children</h2>
+        <h2><small>11</small>Children</h2>
         <p>Campuslit is made for university students. It collects no information from anyone, including children, and it has no accounts or features that contact people.</p>
       </section>
 
 
       <section id="changes">
-        <h2><small>11</small>Changes and contact</h2>
+        <h2><small>12</small>Changes and contact</h2>
         <p>If Campuslit&rsquo;s handling of information ever changes, this page will be updated first and the effective date at the top will change. Every earlier version stays visible in the project&rsquo;s <a href="https://github.com/ahmedammad1709/campuslit/commits/main/site/privacy.html">public history on GitHub</a>. If a change would involve collecting anything from users, it will be announced on this page and in the release notes before it ships.</p>
         <p>Questions, concerns or requests: <a href="https://github.com/ahmedammad1709/campuslit/issues">open an issue on GitHub</a>. Please do not post passwords, enrollment numbers or other private details there.</p>
       </section>

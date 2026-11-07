@@ -6,8 +6,12 @@ export const LIMITS = { name: 75, description: 132, file: 600 * 1024, total: 5 *
 const ALLOWED_TYPES = new Set(['.js', '.css', '.html', '.json', '.png', '.woff2', '.txt']);
 const TEXT_TYPES = new Set(['.js', '.css', '.html', '.json', '.txt']);
 const PORTALS = ['*://cms.bahria.edu.pk/*', '*://lms.bahria.edu.pk/*'];
+const PERMISSIONS = ['alarms', 'notifications', 'storage'];                 // notifications are opt-in; the alarm wakes the checker; storage keeps the settings
+const HOSTS = ['https://cms.bahria.edu.pk/*', 'https://lms.bahria.edu.pk/*'];    // the only places the background worker may read
+const CONNECT = ['https://cms.bahria.edu.pk', 'https://lms.bahria.edu.pk'];
+const WORKER = 'background.js';                                              // the one script that may make requests (and only to those two sites)
 
-// Things the extension must never do. The privacy promise is "no network", so these are checked in every script it ships.
+// Things the extension must never do. Only the background worker may make requests (to the two portals) and load its helper scripts; every other script is checked against all of these.
 const FORBIDDEN_CODE = [
   [/(?<![\w$.])fetch\s*\(/, 'fetch() (network request)'],
   [/XMLHttpRequest/, 'XMLHttpRequest (network request)'],
@@ -20,7 +24,7 @@ const FORBIDDEN_CODE = [
 ];
 const HTML_INJECTION = [[/innerHTML|outerHTML|insertAdjacentHTML/, 'innerHTML, outerHTML or insertAdjacentHTML']];   // fine in the extension's own pages (fixed icons); never in a script that runs on the portals
 // Web addresses that may appear in shipped code (namespaces, the portal's own address, the project's page). Anything else is reported.
-const ALLOWED_URLS = [/^http:\/\/www\.w3\.org\//, /^https:\/\/campuslit-bu\.vercel\.app(?:\/|$)/, /^https?:\/\/(?:cms|lms)\.bahria\.edu\.pk(?:\/|$)/, /^https:\/\/github\.com\/ahmedammad1709\/campuslit(?:\/|$)/];
+const ALLOWED_URLS = [/^http:\/\/www\.w3\.org\//, /^https:\/\/campuslit-bu\.vercel\.app(?:\/|$)/, /^https?:\/\/(?:cms|lms)\.bahria\.edu\.pk(?:[\/;,]|$)/, /^https:\/\/github\.com\/ahmedammad1709\/campuslit(?:\/|$)/];
 const PERSONAL = [
   [/[A-Za-z0-9._%+-]@[A-Za-z0-9-]+\.[A-Za-z]{2,}/, 'an e-mail address'],   // one character before the @: stays fast on very long unbroken lines
   [/(?<!\d)\d{2}-(?!0{5,6}-)\d{5,6}-\d{3}(?!\d)/, 'an enrollment-number pattern'],   // 02-000000-000 is the sample pages' placeholder
@@ -47,13 +51,18 @@ export function audit(files, opts) {
   if (opts.version && manifest.version !== opts.version) add('manifest version ' + manifest.version + ' does not match package.json version ' + opts.version + '.');
   if (!manifest.name || manifest.name.length > LIMITS.name) add('name is missing or longer than ' + LIMITS.name + ' characters.');
   if (!manifest.description || manifest.description.length > LIMITS.description) add('description is missing or longer than ' + LIMITS.description + ' characters (it is ' + (manifest.description || '').length + ').');
-  if (JSON.stringify(manifest.permissions || []) !== JSON.stringify(['storage'])) add('permissions must be exactly ["storage"], found ' + JSON.stringify(manifest.permissions || []) + '.');
-  for (const key of ['host_permissions', 'optional_permissions', 'optional_host_permissions', 'background', 'externally_connectable', 'content_security_policy_sandbox', 'update_url', 'key']) if (key in manifest) add('manifest has "' + key + '", which this extension does not use.');
+  if (JSON.stringify([...(manifest.permissions || [])].sort()) !== JSON.stringify(PERMISSIONS)) add('permissions must be exactly ' + JSON.stringify(PERMISSIONS) + ', found ' + JSON.stringify(manifest.permissions || []) + '.');
+  if (JSON.stringify([...(manifest.host_permissions || [])].sort()) !== JSON.stringify(HOSTS)) add('host_permissions must be exactly the two portals ' + JSON.stringify(HOSTS) + ', found ' + JSON.stringify(manifest.host_permissions || []) + '.');
+  const bg = manifest.background || {};
+  if (opts.browser === 'firefox') { if (JSON.stringify(Object.keys(bg)) !== JSON.stringify(['scripts']) || !Array.isArray(bg.scripts) || bg.scripts[bg.scripts.length - 1] !== WORKER) add('the Firefox background must be scripts ending in ' + WORKER + ', found ' + JSON.stringify(bg) + '.'); }
+  else if (JSON.stringify(bg) !== JSON.stringify({ service_worker: WORKER })) add('the background must be exactly { service_worker: "' + WORKER + '" }, found ' + JSON.stringify(bg) + '.');
+  for (const key of ['optional_permissions', 'optional_host_permissions', 'externally_connectable', 'content_security_policy_sandbox', 'update_url', 'key']) if (key in manifest) add('manifest has "' + key + '", which this extension does not use.');
   const scripts = manifest.content_scripts || [];
   if (!scripts.length) add('no content scripts are declared.');
   for (const block of scripts) if (JSON.stringify([...(block.matches || [])].sort()) !== JSON.stringify(PORTALS)) add('content scripts must match only the two Bahria portals, found ' + JSON.stringify(block.matches) + '.');
   const csp = (manifest.content_security_policy || {}).extension_pages || '';
-  if (!/script-src 'self'/.test(csp) || !/connect-src 'none'/.test(csp) || /unsafe-eval|https?:/.test(csp)) add('extension-page CSP must be script-src \'self\' with connect-src \'none\' and no remote sources.');
+  const connect = (/connect-src ([^;]+)/.exec(csp) || [])[1];
+  if (!/script-src 'self'/.test(csp) || !connect || JSON.stringify(connect.trim().split(/\s+/).sort()) !== JSON.stringify(CONNECT) || /unsafe-eval/.test(csp) || /https?:/.test(csp.replace(/connect-src [^;]+/, ''))) add('extension-page CSP must be script-src \'self\' with connect-src limited to the two portals and no other remote sources.');
   for (const resource of manifest.web_accessible_resources || []) for (const match of resource.matches || []) if (!PORTALS.includes(match)) add('web_accessible_resources may only be shared with the two portals, found ' + match + '.');
   if (opts.browser === 'firefox') {
     const gecko = (manifest.browser_specific_settings || {}).gecko || {};
@@ -65,6 +74,7 @@ export function audit(files, opts) {
   // ---- every file the manifest points at exists ----
   const need = new Set();
   const want = file => { if (file) need.add(String(file).replace(/^\.?\//, '')); };
+  want(bg.service_worker); (bg.scripts || []).forEach(want);
   Object.values(manifest.icons || {}).forEach(want); want((manifest.action || {}).default_popup); want((manifest.options_ui || {}).page);
   for (const block of scripts) { (block.js || []).forEach(want); (block.css || []).forEach(want); }
   for (const resource of manifest.web_accessible_resources || []) (resource.resources || []).forEach(want);
@@ -83,7 +93,7 @@ export function audit(files, opts) {
     const body = text(data), vendor = name.startsWith('preview/vendor/');
     if (type === '.js') {
       const runsOnPortals = scripts.some(block => (block.js || []).includes(name));
-      for (const [pattern, label] of FORBIDDEN_CODE) if (pattern.test(body)) add(name + ': uses ' + label + '.');
+      for (const [pattern, label] of FORBIDDEN_CODE) if (pattern.test(body) && !(name === WORKER && /^(?:fetch|importScripts)\(/.test(label))) add(name + ': uses ' + label + '.');
       if (runsOnPortals) for (const [pattern, label] of HTML_INJECTION) if (pattern.test(body)) add(name + ': a script that runs on the portals uses ' + label + '.');
     }
     if (type !== '.txt' && !vendor) for (const [url] of body.matchAll(/https?:\/\/[^\s"'()<>`\\]+/g)) if (!ALLOWED_URLS.some(rule => rule.test(url))) add(name + ': contains the web address ' + url + '.');

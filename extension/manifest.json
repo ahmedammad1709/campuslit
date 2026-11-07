@@ -1,9 +1,11 @@
 {
   "manifest_version": 3,
   "name": "Campuslit: Bahria University LMS & CMS Redesign",
-  "version": "1.0.2",
-  "description": "Redesign the Bahria University LMS and CMS: themes, attendance planner, due-date reminders, quick search. Unofficial; private.",
-  "permissions": ["storage"],
+  "version": "1.1.0",
+  "description": "Redesign the Bahria University LMS and CMS, with optional alerts for new work, marks, attendance and deadlines. Unofficial; private.",
+  "permissions": ["storage", "alarms", "notifications"],
+  "host_permissions": ["https://lms.bahria.edu.pk/*", "https://cms.bahria.edu.pk/*"],
+  "background": {"service_worker": "background.js"},
   "web_accessible_resources": [{"resources": ["fonts/inter-latin.woff2", "fonts/jakarta-latin.woff2", "fonts/manrope-latin.woff2", "fonts/sora-latin.woff2"], "matches": ["*://cms.bahria.edu.pk/*", "*://lms.bahria.edu.pk/*"]}],
   "action": { "default_popup": "popup.html", "default_title": "Campuslit" },
   "options_ui": { "page": "options.html", "open_in_tab": true },
@@ -15,5 +17,5 @@
     "run_at": "document_start",
     "all_frames": true
   }],
-  "content_security_policy": {"extension_pages": "script-src 'self'; object-src 'none'; connect-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'"}
+  "content_security_policy": {"extension_pages": "script-src 'self'; object-src 'none'; connect-src https://lms.bahria.edu.pk https://cms.bahria.edu.pk; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'"}
 }

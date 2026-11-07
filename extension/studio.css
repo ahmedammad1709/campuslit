@@ -413,8 +413,9 @@ body.popup:not([data-anim]) { visibility: hidden; }   /* until the animation set
 .pop-btn.sm { min-height: 34px; padding: 0 14px; border-radius: 9px; font-size: 13px; }
 
 /* ---------- settings: guide ---------- */
-.work[data-section="guide"] { grid-template-columns: minmax(0, 720px); }
-.work[data-section="guide"] .preview { display: none; }
+.work[data-section="guide"], .work[data-section="notifications"] { grid-template-columns: minmax(0, 720px); }
+.work[data-section="guide"] .preview, .work[data-section="notifications"] .preview { display: none; }
+#n-kinds.is-off, #n-due.is-off, #n-how.is-off { opacity: .55; }
 .guide { display: grid; margin: 0; padding: 0; list-style: none; }
 .guide-item { display: flex; gap: 16px; padding: 18px 0; }
 .guide-item + .guide-item { border-top: 1px solid var(--line); }
