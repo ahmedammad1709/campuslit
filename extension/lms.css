@@ -154,6 +154,7 @@
     @media (max-width: 1500px) {
       & .table-responsive { overflow-x: auto; }
       & .table-responsive > .table:has(.label) { min-width: 1120px; }
+      & .table-responsive > .table:has(.label) > tbody > tr > td:first-child { width: 1%; white-space: nowrap; }   /* the number column hugs its number; the spare width goes to the columns that need it */
     }
     /* the portal's own Submit button: a link around a green box that has no side padding, so the text touched the edge. Same box, evenly spaced. */
     & td > a[data-toggle="modal"]:has(> div[style*="background"]) { display: inline-block; background-image: none !important; text-decoration: none !important; border-radius: calc(var(--bs-r) * .8); transition: transform .16s var(--bs-ease), filter .16s; }
