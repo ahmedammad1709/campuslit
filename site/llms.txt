@@ -16,6 +16,7 @@ Firefox: https://addons.mozilla.org/en-US/firefox/addon/campuslit-bahria-cms-red
 - [Home](https://campuslit-bu.vercel.app/): overview, features, themes, install, FAQ
 - [Bahria University LMS redesign](https://campuslit-bu.vercel.app/bahria-lms): dashboard, assignments, reminders, quick search
 - [Bahria University CMS: attendance planner and time table](https://campuslit-bu.vercel.app/bahria-cms): attendance planner, week time table, Add to calendar
+- [Version history](https://campuslit-bu.vercel.app/versions): every release with its date and what changed; latest is 1.1.1 (7 November 2026)
 - [Privacy policy](https://campuslit-bu.vercel.app/privacy)
 - [Licence](https://campuslit-bu.vercel.app/license)
 - [Source code](https://github.com/ahmedammad1709/campuslit)

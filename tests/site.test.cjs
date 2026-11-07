@@ -8,7 +8,7 @@ const path = require('node:path');
 
 const site = path.resolve(__dirname, '..', 'site');
 const ORIGIN = 'https://campuslit-bu.vercel.app';
-const PAGES = { '': 'index.html', 'bahria-lms': 'bahria-lms.html', 'bahria-cms': 'bahria-cms.html', privacy: 'privacy.html', license: 'license.html' };   // clean URL -> file
+const PAGES = { '': 'index.html', 'bahria-lms': 'bahria-lms.html', 'bahria-cms': 'bahria-cms.html', versions: 'versions.html', privacy: 'privacy.html', license: 'license.html' };   // clean URL -> file
 const read = file => fs.readFileSync(path.join(site, file), 'utf8');
 const pages = Object.entries(PAGES).map(([route, file]) => ({ route, file, html: read(file) }));
 const ids = html => new Set([...html.matchAll(/\sid="([^"]+)"/g)].map(m => m[1]));

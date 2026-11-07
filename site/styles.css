@@ -310,3 +310,6 @@ td:first-child { color: var(--ink); font-weight: 700; }
 @media (max-width: 640px) { .facts-list > div { grid-template-columns: 1fr; gap: 2px; } }
 
 .cta-row.left { justify-content: flex-start; margin-top: 26px; }
+
+.rel-date { margin-top: -6px; color: var(--muted); font-weight: 700; font-size: 15px; }
+.prose h2 .badge { vertical-align: middle; margin-left: 8px; }
