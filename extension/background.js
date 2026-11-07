@@ -164,7 +164,9 @@
     } catch (e) { error = 'Something went wrong while checking.'; }
     let shown = await announce(events, state);
     shown += await announceDue(n, state);
-    state.lastRun = Date.now(); state.last = { at: state.lastRun, events: shown, error };
+    // a look that could not reach the portals (offline, or the network is not up yet after the browser opens) is retried at the next 15 minute tick, not after the whole interval
+    if (!/could not be reached/.test(error)) state.lastRun = Date.now();
+    state.last = { at: Date.now(), events: shown, error };
     await saveState(state);
     return { ok: !error, shown, error, why };
   }

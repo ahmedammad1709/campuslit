@@ -56,7 +56,7 @@ function world() {
     tabs: { create: o => { w.opened.push(o.url); } }
   };
   const ctx = vm.createContext({ chrome, console, URL, AbortController, setTimeout: fn => { fn(); return 0; }, clearTimeout() {}, Math: Object.assign(Object.create(Math), { random: () => 0 }),
-    fetch: async (url, opts) => { w.fetched.push(url); assert.equal(opts.credentials, 'include'); const r = respond(url); return { ok: r.ok, status: r.status, url: r.url, text: async () => r.text }; },
+    fetch: async (url, opts) => { if (w.offline) throw new Error('offline'); w.fetched.push(url); assert.equal(opts.credentials, 'include'); const r = respond(url); return { ok: r.ok, status: r.status, url: r.url, text: async () => r.text }; },
     importScripts: (...files) => { for (const f of files) vm.runInContext(fs.readFileSync('extension/' + f, 'utf8'), ctx); } });
   const RealDate = Date;
   ctx.Date = class extends RealDate { static now() { return w.now; } constructor(...a) { super(...(a.length ? a : [w.now])); } };
@@ -134,6 +134,21 @@ test('an ended session gets one nudge, not a stream of them', async () => {
   assert.equal(t.titles().length, 2);
   const st = await t.send({ bsNotify: 'status' });
   assert.equal(st.session.lms, 'ok'); assert.equal(st.courses, 2);
+});
+
+test('after a day closed: everything that changed is announced; a failed look because the network is not up yet is retried within 15 minutes', async () => {
+  const t = world();
+  await t.setPrefs(ALL); await t.settle();                                   // the last look, before the browser was closed
+  t.w.pages.quizzes.A = quizzes([row(['1', 'Quiz on loops', '', '3.000', ''])]);
+  t.w.pages.attendance = [{ code: 'CS 101', title: 'Data Structures', present: 18, absent: 5, total: 23, percentage: '78.3' }];
+  t.w.pages.lectures.B = lectures([row(['1', 'Routing', '<a href="y">f</a>', '', '', ''])]);
+  t.w.now += 26 * HOUR; t.w.offline = true;                                    // the browser opens a day later, the network is not up yet
+  await t.emit('startup'); await t.settle();
+  assert.equal(t.titles().length, 0, 'nothing can be read yet');
+  t.w.offline = false; t.w.now += 16 * 60000;                                  // 16 minutes later: the next tick retries, it does not wait out the whole interval
+  await t.emit('alarm', { name: 'bs-tick' }); await t.settle();
+  const found = t.titles().join(' | ');
+  assert.match(found, /Quiz marks uploaded/); assert.match(found, /Absent marked/); assert.match(found, /New lecture note/);
 });
 
 test('a kind that is switched off is not looked at, and starts fresh when switched on again', async () => {
