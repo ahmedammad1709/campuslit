@@ -296,12 +296,17 @@ addEventListener('beforeunload', e => { if (isDirty()) { e.preventDefault(); e.r
   const api = globalThis.browser || globalThis.chrome, live = StudioStorage.isExtension && api && api.runtime && api.runtime.sendMessage;
   const ask = action => new Promise(resolve => { try { const r = api.runtime.sendMessage({ bsNotify: action }, res => resolve(res || { ok: false })); if (r && r.then) r.then(resolve, () => resolve({ ok: false })); } catch (e) { resolve({ ok: false }); } });
   const when = t => { const m = Math.round((Date.now() - t) / 60000); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : Math.round(m / 1440) + ' days ago'; };
-  const say = session => session === 'expired' ? 'sign in again' : session === 'ok' ? 'signed in' : 'not checked yet';
+  // how long a sign-in lasts, as seen by the checker: this is what tells us whether regular checks keep the portal session alive
+  const span = ms => { const m = Math.max(1, Math.round(ms / 60000)); if (m < 60) return m + ' min'; const h = Math.floor(m / 60), r = m % 60; return h < 48 ? h + ' h' + (r ? ' ' + r + ' min' : '') : Math.round(h / 24) + ' days'; };
+  const line = (name, state, i) => state === 'ok' && i.since ? name + ': signed in, working for ' + span(Date.now() - i.since) + ' (last good look ' + when(i.lastOk) + ')'
+    : state === 'expired' && i.endedAt ? name + ': session ended ' + when(i.endedAt) + (i.since && i.lastOk > i.since ? ', after at least ' + span(i.lastOk - i.since) + ' of working' : '') + '. Sign in again.'
+    : name + ': not checked yet';
   async function showStatus() {
     if (!live) return;
     const st = await ask('status'), el = $('n-status');
     if (!st.ok) { el.textContent = 'Not checked yet.'; return; }
-    el.textContent = (st.lastRun ? 'Last checked ' + when(st.lastRun) + (st.last && st.last.error ? ' (' + st.last.error + ')' : '') : 'Not checked yet') + '. Watching ' + st.courses + (st.courses === 1 ? ' course' : ' courses') + '. LMS: ' + say(st.session.lms) + '. CMS: ' + say(st.session.cms) + '.';
+    const info = st.info || { lms: {}, cms: {} };
+    el.replaceChildren(...[(st.lastRun ? 'Last checked ' + when(st.lastRun) + (st.last && st.last.error ? ' (' + st.last.error + ')' : '') : 'Not checked yet') + '. Watching ' + st.courses + (st.courses === 1 ? ' course' : ' courses') + '.', line('LMS', st.session.lms, info.lms || {}), line('CMS', st.session.cms, info.cms || {})].flatMap((text, i) => (i ? [document.createElement('br'), document.createTextNode(text)] : [document.createTextNode(text)])));
   }
   if (!live) { for (const id of ['n-test', 'n-check', 'n-forget']) $(id).disabled = true; $('n-hint').hidden = false; $('n-status').textContent = 'Not available in the browser preview.'; return; }
   $('n-test').addEventListener('click', async () => { const r = await ask('test'); status(r.ok ? 'Test notification sent.' : 'Could not show a notification. Check your computer\'s notification settings.'); });

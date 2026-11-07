@@ -17,11 +17,12 @@
 
   // ---------- the notes kept in this browser ----------
   const obj = v => (v && typeof v === 'object' && !Array.isArray(v) ? v : {});
-  const blank = () => ({ v: 1, lastRun: 0, session: { lms: 'unknown', cms: 'unknown' }, warned: { lms: 0, cms: 0 }, courses: [], snap: { assignments: {}, quizzes: {}, lectures: {} }, attendance: null, sent: {}, links: {}, last: { at: 0, events: 0, error: '' } });
+  const blank = () => ({ v: 1, lastRun: 0, session: { lms: 'unknown', cms: 'unknown' }, info: { lms: { since: 0, lastOk: 0, endedAt: 0 }, cms: { since: 0, lastOk: 0, endedAt: 0 } }, warned: { lms: 0, cms: 0 }, courses: [], snap: { assignments: {}, quizzes: {}, lectures: {} }, attendance: null, sent: {}, links: {}, last: { at: 0, events: 0, error: '' } });
   async function loadState() {
     const raw = obj((await api.storage.local.get(notifyStateKey))[notifyStateKey]), s = blank();
     s.lastRun = Number.isFinite(raw.lastRun) ? raw.lastRun : 0;
     for (const p of ['lms', 'cms']) { if (['ok', 'expired', 'unknown'].includes(obj(raw.session)[p])) s.session[p] = raw.session[p]; if (Number.isFinite(obj(raw.warned)[p])) s.warned[p] = raw.warned[p]; }
+    for (const p of ['lms', 'cms']) { const r = obj(obj(raw.info)[p]); for (const k of ['since', 'lastOk', 'endedAt']) if (Number.isFinite(r[k]) && r[k] >= 0) s.info[p][k] = r[k]; }
     s.courses = (Array.isArray(raw.courses) ? raw.courses : []).filter(c => c && typeof c.oc === 'string' && typeof c.name === 'string').slice(0, MAX_COURSES);
     for (const k of Object.keys(s.snap)) s.snap[k] = obj(obj(raw.snap)[k]);
     s.attendance = raw.attendance && typeof raw.attendance === 'object' && !Array.isArray(raw.attendance) ? raw.attendance : null;
@@ -71,8 +72,11 @@
     if (fresh.length > MAX_SHOWN) await show({ id: 'more|' + now, title: (fresh.length - MAX_SHOWN) + ' more updates', body: 'Open the portal to see everything.', url: LMS + 'Dashboard.php' }, state);
     return shown;
   }
+  // how long a sign-in really lasts, as Campuslit has seen it: when it was first seen working, when it last worked, when it was first seen ended
+  function sessionWorks(portal, state) { const i = state.info[portal], now = Date.now(); if (!i.since || i.endedAt) { i.since = now; i.endedAt = 0; } i.lastOk = now; }
   function sessionEnded(portal, state, n, events) {
     state.session[portal] = 'expired';
+    if (!state.info[portal].endedAt) state.info[portal].endedAt = Date.now();
     if (n.sessionAlert && Date.now() - state.warned[portal] > 20 * HOUR) {
       state.warned[portal] = Date.now();
       events.push({ id: 'sess|' + portal + '|' + Date.now(), kind: 'session', title: (portal === 'lms' ? 'LMS' : 'CMS') + ' session ended', body: 'Open the portal and sign in again to keep your alerts going.', url: portal === 'lms' ? LMS + 'Dashboard.php' : CMS_DASHBOARD });
@@ -84,7 +88,7 @@
     const home = await get(LMS + 'Dashboard.php');
     if (home.error || home.skipped) return 'The LMS could not be reached.';
     if (!home.ok || !N.signedIn('lms', home.text, home.url)) { sessionEnded('lms', state, n, events); return ''; }
-    state.session.lms = 'ok'; state.warned.lms = 0;
+    state.session.lms = 'ok'; state.warned.lms = 0; sessionWorks('lms', state);
     const nav = N.navLinks(home.text), page = (word, dflt) => new URL((nav.find(l => l.text.toLowerCase().includes(word)) || { href: dflt }).href, LMS).href;
     const pages = { assignments: page('assignment', 'Assignments.php'), quizzes: page('quiz', 'Quizzes.php'), lectures: page('lecture', 'LectureNotes.php') };
     await pause();
@@ -120,7 +124,7 @@
     const res = await get(CMS_DASHBOARD);
     if (res.error || res.skipped) return 'The CMS could not be reached.';
     if (!res.ok || !N.signedIn('cms', res.text, res.url)) { sessionEnded('cms', state, n, events); return ''; }
-    state.session.cms = 'ok'; state.warned.cms = 0;
+    state.session.cms = 'ok'; state.warned.cms = 0; sessionWorks('cms', state);
     const next = N.parseAttendance(res.text);
     if (!next) return 'Attendance was not found on the CMS dashboard.';
     const found = N.diffAttendance(state.attendance, next, 75);
@@ -210,7 +214,7 @@
         return { ok: true };
       }
       if (msg.bsNotify === 'check') return exclusive(() => runCheck('manual'));
-      if (msg.bsNotify === 'status') { const s = await loadState(); return { ok: true, lastRun: s.lastRun, last: s.last, session: s.session, courses: s.courses.length, attendance: s.attendance ? Object.keys(s.attendance).length : 0 }; }
+      if (msg.bsNotify === 'status') { const s = await loadState(); return { ok: true, lastRun: s.lastRun, last: s.last, session: s.session, info: s.info, courses: s.courses.length, attendance: s.attendance ? Object.keys(s.attendance).length : 0 }; }
       if (msg.bsNotify === 'forget') { await api.storage.local.remove(notifyStateKey); return { ok: true }; }
       return { ok: false };
     })().then(respond, () => respond({ ok: false }));

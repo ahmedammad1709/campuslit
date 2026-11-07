@@ -134,6 +134,7 @@ test('an ended session gets one nudge, not a stream of them', async () => {
   assert.equal(t.titles().length, 2);
   const st = await t.send({ bsNotify: 'status' });
   assert.equal(st.session.lms, 'ok'); assert.equal(st.courses, 2);
+  assert.ok(st.info.lms.since > 0 && st.info.lms.lastOk >= st.info.lms.since && st.info.lms.endedAt === 0, 'a new sign-in starts a new stretch');
 });
 
 test('after a day closed: everything that changed is announced; a failed look because the network is not up yet is retried within 15 minutes', async () => {
@@ -169,6 +170,24 @@ test('signing back in catches up at once, and only for the portal that was opene
   t.w.cmsSignedIn = true; t.w.now += 6 * 60000;
   await t.send({ bsNotify: 'visit', portal: 'cms' }); await t.settle();
   assert.ok(t.titles().some(x => /Absent marked/.test(x)), 'and the CMS news arrives when the CMS is opened');
+});
+
+test('the status shows how long a sign-in really lasted', async () => {
+  const t = world();
+  await t.setPrefs(ALL); await t.settle();
+  const start = t.w.now;
+  for (const hours of [3, 6, 9]) { t.w.now = start + hours * HOUR; await t.emit('alarm', { name: 'bs-tick' }); await t.settle(); }
+  let st = await t.send({ bsNotify: 'status' });
+  assert.equal(st.info.lms.since, start); assert.equal(st.info.lms.lastOk, start + 9 * HOUR); assert.equal(st.info.lms.endedAt, 0);
+  t.w.lmsSignedIn = false; t.w.now = start + 12 * HOUR; await t.emit('alarm', { name: 'bs-tick' }); await t.settle();
+  st = await t.send({ bsNotify: 'status' });
+  assert.equal(st.info.lms.since, start, 'the stretch started when it was first seen working');
+  assert.equal(st.info.lms.lastOk, start + 9 * HOUR, 'the last good look is kept');
+  assert.equal(st.info.lms.endedAt, start + 12 * HOUR, 'and the end is when it was first seen ended');
+  assert.equal(st.session.lms, 'expired'); assert.equal(st.info.cms.endedAt, 0, 'the other portal is unaffected');
+  t.w.lmsSignedIn = true; t.w.now = start + 13 * HOUR; await t.emit('alarm', { name: 'bs-tick' }); await t.settle();
+  st = await t.send({ bsNotify: 'status' });
+  assert.equal(st.info.lms.since, start + 13 * HOUR); assert.equal(st.info.lms.endedAt, 0, 'signing in again starts a new stretch');
 });
 
 test('a kind that is switched off is not looked at, and starts fresh when switched on again', async () => {
