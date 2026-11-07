@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Campuslit: Bahria University LMS & CMS Redesign",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Redesign the Bahria University LMS and CMS, with optional alerts for new work, marks, attendance and deadlines. Unofficial; private.",
   "permissions": ["storage", "alarms", "notifications"],
   "host_permissions": ["https://lms.bahria.edu.pk/*", "https://cms.bahria.edu.pk/*"],

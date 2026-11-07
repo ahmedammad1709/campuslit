@@ -10,6 +10,7 @@ Same logins. Same data. A whole new look.</p>
 
 <p align="center">
   <a href="https://chromewebstore.google.com/detail/kldmhhiopdefjapkebnelablimikghio"><img alt="Add to Chrome" src="https://img.shields.io/badge/Add_to_Chrome-it's_free-2f5bea?style=for-the-badge&logo=googlechrome&logoColor=white"></a>
+  <a href="https://addons.mozilla.org/en-US/firefox/addon/campuslit-bahria-cms-redesign/"><img alt="Add to Firefox" src="https://img.shields.io/badge/Add_to_Firefox-it's_free-e66000?style=for-the-badge&logo=firefoxbrowser&logoColor=white"></a>
   &nbsp;
   <a href="https://campuslit-bu.vercel.app/"><img alt="Live website" src="https://img.shields.io/badge/Live_website-campuslit--bu.vercel.app-0b1d40?style=for-the-badge&logo=vercel&logoColor=white"></a>
 </p>
@@ -47,7 +48,7 @@ Drag the slider on the [website](https://campuslit-bu.vercel.app/) to compare. E
 | **Never miss a deadline** | A *Due soon* card counts down to your next assignment, and a small reminder follows you around the LMS. |
 | **Attendance, explained** | One bar per course and a plain line: how many hours you can still miss, or must attend, to finish above 75%. |
 | **A time table you can read** | A week calendar or day list with your next class on top, and *Add to calendar* for Google, Apple or Outlook. |
-| **Hear about it first** | Optional desktop notifications: attendance marked (present or absent), quiz marks uploaded, new assignments, new lecture notes, and deadline reminders 2 days, 24 hours and 7 hours before. Off until you turn them on. |
+| **Hear about it first** | Optional desktop notifications: attendance marked (present or absent), quiz marks uploaded, new assignments, new lecture notes, and deadline reminders 2 days, 24 hours and 7 hours before. Off until you turn them on. The CMS signs you out quickly, so attendance alerts usually arrive when you next sign in to it. |
 | **Jump anywhere** | Press <kbd>Ctrl</kbd> + <kbd>K</kbd> (or <kbd>/</kbd>), type a few letters, press Enter. It forgives typos. |
 | **Make it yours** | Six hand-tuned themes and a custom-theme maker, with your own text size, spacing and typeface. |
 | **Private by design** | No accounts, no analytics, **sends nothing to anyone**. It never reads your password or what you type. |
@@ -95,7 +96,7 @@ The toolbar button switches themes and turns Campuslit off for the CMS, the LMS 
 | Browser | How |
 | --- | --- |
 | **Chrome, Edge, Brave** | **[Add to Chrome from the Chrome Web Store](https://chromewebstore.google.com/detail/kldmhhiopdefjapkebnelablimikghio)**, then open your CMS or LMS and sign in as usual. Pin the Campuslit button to your toolbar. |
-| **Firefox 140+** | Not on Firefox Add-ons yet. Load the zip from the [latest release](https://github.com/ahmedammad1709/campuslit/releases/latest) (see *Manual install from a zip* below). |
+| **Firefox 140+** | **[Add to Firefox from Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/campuslit-bahria-cms-redesign/)**, then open your CMS or LMS and sign in as usual. Prefer a zip? See *Manual install from a zip* below. |
 
 Switch it off from the toolbar button, or remove the extension, and the original portal is back instantly. It works on a computer; most phone browsers do not run extensions like this.
 

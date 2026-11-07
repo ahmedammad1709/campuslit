@@ -304,6 +304,8 @@ td:first-child { color: var(--ink); font-weight: 700; }
 .prose .cta-box h2 { color: #fff; display: block; }
 .prose .cta-box p { color: #c7d3ee; }
 .prose .cta-box .btn { margin-top: 18px; }
+.prose .cta-box .cta-row { margin-top: 18px; }
+.prose .cta-box .cta-row .btn { margin-top: 0; }
 .prose details { margin-top: 12px; }
 @media (max-width: 640px) { .facts-list > div { grid-template-columns: 1fr; gap: 2px; } }
 

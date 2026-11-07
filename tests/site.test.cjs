@@ -115,7 +115,7 @@ test('nothing on the site would be blocked by its own security policy', () => {
 });
 
 test('the site loads nothing from other websites and links out only to the project, its host and its legal sources', () => {
-  const allowed = [/^https:\/\/campuslit-bu\.vercel\.app\//, /^https:\/\/github\.com\/ahmedammad1709\/campuslit(\/|$)/, /^https:\/\/vercel\.com\/legal\/privacy-policy$/, /^https:\/\/chromewebstore\.google\.com\/detail\/kldmhhiopdefjapkebnelablimikghio$/];
+  const allowed = [/^https:\/\/campuslit-bu\.vercel\.app\//, /^https:\/\/github\.com\/ahmedammad1709\/campuslit(\/|$)/, /^https:\/\/vercel\.com\/legal\/privacy-policy$/, /^https:\/\/chromewebstore\.google\.com\/detail\/kldmhhiopdefjapkebnelablimikghio$/, /^https:\/\/addons\.mozilla\.org\/en-US\/firefox\/addon\/campuslit-bahria-cms-redesign\/$/];
   for (const { file, html } of pages) {
     for (const [, url] of html.matchAll(/(?:href|src)="(https?:[^"]+)"/g)) assert.ok(allowed.some(rule => rule.test(url)), file + ': ' + url);
     assert.ok(!/<(?:script|link|img|iframe)\b[^>]*(?:src|href)="https?:(?!\/\/campuslit-bu\.vercel\.app\/)/.test(html.replace(/<a\b[^>]*>/g, '')), file + ': a resource from another site');

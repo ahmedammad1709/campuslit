@@ -3,13 +3,14 @@
 > Campuslit (also written Campus Lit or CampusLit) is a free, open-source browser extension that redesigns the Bahria University student LMS (lms.bahria.edu.pk) and CMS (cms.bahria.edu.pk). Same logins and data, with a cleaner look, themes, due-date reminders, an attendance planner, a readable week time table with calendar export, and quick search (Ctrl+K). It is an independent student project and is not affiliated with, endorsed by, or supported by Bahria University.
 
 Install: https://chromewebstore.google.com/detail/kldmhhiopdefjapkebnelablimikghio (Chrome, Edge and Brave, on a computer; free; no sign-up).
+Firefox: https://addons.mozilla.org/en-US/firefox/addon/campuslit-bahria-cms-redesign/ (Firefox 140+, free).
 
 ## Key facts
 - Works for students of every Bahria University campus, on lms.bahria.edu.pk and cms.bahria.edu.pk only.
 - Features: six themes (Bahria, Crystal, Midnight, Linen, Grove, Bloom) and a custom-theme maker; Due soon card and assignment reminders on the LMS; attendance planner for the 75% rule and a week time table with Add to calendar on the CMS; quick search.
 - Private: sends nothing to anyone, has no accounts or analytics, never reads passwords or form input. Optional notifications (off by default) read only the two portals, using the browser's own sign-in. Open source under the MIT licence.
-- Optional notifications (off by default): attendance marked present or absent, quiz marks uploaded, new assignments, new lecture notes, and deadline reminders 2 days, 24 hours and 7 hours before.
-- Firefox 140+ is supported by manual install; the Add-ons listing is not live yet.
+- Optional notifications (off by default): attendance marked present or absent, quiz marks uploaded, new assignments, new lecture notes, and deadline reminders 2 days, 24 hours and 7 hours before. The CMS ends sessions quickly, so attendance alerts usually arrive when the student next signs in to it; the rest is checked in the background.
+- Firefox 140+ is supported through the Firefox Add-ons listing above.
 
 ## Pages
 - [Home](https://campuslit-bu.vercel.app/): overview, features, themes, install, FAQ

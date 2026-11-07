@@ -102,7 +102,7 @@
      "name": "Is there a Chrome extension to redesign the Bahria University LMS and CMS?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "Yes. Campuslit is on the Chrome Web Store and works in Chrome, Edge and Brave on a computer. It runs on lms.bahria.edu.pk and cms.bahria.edu.pk and is free."
+      "text": "Yes. Campuslit is on the Chrome Web Store and works in Chrome, Edge and Brave on a computer. It is also on <a href="https://addons.mozilla.org/en-US/firefox/addon/campuslit-bahria-cms-redesign/" rel="noopener">Firefox Add-ons</a>. It runs on lms.bahria.edu.pk and cms.bahria.edu.pk and is free."
      }
     },
     {
@@ -118,7 +118,7 @@
      "name": "Does Campuslit send notifications about assignments, quiz marks and attendance?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "Yes, optionally. In Settings, Notifications, you can turn on desktop alerts for new assignments, quiz marks, new lecture notes, attendance marked present or absent, and deadline reminders 2 days, 24 hours and 7 hours before. Campuslit looks at your portals every 1 to 8 hours while your browser is open and you are signed in, using your own session. It never sees your password and sends nothing to us. It is off until you switch it on."
+      "text": "Yes, optionally. In Settings, Notifications, you can turn on desktop alerts for new assignments, quiz marks, new lecture notes, attendance marked present or absent, and deadline reminders 2 days, 24 hours and 7 hours before. Campuslit looks at your portals every 1 to 8 hours while your browser is open and you are signed in, using your own session. The CMS signs you out quickly, so attendance alerts usually arrive when you next sign in to it; everything else is checked in the background. It never sees your password and sends nothing to us. It is off until you switch it on."
      }
     },
     {
@@ -158,7 +158,7 @@
      "name": "Which browsers work? What about my phone?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "Chrome, Edge and Brave (install from the Chrome Web Store) and Firefox 140 or newer, on a computer. Most phone browsers do not run extensions like this."
+      "text": "Chrome, Edge and Brave (install from the Chrome Web Store) and Firefox 140 or newer (install from Firefox Add-ons), on a computer. Most phone browsers do not run extensions like this."
      }
     },
     {
@@ -204,6 +204,7 @@
       <p class="lede">Campuslit (also written Campus Lit) is a free Chrome extension that redesigns the student CMS and LMS you already use. Same logins, same data, with a cleaner look, due-date countdowns, an attendance planner and a time table you can read.</p>
       <div class="cta-row">
         <a class="btn btn-primary" href="https://chromewebstore.google.com/detail/kldmhhiopdefjapkebnelablimikghio" rel="noopener">Add to Chrome, it is free</a>
+        <a class="btn btn-glass" href="https://addons.mozilla.org/en-US/firefox/addon/campuslit-bahria-cms-redesign/" rel="noopener">Add to Firefox</a>
         <a class="btn btn-glass" href="#features">See what it does</a>
       </div>
       <ul class="trust">
@@ -252,7 +253,7 @@
         <div><dt>Features</dt><dd>Six themes and a custom theme, due-date reminders, attendance planner, week time table with calendar export, quick search (Ctrl+K)</dd></div>
         <div><dt>Alerts</dt><dd>Optional desktop notifications (off by default): attendance marked, quiz marks, new assignments, new lecture notes, and deadline reminders at 2 days, 24 hours and 7 hours</dd></div>
         <div><dt>Price</dt><dd>Free, no sign-up, no ads</dd></div>
-        <div><dt>Browsers</dt><dd>Chrome, Edge and Brave (from the Chrome Web Store); Firefox 140+ (manual)</dd></div>
+        <div><dt>Browsers</dt><dd>Chrome, Edge and Brave (from the Chrome Web Store); Firefox 140+ (from Firefox Add-ons)</dd></div>
         <div><dt>Privacy</dt><dd>Sends nothing to anyone, collects nothing, open source (MIT)</dd></div>
         <div><dt>Official?</dt><dd>No. Independent student project, not affiliated with Bahria University</dd></div>
       </dl>
@@ -384,10 +385,10 @@
           <a class="btn btn-primary" href="https://chromewebstore.google.com/detail/kldmhhiopdefjapkebnelablimikghio" rel="noopener">Add to Chrome</a>
         </article>
         <article class="card reveal">
-          <span class="badge">Firefox Add-ons: coming soon</span>
+          <span class="badge ok">Firefox Add-ons: live</span>
           <h3>Firefox 140 or newer</h3>
-          <p>Until the Add-ons listing is live, you can load it temporarily.</p>
-          <a class="btn btn-primary" href="https://github.com/ahmedammad1709/campuslit/releases/latest">Download for Firefox</a>
+          <p>One click from Firefox Add-ons, free, no account needed.</p>
+          <a class="btn btn-primary" href="https://addons.mozilla.org/en-US/firefox/addon/campuslit-bahria-cms-redesign/" rel="noopener">Add to Firefox</a>
         </article>
       </div>
       <div class="install-steps">
@@ -395,10 +396,10 @@
           <li>Download <code>campuslit-chrome.zip</code> from the <a href="https://github.com/ahmedammad1709/campuslit/releases/latest">latest release</a> and unzip it somewhere you will keep it.</li>
           <li>Open <code>chrome://extensions</code> (or <code>edge://extensions</code>) and switch on <b>Developer mode</b>.</li>
           <li>Click <b>Load unpacked</b> and choose the unzipped folder, then pin Campuslit to your toolbar.</li></ol></div></details>
-        <details class="reveal"><summary>Steps for Firefox</summary><div class="details-body"><ol>
+        <details class="reveal"><summary>Prefer to install by hand? (Firefox)</summary><div class="details-body"><ol>
           <li>Download <code>campuslit-firefox.zip</code> from the latest release and unzip it.</li>
           <li>Open <code>about:debugging#/runtime/this-firefox</code> and click <b>Load Temporary Add-on</b>.</li>
-          <li>Choose <code>manifest.json</code> inside the folder. Firefox removes temporary add-ons when it closes, so repeat this after a restart until the Add-ons listing is live.</li></ol></div></details>
+          <li>Choose <code>manifest.json</code> inside the folder. Firefox removes temporary add-ons when it closes, so repeat this after a restart. The Add-ons listing above installs it for good.</li></ol></div></details>
       </div>
     </div>
   </section>
@@ -436,12 +437,12 @@
         <details class="reveal"><summary>What is Campuslit? Is it the same as Campus Lit?</summary><div class="details-body"><p>Yes, the same thing: Campuslit, Campus Lit and CampusLit all mean this free, open-source browser extension that redesigns the Bahria University student CMS and LMS. It keeps your logins and data, and adds themes, an attendance planner, due-date reminders, a readable time table and quick search.</p></div></details>
         <details class="reveal"><summary>Is there a Chrome extension to redesign the Bahria University LMS and CMS?</summary><div class="details-body"><p>Yes. Campuslit is on the <a href="https://chromewebstore.google.com/detail/kldmhhiopdefjapkebnelablimikghio" rel="noopener">Chrome Web Store</a> and works in Chrome, Edge and Brave on a computer. It runs on lms.bahria.edu.pk and cms.bahria.edu.pk and is free.</p></div></details>
         <details class="reveal"><summary>How do I install Campuslit?</summary><div class="details-body"><p>Open the <a href="https://chromewebstore.google.com/detail/kldmhhiopdefjapkebnelablimikghio" rel="noopener">Campuslit page on the Chrome Web Store</a>, click Add to Chrome, then open your CMS or LMS and sign in as usual. The new look appears on its own. Pin the Campuslit button to your toolbar to change themes or switch it off.</p></div></details>
-        <details class="reveal"><summary>Does Campuslit send notifications about assignments, quiz marks and attendance?</summary><div class="details-body"><p>Yes, optionally. In Settings, Notifications, you can turn on desktop alerts for new assignments, quiz marks, new lecture notes, attendance marked present or absent, and deadline reminders 2 days, 24 hours and 7 hours before. Campuslit looks at your portals every 1 to 8 hours while your browser is open and you are signed in, using your own session. It never sees your password and sends nothing to us. It is off until you switch it on.</p></div></details>
+        <details class="reveal"><summary>Does Campuslit send notifications about assignments, quiz marks and attendance?</summary><div class="details-body"><p>Yes, optionally. In Settings, Notifications, you can turn on desktop alerts for new assignments, quiz marks, new lecture notes, attendance marked present or absent, and deadline reminders 2 days, 24 hours and 7 hours before. Campuslit looks at your portals every 1 to 8 hours while your browser is open and you are signed in, using your own session. The CMS signs you out quickly, so attendance alerts usually arrive when you next sign in to it; everything else is checked in the background. It never sees your password and sends nothing to us. It is off until you switch it on.</p></div></details>
         <details class="reveal"><summary>Is Campuslit official?</summary><div class="details-body"><p>No. It is an independent project made by students and is not made, endorsed or supported by Bahria University. The university&rsquo;s name and emblem belong to the university, and are used here only to say which websites Campuslit works on.</p></div></details>
         <details class="reveal"><summary>Which campuses does it work for?</summary><div class="details-body"><p>All of them. Campuslit runs on the two student portals every campus uses, so it does not matter where you study. It was built using pages from one campus, so if a screen at yours looks wrong, <a href="https://github.com/ahmedammad1709/campuslit/issues">tell us</a> and it will be fixed.</p></div></details>
         <details class="reveal"><summary>Is it safe, and does it send my data anywhere?</summary><div class="details-body"><p>It changes how pages look. Forms, uploads and downloads still go to the university exactly as before, and your marks and submissions are never touched. Out of the box Campuslit makes no network requests at all. If you turn on the optional notifications, it opens pages on the two portals using your own sign-in, and nothing goes anywhere else. On your device it keeps only your look, an optional note of open assignments so reminders work, the optional notification note, and which tips you have seen. Switch it off from the toolbar button, or remove it, and the original portal is back. Details are in the <a href="privacy">privacy policy</a>.</p></div></details>
         <details class="reveal"><summary>Can I rely on the attendance numbers?</summary><div class="details-body"><p>Treat them as a helpful estimate. They are worked out from the hours the portal shows, your credit hours and the semester length you set. The university&rsquo;s own records are what count.</p></div></details>
-        <details class="reveal"><summary>Which browsers work? What about my phone?</summary><div class="details-body"><p>Chrome, Edge and Brave (install from the Chrome Web Store) and Firefox 140 or newer, on a computer. Most phone browsers do not run extensions like this.</p></div></details>
+        <details class="reveal"><summary>Which browsers work? What about my phone?</summary><div class="details-body"><p>Chrome, Edge and Brave (install from the Chrome Web Store) and Firefox 140 or newer (install from Firefox Add-ons), on a computer. Most phone browsers do not run extensions like this.</p></div></details>
         <details class="reveal"><summary>The university changed its pages and something looks off.</summary><div class="details-body"><p>That can happen. Switch Campuslit off for that portal and the page is back to normal, then <a href="https://github.com/ahmedammad1709/campuslit/issues">report it on GitHub</a> with a screenshot (hide your name and enrollment number first).</p></div></details>
       </div>
     </div>

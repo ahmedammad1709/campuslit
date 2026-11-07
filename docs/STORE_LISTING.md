@@ -34,7 +34,7 @@ WHAT YOU GET
 • Assignment reminder: a small popup on other LMS pages names the next assignment you have not submitted. Cross it away and it stays hidden for a few hours.
 • Attendance planner: for each course, how many hours you can still miss and finish above 75%, worked out from your credit hours and the semester length you choose.
 • Time table: a compact day board or a one-page week calendar, and an "Add to calendar" button that downloads your classes as a calendar file you can open in Google, Apple or Outlook calendar.
-• Notifications (optional; Campuslit asks once and does nothing until you say yes): desktop alerts when attendance is marked present or absent, quiz marks are uploaded, a new assignment or lecture note appears, and 2 days, 24 hours and 7 hours before a deadline. You choose each one in settings.
+• Notifications (optional; Campuslit asks once and does nothing until you say yes): desktop alerts when attendance is marked present or absent, quiz marks are uploaded, a new assignment or lecture note appears, and 2 days, 24 hours and 7 hours before a deadline. You choose each one in settings. The CMS signs you out quickly, so attendance alerts usually arrive when you next sign in to it; the rest is checked in the background.
 • Quick search: press Ctrl+K (Cmd+K on a Mac) or / to jump to any page in the portal's menu.
 • A short welcome and tour the first time you open it (skip it any time), and one small hint beside each new feature the first time it appears. Tips, the tour and the opening animation can all be switched off in settings.
 • A calmer sign-in page and portal chooser.
