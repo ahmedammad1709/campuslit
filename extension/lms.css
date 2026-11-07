@@ -149,7 +149,12 @@
     & a.label:active { transform: scale(.97); }
     & td > div[style*="background:red"], & td > div[style*="background: red"] { background: color-mix(in srgb, var(--bs-bad) 12%, var(--bs-surface)) !important; color: color-mix(in srgb, var(--bs-bad) 80%, var(--bs-ink)) !important; border: 1px solid color-mix(in srgb, var(--bs-bad) 28%, transparent); border-radius: 999px !important; padding: 6px 12px !important; font-size: calc(var(--bs-size) * 0.7667); font-weight: 800 !important; line-height: 1.2 !important; letter-spacing: .02em; text-transform: uppercase; white-space: nowrap; }
     & td > div[style*="background:red"]::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 7px; border-radius: 50%; background: currentColor; vertical-align: 1px; }
-    & .table .label { white-space: normal; text-align: left; }
+    & .table .label { white-space: normal; text-align: left; border-radius: 12px; }   /* if a pill has to wrap it becomes a rounded box, never a tall oval */
+    /* narrow windows and zoomed pages: a table that has status pills keeps a sensible width and scrolls sideways inside its box, instead of crushing its columns or cutting the last one off */
+    @media (max-width: 1500px) {
+      & .table-responsive { overflow-x: auto; }
+      & .table-responsive > .table:has(.label) { min-width: 1120px; }
+    }
     /* the portal's own Submit button: a link around a green box that has no side padding, so the text touched the edge. Same box, evenly spaced. */
     & td > a[data-toggle="modal"]:has(> div[style*="background"]) { display: inline-block; background-image: none !important; text-decoration: none !important; border-radius: calc(var(--bs-r) * .8); transition: transform .16s var(--bs-ease), filter .16s; }
     & td > a[data-toggle="modal"]:has(> div[style*="background"]):hover { transform: translateY(-1px); filter: brightness(1.08); }
@@ -196,7 +201,7 @@
     & .bs-due-others { margin: 0 0 10px; padding: 0; list-style: none; font-size: calc(var(--bs-size) * 0.9333); color: var(--bs-muted); }
     & .bs-due-others li { padding: 3px 0; } & .bs-due-others b { color: var(--bs-ink); font-weight: 700; }
     & .bs-due-hint { margin: 0; font-size: calc(var(--bs-size) * 0.8); color: var(--bs-muted); }
-    & .bs-due-chip { --tone: var(--bs-muted); display: block; width: fit-content; max-width: 100%; margin-top: 8px; padding: 3px 9px; border-radius: 999px; font-size: calc(var(--bs-size) * 0.8); font-weight: 700; line-height: 1.35; white-space: normal; color: color-mix(in srgb, var(--tone) 78%, var(--bs-ink)); background: color-mix(in srgb, var(--tone) 12%, var(--bs-surface)); border: 1px solid color-mix(in srgb, var(--tone) 28%, transparent); }
+    & .bs-due-chip { --tone: var(--bs-muted); display: block; width: fit-content; max-width: 100%; margin-top: 8px; padding: 3px 9px; border-radius: 12px; font-size: calc(var(--bs-size) * 0.8); font-weight: 700; line-height: 1.35; white-space: normal; color: color-mix(in srgb, var(--tone) 78%, var(--bs-ink)); background: color-mix(in srgb, var(--tone) 12%, var(--bs-surface)); border: 1px solid color-mix(in srgb, var(--tone) 28%, transparent); }
     & .bs-due-chip[hidden] { display: none; }
     & .bs-due-chip[data-level="ok"] { --tone: var(--bs-ok); } & .bs-due-chip[data-level="info"] { --tone: var(--bs-info); } & .bs-due-chip[data-level="warn"] { --tone: var(--bs-warn); } & .bs-due-chip[data-level="bad"] { --tone: var(--bs-bad); }
 
