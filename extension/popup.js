@@ -51,6 +51,24 @@ function render() {
   }
   b.classList.add('custom');
   grid.append(b);
+  renderAsk();
+}
+// The one-time question about notifications. Yes turns them on (the background worker then makes a silent first look); either answer is remembered, so it never nags.
+function renderAsk() {
+  const box = document.getElementById('notify-ask');
+  box.hidden = !(guide && BahriaGuide.wantsNotifyAsk(guide, settings.notify.enabled)) || !welcome.hidden || !tourBox.hidden;
+  if (!box.hidden) StudioIcons.render(box);
+}
+async function answerAsk(turnOn, then) {
+  try { guide = await StudioStorage.updateGuide(BahriaGuide.markNotifyAsked); } catch { /* it may ask once more */ }
+  document.getElementById('notify-ask').hidden = true;
+  if (turnOn) await save({ notify: { ...settings.notify, enabled: true } }).then(() => { status.textContent = 'Notifications are on. Choose what you get in Settings.'; });
+  if (then) then();
+}
+function openNotifySettings() {
+  const api = globalThis.browser || globalThis.chrome;
+  if (StudioStorage.isExtension && api.tabs && api.tabs.create) api.tabs.create({ url: api.runtime.getURL('options.html#notifications') });
+  else location.href = 'options.html#notifications';
 }
 function openStudio() {
   const api = globalThis.browser || globalThis.chrome;
@@ -72,6 +90,9 @@ async function save(patch) {
 for (const k of ['enabled', 'cms', 'lms']) document.getElementById(k).addEventListener('change', e => save({ power: [k, e.target.checked] }));
 document.getElementById('system').addEventListener('change', e => save({ mode: e.target.checked ? 'system' : 'preset' }));
 document.getElementById('customize').addEventListener('click', () => StudioStorage.openOptions());
+document.getElementById('na-yes').addEventListener('click', () => answerAsk(true));
+document.getElementById('na-no').addEventListener('click', () => answerAsk(false));
+document.getElementById('na-choose').addEventListener('click', () => answerAsk(false, openNotifySettings));
 
 // ---------- the first-run welcome and tour ----------
 // The first time the popup opens it shows a short welcome, then (if you take it) a tour: a spotlight on one part of the popup at a time.
@@ -105,7 +126,7 @@ function maybeWelcome() {
 function hideWelcome() {
   if (welcome.hidden) return Promise.resolve();
   welcome.classList.add('leaving');
-  return new Promise(done => setTimeout(() => { welcome.hidden = true; welcome.classList.remove('leaving'); document.body.classList.remove('is-welcome'); done(); }, animated() ? 170 : 0));
+  return new Promise(done => setTimeout(() => { welcome.hidden = true; welcome.classList.remove('leaving'); document.body.classList.remove('is-welcome'); renderAsk(); done(); }, animated() ? 170 : 0));
 }
 async function rememberWelcome() { try { guide = await StudioStorage.updateGuide(BahriaGuide.markWelcome); } catch { /* it will simply show again next time */ } }
 function openGuide() {
@@ -151,7 +172,7 @@ async function startTour() {
   showStep(0);
 }
 function endTour() {
-  tourBox.hidden = true; step = -1;
+  tourBox.hidden = true; step = -1; renderAsk();
   mainParts().forEach(n => { n.inert = false; });
   document.getElementById('tour-link').focus({ preventScroll: true });
 }
@@ -173,6 +194,6 @@ document.addEventListener('keydown', e => {
 addEventListener('resize', () => { if (!tourBox.hidden && step >= 0) place(); });
 
 StudioStorage.subscribe(value => { if (!saving) { settings = value; setAnimation(); render(); } });
-StudioStorage.subscribeGuide(value => { guide = value; });
+StudioStorage.subscribeGuide(value => { guide = value; renderAsk(); });
 StudioStorage.read().then(value => { settings = value; setAnimation(); render(); maybeWelcome(); }).catch(() => { setAnimation(); render(); status.textContent = 'Could not load saved preferences.'; });
-StudioStorage.guide().then(value => { guide = value; maybeWelcome(); }).catch(() => { /* no welcome if the record cannot be read */ });
+StudioStorage.guide().then(value => { guide = value; maybeWelcome(); renderAsk(); }).catch(() => { /* no welcome if the record cannot be read */ });

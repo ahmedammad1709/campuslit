@@ -12,12 +12,13 @@
   });
   const ORDER = Object.freeze(Object.keys(HINTS));
 
-  const empty = () => ({ v: 1, welcome: false, tour: false, seen: [] });
+  const empty = () => ({ v: 1, welcome: false, tour: false, notifyAsked: false, seen: [] });
   // Anything read from storage is untrusted: keep only known keys, as an ordered list without repeats (a list, not an object, so odd key names cannot matter).
   function sanitize(raw) {
     const state = empty();
     if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return state;
     state.welcome = raw.welcome === true;
+    state.notifyAsked = raw.notifyAsked === true;   // the one-time "get alerts?" question has been answered (either way)
     state.tour = raw.tour === true;   // set from settings: "take the tour again" at the next popup open
     if (Array.isArray(raw.seen)) for (const key of raw.seen) if (typeof key === 'string' && ORDER.includes(key) && !state.seen.includes(key)) state.seen.push(key);
     return state;
@@ -27,6 +28,9 @@
   const welcomed = state => sanitize(state).welcome;
   function markWelcome(state) { const next = sanitize(state); next.welcome = true; next.tour = false; return next; }
   function requestTour(state) { const next = sanitize(state); next.tour = true; return next; }
+  function markNotifyAsked(state) { const next = sanitize(state); next.notifyAsked = true; return next; }
+  // Ask once whether to turn notifications on: not if they already are, and not again after an answer.
+  function wantsNotifyAsk(state, notifyOn) { return !notifyOn && !sanitize(state).notifyAsked; }
   function clearHints(state) { const next = sanitize(state); next.seen = []; return next; }
   // Should the popup open with the welcome and tour? The first time (unless tips are off), or whenever a replay was asked for.
   function wantsTour(state, tipsOn) { const s = sanitize(state); return s.tour || (!!tipsOn && !s.welcome); }
@@ -46,5 +50,5 @@
     return { key, title: base.title, text: raw.replace('{key}', mac ? 'Cmd+K or /' : 'Ctrl+K or /') };
   }
 
-  root.BahriaGuide = { KEY, HINTS, ORDER, empty, sanitize, isSeen, mark, welcomed, markWelcome, requestTour, clearHints, wantsTour, progress, pick, hint };
+  root.BahriaGuide = { KEY, HINTS, ORDER, empty, sanitize, isSeen, mark, welcomed, markWelcome, requestTour, markNotifyAsked, wantsNotifyAsk, clearHints, wantsTour, progress, pick, hint };
 })(globalThis);

@@ -33,6 +33,14 @@
     <label class="pop-row"><span>Follow device appearance<small id="system-note">Midnight when your device is dark</small></span><input id="system" type="checkbox" role="switch"><span class="track" aria-hidden="true"></span></label>
   </div>
 
+  <!-- Asked once: whether to turn notifications on. Nothing is checked until they say yes. -->
+  <section id="notify-ask" class="pop-ask" aria-labelledby="na-title" hidden>
+    <h2 id="na-title"><span data-icon="bell"></span>Get alerts?</h2>
+    <p>Desktop notifications for new assignments, quiz marks, lecture notes, attendance and deadlines. Campuslit checks your portals with your own sign-in while your browser is open. Change it any time in Settings.</p>
+    <div class="pop-ask-actions"><button id="na-yes" class="pop-btn primary" type="button">Turn on</button><button id="na-no" class="pop-btn" type="button">Not now</button></div>
+    <button id="na-choose" class="pop-link" type="button">Choose what to get <span data-icon="arrow"></span></button>
+  </section>
+
   <footer class="pop-foot"><span class="foot-status"><span class="local-dot"></span><span id="status" role="status" aria-live="polite">Stored only on this browser</span></span><span class="foot-links"><button id="tour-link" class="foot-btn" type="button">Tour</button><a href="privacy.html" target="_blank" rel="noopener">Privacy</a></span></footer>
 
   <!-- First time the popup is opened: a short welcome instead of the controls. Closing it (or "Show me around") is remembered. -->

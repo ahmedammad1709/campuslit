@@ -11,29 +11,29 @@ const G = sandbox.BahriaGuide;
 const plain = value => JSON.parse(JSON.stringify(value));   // the module runs in its own realm; compare plain data
 
 test('a fresh state has nothing dismissed and no welcome seen', () => {
-  assert.deepEqual(plain(G.empty()), { v: 1, welcome: false, tour: false, seen: [] });
+  assert.deepEqual(plain(G.empty()), { v: 1, welcome: false, tour: false, notifyAsked: false, seen: [] });
   assert.equal(G.welcomed(undefined), false);
   assert.deepEqual(plain(G.progress(undefined)), { seen: 0, total: 4 });
 });
 
 test('anything that is not a clean record is read as a fresh state', () => {
-  for (const raw of [null, undefined, 0, 1, 'x', true, [], [1, 2], () => 1]) assert.deepEqual(plain(G.sanitize(raw)), { v: 1, welcome: false, tour: false, seen: [] }, String(raw));
+  for (const raw of [null, undefined, 0, 1, 'x', true, [], [1, 2], () => 1]) assert.deepEqual(plain(G.sanitize(raw)), { v: 1, welcome: false, tour: false, notifyAsked: false, seen: [] }, String(raw));
 });
 
 test('only known hints are kept, once each, and only a real true counts as welcomed', () => {
   const s = plain(G.sanitize({ welcome: 'yes', seen: ['search', 'search', 'nonsense', 42, null, {}, ['search'], '__proto__', 'constructor', 'timetable'], extra: 'dropped' }));
-  assert.deepEqual(s, { v: 1, welcome: false, tour: false, seen: ['search', 'timetable'] });
+  assert.deepEqual(s, { v: 1, welcome: false, tour: false, notifyAsked: false, seen: ['search', 'timetable'] });
   assert.equal(G.welcomed({ welcome: true }), true);
   assert.equal(G.welcomed({ welcome: 1 }), false);
-  assert.deepEqual(Object.keys(G.sanitize({ welcome: true, seen: [], __proto__: { polluted: 1 } })).sort(), ['seen', 'tour', 'v', 'welcome']);
+  assert.deepEqual(Object.keys(G.sanitize({ welcome: true, seen: [], __proto__: { polluted: 1 } })).sort(), ['notifyAsked', 'seen', 'tour', 'v', 'welcome']);
   assert.equal(({}).polluted, undefined);
 });
 
 test('marking a hint or the welcome returns a new state and never changes the old one', () => {
   const a = G.empty(), b = G.mark(a, 'search'), c = G.markWelcome(b);
-  assert.deepEqual(plain(a), { v: 1, welcome: false, tour: false, seen: [] });
-  assert.deepEqual(plain(b), { v: 1, welcome: false, tour: false, seen: ['search'] });
-  assert.deepEqual(plain(c), { v: 1, welcome: true, tour: false, seen: ['search'] });
+  assert.deepEqual(plain(a), { v: 1, welcome: false, tour: false, notifyAsked: false, seen: [] });
+  assert.deepEqual(plain(b), { v: 1, welcome: false, tour: false, notifyAsked: false, seen: ['search'] });
+  assert.deepEqual(plain(c), { v: 1, welcome: true, tour: false, notifyAsked: false, seen: ['search'] });
   assert.deepEqual(plain(G.mark(c, 'search')), plain(c), 'marking twice changes nothing');
   assert.deepEqual(plain(G.mark(c, 'not-a-hint')), plain(c), 'an unknown hint is ignored');
   assert.equal(G.isSeen(c, 'search'), true); assert.equal(G.isSeen(c, 'timetable'), false);
@@ -67,10 +67,10 @@ test('a tour can be asked for again, and the first-open tour is only for people 
   assert.equal(G.wantsTour(G.markWelcome(fresh), true), false, 'once shown it does not come back by itself');
   const again = G.requestTour(G.markWelcome(fresh));
   assert.equal(G.wantsTour(again, false), true, 'but a replay asked for in settings works even with tips off');
-  assert.deepEqual(plain(G.markWelcome(again)), { v: 1, welcome: true, tour: false, seen: [] }, 'showing it clears the request');
+  assert.deepEqual(plain(G.markWelcome(again)), { v: 1, welcome: true, tour: false, notifyAsked: false, seen: [] }, 'showing it clears the request');
   assert.equal(G.sanitize({ tour: 'yes' }).tour, false, 'only a real true counts');
   const hints = G.mark(G.mark(G.markWelcome(fresh), 'search'), 'timetable');
-  assert.deepEqual(plain(G.clearHints(hints)), { v: 1, welcome: true, tour: false, seen: [] }, 'forgetting the hints keeps the welcome as seen');
+  assert.deepEqual(plain(G.clearHints(hints)), { v: 1, welcome: true, tour: false, notifyAsked: false, seen: [] }, 'forgetting the hints keeps the welcome as seen');
 });
 
 test('the hint list cannot be edited from outside', () => {
@@ -80,4 +80,14 @@ test('the hint list cannot be edited from outside', () => {
 
 test('the module touches nothing outside itself (no storage, network, DOM or timers)', () => {
   assert.ok(!/\b(?:chrome|browser|document|window|fetch|XMLHttpRequest|localStorage|setTimeout|setInterval|eval)\b/.test(source.replace(/\/\/.*$/gm, '')));
+});
+
+test('the notification question is asked once, and never when notifications are already on', () => {
+  assert.equal(G.wantsNotifyAsk(undefined, false), true, 'a fresh install is asked');
+  assert.equal(G.wantsNotifyAsk(undefined, true), false, 'not when they are already on');
+  const answered = G.markNotifyAsked(undefined);
+  assert.equal(plain(answered).notifyAsked, true);
+  assert.equal(G.wantsNotifyAsk(answered, false), false, 'an answer, either way, is remembered');
+  assert.equal(G.sanitize({ notifyAsked: 'yes' }).notifyAsked, false, 'only a real true counts');
+  assert.equal(G.wantsNotifyAsk(G.clearHints(answered), false), false, 'forgetting the hints does not ask again');
 });
