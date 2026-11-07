@@ -80,7 +80,9 @@
   }
   // the CMS dashboard carries every course's present and absent hours in its script
   function parseAttendance(html) {
-    const A = root.BahriaAttendance; const list = A && A.extractCourses ? A.extractCourses(String(html || '')) : null;
+    // The dashboard names the function twice: where it is defined, and where it is called with the data. Try each mention until one holds the list.
+    const A = root.BahriaAttendance, text = String(html || ''); let list = null;
+    for (let from = 0; A && A.extractCourses && !list;) { const at = text.indexOf('renderAttendanceSummaryChart(', from); if (at < 0) break; list = A.extractCourses(text.slice(at)); from = at + 1; }
     if (!list) return null;
     const out = {};
     for (const c of list.slice(0, 40)) {

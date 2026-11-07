@@ -50,6 +50,9 @@ test('reads the attendance hours from the CMS dashboard script and tells a sign-
   const script = '<script>renderAttendanceSummaryChart([{"code":"CS 101","title":"Data Structures","present":18.0,"absent":3.0,"total":21.0,"percentage":"85.7"},{"code":"bad"}]);</script>';
   assert.deepEqual(plain(N.parseAttendance(script)), { 'CS 101': { code: 'CS 101', title: 'Data Structures', present: 18, absent: 3, total: 21, pct: 85.7 } });
   assert.equal(N.parseAttendance('<p>none</p>'), null);
+  // the real dashboard defines the function first and calls it later, in another script
+  const real = '<script>function renderAttendanceSummaryChart(data) { var rows = []; for (var i = 0; i < data.length; i++) { rows.push(data[i]); } }</script><script>renderAttendanceSummaryChart([{"code":"CS 101","title":"Data Structures","present":18.0,"absent":3.0,"total":21.0,"percentage":"85.7"}]);</script>';
+  assert.equal(plain(N.parseAttendance(real))['CS 101'].present, 18, 'found after the definition');
   assert.equal(N.signedIn('cms', script, 'https://cms.bahria.edu.pk/Sys/Student/Dashboard.aspx'), true);
   assert.equal(N.signedIn('cms', '<input type="password">', 'https://cms.bahria.edu.pk/Logins/Student/Login.aspx'), false);
   assert.equal(N.signedIn('lms', select('semesterId', [['a', 'b']]), 'https://lms.bahria.edu.pk/Student/Assignments.php'), true);
