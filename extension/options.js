@@ -296,12 +296,12 @@ addEventListener('beforeunload', e => { if (isDirty()) { e.preventDefault(); e.r
   const api = globalThis.browser || globalThis.chrome, live = StudioStorage.isExtension && api && api.runtime && api.runtime.sendMessage;
   const ask = action => new Promise(resolve => { try { const r = api.runtime.sendMessage({ bsNotify: action }, res => resolve(res || { ok: false })); if (r && r.then) r.then(resolve, () => resolve({ ok: false })); } catch (e) { resolve({ ok: false }); } });
   const when = t => { const m = Math.round((Date.now() - t) / 60000); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : Math.round(m / 1440) + ' days ago'; };
-  const say = (ok, session) => session === 'expired' ? 'sign in again' : ok ? 'signed in' : 'not seen yet';
+  const say = session => session === 'expired' ? 'sign in again' : session === 'ok' ? 'signed in' : 'not checked yet';
   async function showStatus() {
     if (!live) return;
     const st = await ask('status'), el = $('n-status');
     if (!st.ok) { el.textContent = 'Not checked yet.'; return; }
-    el.textContent = (st.lastRun ? 'Last checked ' + when(st.lastRun) + (st.last && st.last.error ? ' (' + st.last.error + ')' : '') : 'Not checked yet') + '. Watching ' + st.courses + (st.courses === 1 ? ' course' : ' courses') + '. LMS: ' + say(true, st.session.lms) + '. CMS: ' + say(true, st.session.cms) + '.';
+    el.textContent = (st.lastRun ? 'Last checked ' + when(st.lastRun) + (st.last && st.last.error ? ' (' + st.last.error + ')' : '') : 'Not checked yet') + '. Watching ' + st.courses + (st.courses === 1 ? ' course' : ' courses') + '. LMS: ' + say(st.session.lms) + '. CMS: ' + say(st.session.cms) + '.';
   }
   if (!live) { for (const id of ['n-test', 'n-check', 'n-forget']) $(id).disabled = true; $('n-hint').hidden = false; $('n-status').textContent = 'Not available in the browser preview.'; return; }
   $('n-test').addEventListener('click', async () => { const r = await ask('test'); status(r.ok ? 'Test notification sent.' : 'Could not show a notification. Check your computer\'s notification settings.'); });

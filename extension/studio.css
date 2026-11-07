@@ -478,3 +478,7 @@ code { padding: 2px 7px; border-radius: 6px; background: var(--sunken); font-fam
 }
 
 .quick-hint { margin: -4px 0 14px; font-size: 13.5px; line-height: 1.45; color: var(--muted, #566683); }
+
+/* notes that follow a control get a gap (the default note style tucks up under a heading) */
+#section-notifications .row + .group-note, #section-notifications .segmented + .group-note, #section-notifications .data-actions + .group-note, #section-notifications .group-note + .group-note { margin-top: 14px; }
+#section-notifications .data-actions { margin-top: 4px; }
