@@ -115,7 +115,7 @@ test('nothing on the site would be blocked by its own security policy', () => {
 });
 
 test('the site loads nothing from other websites and links out only to the project, its host and its legal sources', () => {
-  const allowed = [/^https:\/\/campuslit-bu\.vercel\.app\//, /^https:\/\/github\.com\/ahmedammad1709\/campuslit(\/|$)/, /^https:\/\/vercel\.com\/legal\/privacy-policy$/, /^https:\/\/chromewebstore\.google\.com\/detail\/kldmhhiopdefjapkebnelablimikghio$/, /^https:\/\/addons\.mozilla\.org\/en-US\/firefox\/addon\/campuslit-bahria-cms-redesign\/$/, /^https:\/\/ammadahmed\.netlify\.app\/$/, /^https:\/\/www\.instagram\.com\/ammad_innovates\/$/];
+  const allowed = [/^https:\/\/campuslit-bu\.vercel\.app\//, /^https:\/\/github\.com\/ahmedammad1709\/campuslit(\/|$)/, /^https:\/\/vercel\.com\/legal\/privacy-policy$/, /^https:\/\/chromewebstore\.google\.com\/detail\/kldmhhiopdefjapkebnelablimikghio$/, /^https:\/\/addons\.mozilla\.org\/en-US\/firefox\/addon\/campuslit-bahria-cms-redesign\/$/, /^https:\/\/ammadahmed\.netlify\.app\/$/, /^https:\/\/www\.linkedin\.com\/feed\/update\/urn:li:ugcPost:7525203614693404672\/$/, /^https:\/\/www\.linkedin\.com\/legal\/privacy-policy$/, /^https:\/\/www\.instagram\.com\/ammad_innovates\/$/];
   for (const { file, html } of pages) {
     for (const [, url] of html.matchAll(/(?:href|src)="(https?:[^"]+)"/g)) assert.ok(allowed.some(rule => rule.test(url)), file + ': ' + url);
     assert.ok(!/<(?:script|link|img|iframe)\b[^>]*(?:src|href)="https?:(?!\/\/campuslit-bu\.vercel\.app\/)/.test(html.replace(/<a\b[^>]*>/g, '')), file + ': a resource from another site');
@@ -141,11 +141,11 @@ test('the home page says plainly what Campuslit is, who it is for, and that it i
 });
 
 test('the home page stays short: few words, one idea per section, no section repeated', () => {
-  const html = pages[0].html, text = decode(html.replace(/<script[\s\S]*?<\/script>/g, ' ').replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim();
-  assert.ok(text.split(' ').length < 1750, 'home page words: ' + text.split(' ').length);
-  const sections = [...html.matchAll(/<(?:section|div)[^>]*\sid="(features|themes|install|faq|trust)"/g)].map(m => m[1]);
-  assert.deepEqual(sections, ['features', 'themes', 'install', 'trust', 'faq'], 'sections, in order');
-  assert.ok((html.match(/<h2[\s>]/g) || []).length <= 6, 'at most six headed sections');
+  const html = pages[0].html, text = decode(html.replace(/<script[\s\S]*?<\/script>/g, ' ').replace(/<section id="praise"[\s\S]*?<\/section>/, ' ').replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim();
+  assert.ok(text.split(' ').length < 1750, 'home page words (the comments wall is counted separately): ' + text.split(' ').length);
+  const sections = [...html.matchAll(/<(?:section|div)[^>]*\sid="(features|themes|praise|install|faq|trust)"/g)].map(m => m[1]);
+  assert.deepEqual(sections, ['features', 'themes', 'praise', 'install', 'trust', 'faq'], 'sections, in order');
+  assert.ok((html.match(/<h2[\s>]/g) || []).length <= 7, 'at most seven headed sections');
   const questions = [...html.matchAll(/<summary>([^<]+)<\/summary>/g)].map(m => m[1]);
   assert.ok(questions.length <= 12 && new Set(questions).size === questions.length, 'distinct, few questions');
 });
@@ -220,4 +220,26 @@ test('the structured data on every page is valid JSON (Search Console rejects a 
     for (const block of blocks) { let data; assert.doesNotThrow(() => { data = JSON.parse(block); }, file + ': structured data is not valid JSON'); assert.ok(data['@context'], file + ': structured data has no @context'); }
   }
   assert.ok([...pages[0].html.matchAll(/ld\+json/g)].length >= 1, 'the home page keeps its structured data');
+});
+
+test('the praise section: real comments, each opening the post; LinkedIn is contacted only when the visitor scrolls to the post', () => {
+  const data = JSON.parse(read('../scripts/data/testimonials.json')), html = pages[0].html, postUrl = data.post.url;
+  assert.ok(data.comments.length >= 3, 'a few comments');
+  for (const c of data.comments) {
+    const esc = x => x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    assert.ok(html.includes(esc(c.name)) && html.includes(esc(c.quote)), c.name + ': name and the exact words are on the page');
+    assert.ok(c.role && c.quote, c.name + ': a bio and the words');
+  }
+  const cards = [...html.matchAll(/<a class="tcard" href="([^"]+)"/g)].map(m => m[1]);
+  assert.equal(cards.length, data.comments.length, 'one card per comment');
+  assert.ok(cards.every(u => u === postUrl), 'every card opens the original LinkedIn post');
+  assert.ok(/data-embed="https:\/\/www\.linkedin\.com\/embed\/feed\/update\/urn:li:ugcPost:\d+"/.test(html), 'the embed address is LinkedIn\'s official embed');
+  assert.ok(!/<iframe/i.test(html), 'no frame in the page itself: the script adds it only when the visitor scrolls near the post');
+  const csp = JSON.parse(read('vercel.json')).headers[0].headers.find(h => h.key === 'Content-Security-Policy').value;
+  assert.match(csp, /frame-src https:\/\/www\.linkedin\.com(;|$)/, 'only LinkedIn may be framed');
+  assert.ok(!/frame-src[^;]*(\*|http:)/.test(csp), 'no other frame source');
+  const script = read('script.js');
+  assert.ok(script.includes("startsWith('https://www.linkedin.com/embed/')"), 'the script only ever frames LinkedIn\'s embed address');
+  assert.ok(script.includes('IntersectionObserver') && script.includes("rootMargin: '400px 0px'"), 'the post loads when the visitor scrolls near it, not on page load');
+  assert.match(pages.find(p => p.route === 'privacy').html, /only when you scroll down to it/, 'the privacy policy says when LinkedIn is contacted');
 });

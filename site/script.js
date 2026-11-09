@@ -64,6 +64,48 @@
     show(0);
   });
 
+  // praise: the wall of comments slides slowly (cards are cloned to loop forever); the LinkedIn post loads only when someone asks for it
+  const wall = document.querySelector('.wall');
+  if (wall && !reduced) {
+    const SPEED = 38;   // pixels per second: slow enough to read
+    const build = () => {
+      wall.classList.remove('live');
+      wall.querySelectorAll('[data-clone]').forEach(n => n.remove());
+      wall.querySelectorAll('.row').forEach(row => {
+        const track = row.querySelector('.track'), originals = [...track.children];
+        if (!originals.length) return;
+        wall.classList.add('live');
+        const gap = parseFloat(getComputedStyle(track).columnGap) || 16;
+        const setWidth = originals.reduce((w, c) => w + c.getBoundingClientRect().width + gap, 0);
+        const copies = Math.ceil(row.clientWidth / setWidth) + 1;
+        for (let i = 0; i < copies; i++) originals.forEach(c => { const k = c.cloneNode(true); k.setAttribute('data-clone', ''); k.setAttribute('aria-hidden', 'true'); k.tabIndex = -1; track.append(k); });
+        track.style.setProperty('--wall-shift', -setWidth + 'px'); track.style.setProperty('--wall-time', (setWidth / SPEED) + 's');
+      });
+    };
+    let timer = 0;
+    build(); addEventListener('resize', () => { clearTimeout(timer); timer = setTimeout(build, 250); });
+  }
+  // the LinkedIn post: loaded by default, but only when the visitor scrolls close to it (so people who never get there never contact LinkedIn); the button is the fallback
+  const embedButton = document.querySelector('[data-embed]');
+  if (embedButton) {
+    const post = document.querySelector('.lpost'), face = document.querySelector('.lp-face'), host = document.querySelector('.lp-host');
+    let loaded = false;
+    const load = () => {
+      const src = embedButton.dataset.embed || '';
+      if (loaded || !post || !face || !host || !src.startsWith('https://www.linkedin.com/embed/')) return;
+      loaded = true;
+      const frame = document.createElement('iframe');
+      frame.className = 'lp-embed'; frame.title = 'The LinkedIn post'; frame.src = src; frame.setAttribute('allowfullscreen', ''); frame.referrerPolicy = 'strict-origin-when-cross-origin';
+      frame.addEventListener('load', () => { face.hidden = true; host.hidden = false; post.classList.add('embedded'); });
+      host.append(frame);
+    };
+    embedButton.addEventListener('click', load);
+    if ('IntersectionObserver' in window && post) {
+      const io = new IntersectionObserver(entries => { if (entries.some(e => e.isIntersecting)) { io.disconnect(); load(); } }, { rootMargin: '400px 0px' });
+      io.observe(post);
+    }
+  }
+
   // theme gallery
   const shot = document.getElementById('theme-shot');
   if (shot) {

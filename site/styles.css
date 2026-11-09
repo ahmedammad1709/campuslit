@@ -314,3 +314,51 @@ td:first-child { color: var(--ink); font-weight: 700; }
 .rel-date { margin-top: -6px; color: var(--muted); font-weight: 700; font-size: 15px; }
 .prose h2 .badge { vertical-align: middle; margin-left: 8px; }
 .foot .by { margin-top: 10px; font-size: 14px; }
+
+/* ---------- praise: what people are saying (the LinkedIn post and the wall of comments) ---------- */
+#praise .praise { display: grid; grid-template-columns: minmax(0, 504px) minmax(0, 1fr); gap: 56px; align-items: start; }
+.lpost { padding: 22px; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); box-shadow: var(--shadow); }
+.lp-head { display: flex; gap: 12px; align-items: center; }
+.lp-head b { display: block; font-size: 16px; }
+.lp-head small { display: block; color: var(--muted); font-size: 13px; line-height: 1.35; }
+.lp-text { margin-top: 16px; font-size: 15.5px; color: var(--ink-2); }
+.lp-media { position: relative; margin-top: 16px; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: var(--navy); }
+.lp-media .play { position: absolute; inset: 0; display: grid; place-items: center; }
+.lp-media .play::before { content: ""; width: 62px; height: 62px; border-radius: 50%; background: rgba(11, 29, 64, .78); box-shadow: 0 8px 24px rgba(0, 0, 0, .3); }
+.lp-media .play::after { content: ""; position: absolute; width: 0; height: 0; margin-left: 5px; border-style: solid; border-width: 11px 0 11px 18px; border-color: transparent transparent transparent #fff; }
+.lp-stats { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 14px; color: var(--muted); font-size: 14px; font-weight: 600; }
+.lp-stats span { display: inline-flex; align-items: center; gap: 6px; }
+.lp-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.lp-note { margin-top: 12px; font-size: 13px; color: var(--muted); }
+.lp-face[hidden], .lp-host[hidden] { display: none; }
+.lpost.embedded { padding: 0; border: 0; background: transparent; box-shadow: none; }
+.lp-embed { display: block; width: 100%; height: 920px; border: 1px solid var(--line); border-radius: 14px; background: #fff; box-shadow: var(--shadow); }
+.tin { display: inline-grid; place-items: center; flex: none; width: 18px; height: 18px; border-radius: 4px; background: #0a66c2; color: #fff; font: 800 11px/1 "Plus Jakarta Sans", sans-serif; letter-spacing: -.02em; }
+.tin.big { width: 30px; height: 30px; margin-left: auto; border-radius: 7px; font-size: 17px; }
+.tav { flex: none; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; object-fit: cover; color: #fff; font-weight: 800; font-size: 16px; }
+.tav.big { width: 52px; height: 52px; }
+.tav.c0 { background: #2f5bea; } .tav.c1 { background: #0e8f6a; } .tav.c2 { background: #b4558a; } .tav.c3 { background: #c97a12; } .tav.c4 { background: #6a4fd1; } .tav.c5 { background: #1b8aa6; }
+.wall { display: grid; gap: 30px; min-width: 0; }
+.wall .row { min-width: 0; overflow: hidden; }
+.wall .track { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 28px; padding: 6px 0 10px; }
+.tcard { flex: 0 0 340px; display: flex; gap: 12px; padding: 18px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); color: inherit; text-decoration: none; box-shadow: var(--shadow-s); transition: transform .25s var(--ease), border-color .25s, box-shadow .25s; }
+.tcard:hover, .tcard:focus-visible { transform: translateY(-2px); border-color: var(--line-2); box-shadow: var(--shadow); }
+.tbody { min-width: 0; display: grid; gap: 4px; align-content: start; }
+.tname { display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 15.5px; color: var(--ink); }
+.trole { color: var(--muted); font-size: 13px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.tq { margin-top: 6px; color: var(--ink-2); font-size: 14.5px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 6; line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
+.tfoot { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 8px; padding-top: 10px; border-top: 1px solid var(--line); font-size: 13px; font-weight: 700; color: var(--muted); }
+.tgo { color: var(--accent-2); }
+/* the script marks the wall live (and clones the cards to make the loop endless); without it the cards simply wrap into a grid */
+.wall.live { -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent); mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent); }
+.wall.live .track { flex-wrap: nowrap; width: max-content; animation: wall-slide var(--wall-time, 60s) linear infinite; }
+.wall.live .row.rev .track { animation-direction: reverse; }
+.wall.live .row:hover .track, .wall.live .row:focus-within .track { animation-play-state: paused; }
+@keyframes wall-slide { from { transform: translateX(0); } to { transform: translateX(var(--wall-shift, -50%)); } }
+@media (prefers-reduced-motion: reduce) {
+  .wall.live { -webkit-mask-image: none; mask-image: none; }
+  .wall.live .track { animation: none; flex-wrap: wrap; width: auto; }
+  .tcard[data-clone] { display: none; }
+}
+@media (max-width: 960px) { #praise .praise { grid-template-columns: minmax(0, 1fr); gap: 40px; } }
+@media (max-width: 640px) { .tcard { flex-basis: 286px; } .wall .track { gap: 22px; } .lp-embed { height: 640px; } }

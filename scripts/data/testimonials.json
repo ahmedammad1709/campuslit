@@ -1,0 +1,30 @@
+{
+  "post": {
+    "url": "https://www.linkedin.com/feed/update/urn:li:ugcPost:7525203614693404672/",
+    "embed": "https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7525203614693404672",
+    "author": "Ammad Ahmed",
+    "headline": ".NET & Full Stack Developer | C# | React | Web & Game Development",
+    "text": [
+      "My university portal doesn't look like yours. 👀",
+      "I just redesigned the Bahria University portal, and every student on every campus can use it."
+    ],
+    "reactions": 259,
+    "comments": 53,
+    "asOf": "10 November 2026"
+  },
+  "comments": [
+    { "name": "Yusra Tariq", "role": "AI Product Engineer | Building AI Applications & Intelligent Workflows for Startups | Sharing What I Build", "quote": "This is a great example of solving a real problem students deal with every day. Love how you've gone beyond just redesigning the UI and added practical features like attendance planning, deadline tracking, and notifications. The privacy-first approach is a big plus too. Great work!" },
+    { "name": "Muhammad Hussain", "role": "Founding Member @ BISOL Labs | Software Engineer | We Build the Apps, Sites & Systems Businesses Actually Need", "quote": "Great work Ammad Ahmed on building something that solves a real problem for Bahria students" },
+    { "name": "Engr Muhammad sameer", "role": "Attended Bahria University", "quote": "Proud to see someone from among us getting praised for solving something we all struggled with but never took the step to fix.❤" },
+    { "name": "Muaaz Rizwan", "role": "Senior Associate @ Khosa Law Chambers | Bachelor of Laws - LLB", "quote": "Great example of turning a real user problem into a practical technology solution. What I find particularly interesting is how this project combines user experience, automation, and privacy-focused design to make everyday academic tasks easier. The best innovations are not always the most complicated ones. Sometimes, they come from understanding people's daily challenges and building simple tools that make a meaningful difference. Impressive initiative and great work bringing this idea to life" },
+    { "name": "Kaarim Hussain", "role": "Full Stack AI Developer & Founder at Klyron · Building AI-native products", "quote": "Such an amazing job done - it is really good to see people redesigning stuff that actually looks good, I personally really loved the Midnight Theme design it's great to use and feel nice for eyes!" },
+    { "name": "Bilal Qureshi", "role": "Somewhere Between Search & Software | SEO Executive @ Creatif Soft | On the Software Engineering Track @ BUKC", "quote": "Tremendous boy 🙌 , keep it up" },
+    { "name": "Muhammad Ibrahim", "role": "I build apps, break them, fix them, and post about it | Student by degree, builder by habit | Flutter dev, always one bug away from a better app", "quote": "Lowkey the LinkedIn feed has become a portal redesign convention. Institutes really need to take the hint 😭 Nice work on this one. Please do my uni next. 🙏" },
+    { "name": "Kifayat Ullah", "role": "🚀 Flutter Dev (3+ yrs) | ⚡ Agentic AI & LLMs | BLoC • Riverpod • Clean Architecture", "quote": "mashaa Allah. very practical use-case. good job" },
+    { "name": "Md. Atif Absar", "role": "CSE Undergraduate at KUET | Digital Marketing & Meta Ads | Technology, Business & Strategy | Leadership & Innovation", "quote": "Great, Amazing Work!" },
+    { "name": "Maryam Fatima", "role": "BS Computer Science Student | Data Engineer | Learning and Growing", "quote": "Sooo Good!!" },
+    { "name": "Saim Ahmed", "role": "Full Stack Web Developer & React Native App Developer", "quote": "Amazing, bro... keep it up ❤️🔥" },
+    { "name": "Faheem Ahmed", "role": "BUKC'29 (Software Engineering)", "quote": "Good keep it up bro" },
+    { "name": "Arman Naeem", "role": "Python Developer | Web Developer | Building Practical Web Projects", "quote": "Very Amazing,brother" }
+  ]
+}

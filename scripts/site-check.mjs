@@ -61,7 +61,7 @@ await call('Input.dispatchKeyEvent', {type: 'rawKeyDown', key: 'End', code: 'End
 assert.equal(await ev("document.querySelector('.tabpanel:not([hidden])').id"), 'p-popup', 'End goes to the last tab');
 await ev("document.getElementById('t-assignments').click(); 0");
 // the home page is short
-assert.ok(await ev("document.documentElement.scrollHeight") < 8200, 'desktop page height: ' + await ev("document.documentElement.scrollHeight"));
+assert.ok(await ev("document.documentElement.scrollHeight") < 9400, 'desktop page height: ' + await ev("document.documentElement.scrollHeight"));
 // themes gallery
 await ev("document.querySelector('.chip[data-theme=midnight]').click(); 0");
 assert.match(await ev("document.getElementById('theme-shot').getAttribute('src')"), /lms-midnight\.webp$/);
@@ -81,15 +81,15 @@ assert.equal(await ev("document.querySelector('.site-header').classList.contains
 
 // mobile menu
 await open('/', 390, 844);
-assert.ok(await ev("document.documentElement.scrollHeight") < 10200, 'phone page height: ' + await ev("document.documentElement.scrollHeight"));
+assert.ok(await ev("document.documentElement.scrollHeight") < 12400, 'phone page height: ' + await ev("document.documentElement.scrollHeight"));
 assert.equal(await ev("getComputedStyle(document.querySelector('.nav-links')).display"), 'none', 'menu hidden on a phone');
 await ev("document.querySelector('.menu-btn').click(); 0");
 assert.equal(await ev("getComputedStyle(document.querySelector('.nav-links')).display"), 'flex');
 assert.equal(await ev("document.querySelector('.menu-btn').getAttribute('aria-expanded')"), 'true');
 await ev("document.querySelector('.nav-links a[href=\"#features\"]').click(); 0"); await sleep(600);
 assert.equal(await ev("getComputedStyle(document.querySelector('.nav-links')).display"), 'none', 'choosing a link closes the menu');
-const wide = await ev("[...document.querySelectorAll('body *')].filter(n => n.getBoundingClientRect().right > innerWidth + 1 && getComputedStyle(n).position !== 'fixed' && !n.closest('.tablist')).slice(0, 6).map(n => n.tagName + '.' + n.className + ' ' + Math.round(n.getBoundingClientRect().right))");
-assert.deepEqual(wide, [], 'nothing wider than a phone screen (the tab bar scrolls inside itself)');
+const wide = await ev("[...document.querySelectorAll('body *')].filter(n => n.getBoundingClientRect().right > innerWidth + 1 && getComputedStyle(n).position !== 'fixed' && !n.closest('.tablist, .wall')).slice(0, 6).map(n => n.tagName + '.' + n.className + ' ' + Math.round(n.getBoundingClientRect().right))");
+assert.deepEqual(wide, [], 'nothing wider than a phone screen (the tab bar and the comment wall scroll inside themselves)');
 assert.equal(await ev("document.documentElement.scrollWidth <= innerWidth"), true, 'no sideways scroll on a phone');
 for (const url of ['/privacy', '/license']) { await open(url, 390, 844); assert.equal(await ev("document.documentElement.scrollWidth <= innerWidth"), true, url + ' no sideways scroll'); }
 // tablet width
