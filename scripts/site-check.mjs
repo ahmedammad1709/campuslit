@@ -38,7 +38,7 @@ assert.equal(await ev("getComputedStyle(document.querySelector('.compare-before'
 assert.match(await ev("document.querySelector('.compare-range').getAttribute('aria-valuetext')"), /^20%/);
 // real mouse drag across the picture
 const rect = await ev("(() => { const r = document.querySelector('.compare-stage').getBoundingClientRect(); return {x: r.left, y: r.top + r.height / 2, w: r.width}; })()");
-await ev("document.querySelector('.compare-stage').scrollIntoView({block: 'center'}); 0"); await sleep(400);
+await ev("document.querySelector('.compare-stage').scrollIntoView({block: 'center'}); 0"); await sleep(1500);
 const r2 = await ev("(() => { const r = document.querySelector('.compare-stage').getBoundingClientRect(); return {x: r.left, y: r.top + r.height / 2, w: r.width}; })()");
 await call('Input.dispatchMouseEvent', {type: 'mousePressed', x: r2.x + r2.w * 0.5, y: r2.y, button: 'left', clickCount: 1});
 await call('Input.dispatchMouseEvent', {type: 'mouseMoved', x: r2.x + r2.w * 0.75, y: r2.y, button: 'left'});
