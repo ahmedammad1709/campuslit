@@ -213,3 +213,11 @@ test('the site stays light: the whole site, pictures included, is under 3 MB', (
   (function walk(dir) { for (const entry of fs.readdirSync(dir, { withFileTypes: true })) { const full = path.join(dir, entry.name); if (entry.isDirectory()) walk(full); else total += fs.statSync(full).size; } })(site);
   assert.ok(total < 3 * 1024 * 1024, (total / 1048576).toFixed(2) + ' MB');
 });
+
+test('the structured data on every page is valid JSON (Search Console rejects a block it cannot parse)', () => {
+  for (const { file, html } of pages) {
+    const blocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(m => m[1]);
+    for (const block of blocks) { let data; assert.doesNotThrow(() => { data = JSON.parse(block); }, file + ': structured data is not valid JSON'); assert.ok(data['@context'], file + ': structured data has no @context'); }
+  }
+  assert.ok([...pages[0].html.matchAll(/ld\+json/g)].length >= 1, 'the home page keeps its structured data');
+});
