@@ -313,3 +313,4 @@ td:first-child { color: var(--ink); font-weight: 700; }
 
 .rel-date { margin-top: -6px; color: var(--muted); font-weight: 700; font-size: 15px; }
 .prose h2 .badge { vertical-align: middle; margin-left: 8px; }
+.foot .by { margin-top: 10px; font-size: 14px; }
