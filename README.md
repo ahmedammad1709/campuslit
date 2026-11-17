@@ -102,7 +102,7 @@ Switch it off from the toolbar button, or remove the extension, and the original
 
 ## Trust, in four lines
 
-- **It sends nothing to us or anyone else.** The extension has no server, no accounts and no analytics. Out of the box it makes no requests at all; only if you turn on the optional notifications does it open pages on the two portals, with your own sign-in. Only your look settings, optional notes (open assignments for reminders, what the notifications last saw) and a few "tip seen" flags stay on your device.
+- **It sends nothing to us or anyone else.** The extension has no server, no accounts and no analytics. Out of the box it makes no requests at all; it asks the portal for a file only when you press Preview on it, and for pages only if you turn on the optional notifications, always with your own sign-in. Only your look settings, optional notes (open assignments for reminders, what the notifications last saw) and a few "tip seen" flags stay on your device.
 - **It only runs on** `cms.bahria.edu.pk` and `lms.bahria.edu.pk`, and asks for the single browser permission `storage`.
 - **It changes how pages look**, not what they do. Forms, uploads, marks and submissions still go to the university exactly as before.
 - **It is open source (MIT)**, so you can check all of the above in this repository. Read the [privacy policy](https://campuslit-bu.vercel.app/privacy).

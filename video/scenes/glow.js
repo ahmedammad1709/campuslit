@@ -23,7 +23,7 @@
   const FILL = 1.7;                                              // seconds the calendar takes to fill with classes
   let T = null, btnPos = [0, 0];
   const G = {}, frames = {}, capEls = {}, applied = new Map();
-  const pages = { LMS: '/preview/lms/dashboard.html', CMS: '/preview/cms/dashboard.html', TT: '/preview/cms/timetable.html', ASG: '/preview/lms/assignments.html', CAL: '/__video/calmock.html' };
+  const pages = { LMS: '/preview/lms/dashboard.html', CMS: '/preview/cms/dashboard.html', TT: '/preview/cms/timetable.html', ASG: '/preview/lms/assignments.html', CAL: '/__video/calmock.html', SET: '/options.html#notifications' };
   const HIDE = '.bs-remind, .bs-tip { display: none !important; }';
 
   // ---------------------------------------------------------------- loading
@@ -93,8 +93,8 @@
     const sentences = timing.lines.flatMap(l => l.sentences).sort((x, y) => x.t0 - y.t0);
     T.caps = sentences.map((sn, i) => ({ t0: sn.t0 - .06, t1: Math.min(sn.t1 + .55, i + 1 < sentences.length ? sentences[i + 1].t0 - .03 : 1e9), words: sn.words, small: sn.small }));
     // chapter: [card start, card end, wipe]
-    T.ch = [1, 2, 3, 4].map(n => ({ n, a: sx['card' + n], b: sx['card' + n + 'end'], wipe: sx['wipe' + n] }));
-    const swapAt = n => (n < 4 ? sx['card' + (n + 1)] : sx.end) + .5;          // pages change under the next chapter card
+    T.ch = [1, 2, 3, 4, 5].map(n => ({ n, a: sx['card' + n], b: sx['card' + n + 'end'], wipe: sx['wipe' + n] }));
+    const swapAt = n => (n < 5 ? sx['card' + (n + 1)] : sx.end) + .5;          // pages change under the next chapter card
     const swap0 = n => sx['card' + n] + .5;
     const vis = (g, a, b) => { g.off = [[0, OFF], [a - .001, OFF], [a, 0, 'lin'], [b, 0], [b + .001, OFF, 'lin']]; g.inAt = a; g.outAt = b; };
     const slideIn = (g, inAt, b) => { g.off = [[0, OFF], [inAt + .05, OFF], [inAt + .05 + SL, 0, 'io'], [b, 0], [b + .001, OFF, 'lin']]; g.inAt = inAt; g.outAt = b; };
@@ -129,17 +129,25 @@
     G.lmsS.S = [[0, 1], [sx.key2 - .1, 1], [sx.key2 + .7, 1.5, 'io']];
     G.lmsS.X = [[0, CX], [sx.key2 - .1, CX], [sx.key2 + .7, 720, 'io']];
     G.lmsS.Y = [[0, CY], [sx.key2 - .1, CY], [sx.key2 + .7, 270, 'io']];
-    slideIn(G.install, sx.slideI, swapAt(4));
+    // ----- chapter 5: alerts (the stock page, then the real extension with its desktop alerts, then the real settings)
+    vis(G.ntf, swap0(5), sx.slideSet + SL + .4);
+    G.ntf.wipe = [[w(5) + .15, 0], [w(5) + 1.9, 1, 'io']];
+    slideIn(G.set, sx.slideSet, sx.slideI + SL + .2);
+    G.set.S = [[0, 1], [sx.slideSet + .9, 1], [sx.slideSet + 2.0, 1.25, 'io']];
+    G.set.X = [[0, CX], [sx.slideSet + .9, CX], [sx.slideSet + 2.0, 700, 'io']];
+    G.set.Y = [[0, CY], [sx.slideSet + .9, CY], [sx.slideSet + 2.0, 324, 'io']];
+    slideIn(G.install, sx.slideI, sx.end + .5);
     G.install.cam = null;
     // problem markers: [frame, selector, label, appears, vanishes, side, grow]
     const gone = n => w(n) - .05;
     G.lms.marks = [['lmsOld', '.main-header', 'A dated header', sx.mk1a, gone(1), 'below'], ['lmsOld', '.content table, .box table, table', 'Tiny, cramped table', sx.mk1b, gone(1), 'below'], ['lmsOld', '.main-sidebar', 'A plain list of links', sx.mk1c, gone(1), 'in']];
     G.tt.marks = [['ttOld', '.table-responsive', 'A grid wider than your screen', sx.mk2a, gone(2), 'below'], ['ttOld', '#timeTable td.ev', 'Tiny cells', sx.mk2b, gone(2), 'below']];
     G.asg.marks = [['asgOld', 'table', 'Dates, but no countdown', sx.mk3a, gone(3), 'below'], ['asgOld', 'select', 'One course at a time', sx.mk3b, gone(3), 'below']];
+    G.ntf.marks = [['ntfOld', 'table', 'Marks and new work appear silently', sx.mk5a, w(5) - .05, 'below'], ['ntfOld', 'select', 'You have to keep checking', sx.mk5b, w(5) - .05, 'below']];
     G.cmsS.marks = [['cmsOld', '#sideBar', 'Dozens of links, no search', sx.mk4a, gone(4), 'in'], ['cmsOld', '#header', 'No search anywhere', sx.mk4b, gone(4), 'below']];
     // tag in the window bar: PROBLEM n, then FIXED
     T.tags = [];
-    T.ch.forEach((c, i) => { T.tags.push([c.b + .1, c.wipe + .1, 'Problem ' + c.n, false]); T.tags.push([c.wipe + 1.3, i < 3 ? T.ch[i + 1].a : sx.slideI, 'Fixed', true]); });
+    T.ch.forEach((c, i) => { T.tags.push([c.b + .1, c.wipe + .1, 'Problem ' + c.n, false]); T.tags.push([c.wipe + 1.3, i < 4 ? T.ch[i + 1].a : sx.slideSet, 'Fixed', true]); });
   }
 
   // ---------------------------------------------------------------- per-frame state
@@ -223,7 +231,7 @@
     const enter = ramp(t, c.a - .02, .42, 'out'), exit = ramp(t, c.b, .45, 'in');
     el.style.opacity = '1'; el.style.transform = `translateY(${(1 - enter) * 100 - exit * 100}%)`;
     $('cardnum').textContent = '0' + c.n; $('cardnum').style.transform = `scale(${.7 + .3 * ramp(t, c.a + .05, .5, 'back')})`;
-    const dots = $('carddots').children; for (let i = 0; i < 4; i++) dots[i].classList.toggle('on', i < c.n);
+    const dots = $('carddots').children; for (let i = 0; i < 5; i++) dots[i].classList.toggle('on', i < c.n);
   }
 
   // ---------------------------------------------------------------- themes: dock, circular reveal, custom colour sweep
@@ -332,11 +340,51 @@
     return changed;
   }
 
+  // ---------------------------------------------------------------- chapter 5: the desktop alerts, written by the extension's own code from invented sample data
+  const toastEls = [];
+  function buildToasts() {
+    const N = BahriaNotify, deadline = Date.UTC(2026, 10, 14, 18, 59), icon = '/icons/icon-128.png';
+    const c1 = { oc: 'c1', name: 'Data Structures' }, c2 = { oc: 'c2', name: 'Database Systems' };
+    const ev = [
+      N.diffAssignments(c1, [], [{ no: '3', title: 'Assignment 3: Linked Lists', marks: null, submitted: false, closed: false, deadline }])[0],
+      N.diffQuizzes(c2, [{ no: '2', title: 'SQL joins', marks: null }], [{ no: '2', title: 'SQL joins', marks: 9 }])[0],
+      N.diffAttendance({ CS201: { code: 'CS201', title: 'Data Structures', present: 44, absent: 4, total: 50, pct: 88 } }, { CS201: { code: 'CS201', title: 'Data Structures', present: 46, absent: 4, total: 50, pct: 92 } }, 75)[0],
+      N.dueReminders([{ oc: 'c3', course: 'Operating Systems', key: '4|Lab report 4', title: 'Lab report 4', deadline: deadline + 3600e3 * 22, submitted: false }], deadline + 3600e3 * 22 - 23.9 * 3600e3, { due2d: true, due24h: true, due7h: true }, {}).events[0],
+    ];
+    ev.forEach((e, i) => {
+      const el = document.createElement('div'); el.className = 'toast'; el.style.top = (i * 140) + 'px';
+      el.innerHTML = '<div class="app"><img src="' + icon + '" alt="">Campuslit</div><img class="ic" src="' + icon + '" alt=""><b></b><span></span>';
+      el.querySelector('b').textContent = e.title; el.querySelector('span').textContent = e.body;
+      $('toasts').append(el); toastEls.push(el);
+    });
+  }
+  function setToasts(t) {
+    const s = T.sx, out = 1 - ramp(t, s.slideSet - .15, .4, 'in');
+    toastEls.forEach((el, i) => {
+      const u = ramp(t, s['toast' + (i + 1)], .5, 'back');
+      el.style.opacity = String(Math.min(1, u * 1.6) * out);
+      el.style.transform = 'translateX(' + ((1 - Math.min(1, u)) * 130) + '%)';
+    });
+  }
+  // the one-time question: the real toolbar popup, asking first
+  let askFrame = null;
+  async function setAsk(t) {
+    const s = T.sx, el = $('ask'), want = t >= s.askPop - 1.2 && t <= s.slideI + .8;
+    if (want && !askFrame) {
+      askFrame = document.createElement('iframe'); askFrame.tabIndex = -1; askFrame.title = '';
+      try { localStorage.setItem('bahriaStudioGuide', JSON.stringify({ v: 1, welcome: true, tour: false, seen: [] })); } catch (e) { /* default state */ }
+      el.append(askFrame); await new Promise(r => { askFrame.onload = r; askFrame.src = '/popup.html'; }); await settle(900);
+      try { askFrame.contentDocument.getAnimations().forEach(a => { try { a.finish(); } catch (e2) { /* done */ } }); } catch (e) { /* not ready */ }
+    } else if (!want && askFrame) { askFrame.remove(); askFrame = null; }
+    const u = ramp(t, s.askPop, .5, 'back'), v = 1 - ramp(t, s.slideI - .1, .35, 'in');
+    el.style.opacity = String(Math.min(1, u * 1.4) * v); el.style.transform = 'translateY(' + ((1 - Math.min(1, u)) * 60) + 'px) scale(' + (.94 + .06 * Math.min(1, u)) + ')';
+  }
+
   // ---------------------------------------------------------------- install card, cursor, ripple, end card
   function buildInstall() {
     const g = group('install', 'campuslit-bu.vercel.app', false); g.el.classList.add('install');
     g.cam.remove();
-    g.el.innerHTML = '<svg viewBox="0 0 128 128" aria-hidden="true"><rect width="128" height="128" rx="30" fill="#0b1d40"/><path d="M80.57 81.21A30 30 0 1 1 80.57 46.79" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round"/><circle cx="98" cy="64" r="8.5" fill="#f2b84b"/></svg><h1>campus<span>lit</span></h1><p>The redesign for Bahria University</p><div class="row"><b>Free</b><b>Private</b><b>One click</b></div><div class="btn" id="btn">Add to Chrome</div>';
+    g.el.innerHTML = '<svg viewBox="0 0 128 128" aria-hidden="true"><rect width="128" height="128" rx="30" fill="#0b1d40"/><path d="M80.57 81.21A30 30 0 1 1 80.57 46.79" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round"/><circle cx="98" cy="64" r="8.5" fill="#f2b84b"/></svg><h1>campus<span>lit</span></h1><p>The redesign for Bahria University</p><div class="row"><b>Free</b><b>Private</b><b>One click</b></div><div class="btn" id="btn">Add to Chrome</div><div class="alt">Also on Firefox Add-ons</div>';
     g.cam = null;
     g.el.style.transform = 'none';
     const box = $('frame').getBoundingClientRect(), r = $('btn').getBoundingClientRect();
@@ -373,17 +421,17 @@
   function setWindow(t) {
     const w = $('win'), s = T.sx, endU = ramp(t, s.end - .1, .5, 'io');
     const e = ramp(t, 0, 2.2, 'out'), tilt = 1 - e;
-    const calm = Math.max(ramp(t, s.dockIn - .4, .4, 'lin') * (1 - ramp(t, s.dockOut + .2, .4, 'lin')), ramp(t, s.openPanel - .9, .4, 'lin') * (1 - ramp(t, s.slideCal - .1, .3, 'lin')), ramp(t, s.slideI - .2, .4, 'lin'));
+    const calm = Math.max(ramp(t, s.dockIn - .4, .4, 'lin') * (1 - ramp(t, s.dockOut + .2, .4, 'lin')), ramp(t, s.openPanel - .9, .4, 'lin') * (1 - ramp(t, s.slideCal - .1, .3, 'lin')), ramp(t, s.slideI - .2, .4, 'lin'), ramp(t, s.slideSet + .3, .4, 'lin') * (1 - ramp(t, s.slideI - .2, .4, 'lin')));
     const fl = 1 - calm;
     let ry = -17 * tilt + fl * 1.2 * Math.sin(t * .9), rx = 13 * tilt + fl * .7 * Math.sin(t * .7 + 1), sc = WIN_S * (.84 + .16 * e), dz = -140 * tilt;
-    let sw = 0; for (const id of ['slideCal', 'slideRem', 'slideL', 'slideI']) { const u = (t - s[id] - .05) / SL; if (u > 0 && u < 1) sw = Math.max(sw, Math.sin(Math.PI * u)); }
+    let sw = 0; for (const id of ['slideCal', 'slideRem', 'slideL', 'slideSet', 'slideI']) { const u = (t - s[id] - .05) / SL; if (u > 0 && u < 1) sw = Math.max(sw, Math.sin(Math.PI * u)); }
     const ce = cardEnvelope(t);
     ry += 6 * sw - 5 * ce; sc *= (1 - .03 * sw) * (1 - .07 * ce); rx += 3 * ce;
     if (t > s.hw1) sc *= 1 + .028 * Math.exp(-(t - s.hw1) * 7);
     sc *= 1 - .06 * endU;
     w.style.opacity = String(1 - endU);
     w.style.transform = `translateZ(${dz}px) rotateX(${rx}deg) rotateY(${ry}deg) scale(${sc})`;
-    let sh = null; for (const a of [1, 2, 3, 4].map(n => T.ch[n - 1].wipe + .15).concat(['slideCal', 'slideRem', 'slideL', 'slideI'].map(id => s[id] + .05))) { const u = (t - a) / .75; if (u > 0 && u < 1) sh = u; }
+    let sh = null; for (const a of [1, 2, 3, 4, 5].map(n => T.ch[n - 1].wipe + .15).concat(['slideCal', 'slideRem', 'slideL', 'slideSet', 'slideI'].map(id => s[id] + .05))) { const u = (t - a) / .75; if (u > 0 && u < 1) sh = u; }
     const el = $('shine'); el.style.opacity = sh === null ? '0' : String(.9 * Math.sin(Math.PI * sh)); el.style.transform = `translateX(${((sh || 0) * 2 - 1) * 100}%)`;
   }
   function setBackdrop(t) {
@@ -430,6 +478,8 @@
     const timing = await (await fetch('/__out/' + sc + '/timing.json', { cache: 'no-store' })).json();
     const gl = group('lms', 'lms.bahria.edu.pk', true), gt = group('tt', 'cms.bahria.edu.pk', true), gc = group('cal', 'My calendar', false);
     const ga = group('asg', 'lms.bahria.edu.pk', true), gr = group('rem', 'lms.bahria.edu.pk', false), gm = group('cmsS', 'cms.bahria.edu.pk', true), gs = group('lmsS', 'lms.bahria.edu.pk', false);
+    const gn = group('ntf', 'lms.bahria.edu.pk', true), gset = group('set', 'campuslit settings', false);
+    try { localStorage.setItem('bahriaStudioGuide', JSON.stringify({ v: 1, welcome: true, tour: false, seen: [], notifyAsked: true })); } catch (e) { /* the sample pages then show their own hints */ }
     const navy = { theme: 'navy' }, off = { enabled: false };
     gl.specs = [['lmsOld', pages.LMS, off], ['lmsNew', pages.LMS, navy, HIDE], ['lmsAlt', pages.LMS, navy, HIDE]];
     gt.specs = [['ttOld', pages.TT, off, null, async (f) => { T.events = readEvents(f.contentDocument); injectGrid(f.contentDocument, T.events); }], ['ttNew', pages.TT, navy, HIDE]];
@@ -438,6 +488,13 @@
     gr.specs = [['remNew', pages.LMS, navy, '.bs-tip { display: none !important; } .bs-remind { animation: none !important; transition: none !important; }']];
     gm.specs = [['cmsOld', pages.CMS, off], ['cmsNew', pages.CMS, navy, HIDE]];
     gs.specs = [['lmsSrch', pages.LMS, navy, HIDE]];
+    gn.specs = [['ntfOld', pages.ASG, off], ['ntfNew', pages.ASG, navy, '.bs-remind, .bs-tip { display: none !important; }']];
+    gset.specs = [['setF', pages.SET, null, '.dirty { display: none !important; }', async (f) => {
+      const doc = f.contentDocument, sw = doc.getElementById('n-enabled');
+      if (sw && !sw.checked) { sw.click(); await settle(200); }
+      doc.getAnimations().forEach(a => { try { a.finish(); } catch (e) { /* done */ } });
+    }]];
+    buildToasts();
     buildInstall(); build(timing); buildDock();
     // cursor on the time table: to "Add to calendar", then to "Download calendar file" (positions measured from the real buttons)
     gt.afterAll = async () => {
@@ -464,7 +521,7 @@
     for (const g of Object.values(G)) await ensure(g, t >= g.need[0] && t <= g.need[1]);
     setGroups(t); setCaptions(t); setTag(t); setCard(t); setBackdrop(t); setInstall(t); setCursor(t); setEnd(t); setWindow(t);
     const a = await setThemes(t), b = await setSearch(t), c = await setTable(t);
-    setCalendar(t); setReminder(t);
+    setCalendar(t); setReminder(t); setToasts(t); await setAsk(t);
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
     return a || b || c || true;
   };

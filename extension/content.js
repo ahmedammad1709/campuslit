@@ -13,7 +13,7 @@
     const root = document.documentElement;
     if (!root) return;
     const enabled = settings.enabled && settings[site];
-    if (!enabled) { globalThis.BahriaLogin?.disable(); globalThis.BahriaLms?.disable(); globalThis.BahriaCms?.disable(); globalThis.BahriaQuickSearch?.disable(); globalThis.BahriaTips?.disable(); delete root.dataset.bahriaStudio; return; }
+    if (!enabled) { globalThis.BahriaLogin?.disable(); globalThis.BahriaLms?.disable(); globalThis.BahriaPreviewer?.disable(); globalThis.BahriaCms?.disable(); globalThis.BahriaQuickSearch?.disable(); globalThis.BahriaTips?.disable(); delete root.dataset.bahriaStudio; return; }
     const file = BahriaStudio.fontFiles[settings.font];
     if (file && !fontRequested.has(settings.font) && typeof FontFace !== 'undefined') {
       fontRequested.add(settings.font);
@@ -27,7 +27,7 @@
     root.dataset.bsMotion = String(settings.motion);
     root.dataset.bsPage = /\/logins\//i.test(location.pathname) ? 'login' : /^\/(default\.aspx)?$/i.test(location.pathname) ? 'entry' : 'portal';
     globalThis.BahriaLogin?.mount();
-    if (site === 'lms') globalThis.BahriaLms?.mount(settings);
+    if (site === 'lms') { globalThis.BahriaLms?.mount(settings); globalThis.BahriaPreviewer?.mount(); }
     if (site === 'cms') globalThis.BahriaCms?.mount(settings);
     globalThis.BahriaQuickSearch?.mount({ enabled: settings.quickSearch });
     globalThis.BahriaTips?.mount({ enabled: settings.tips });

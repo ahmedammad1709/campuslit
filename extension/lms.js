@@ -30,6 +30,31 @@
     return h < 5 ? 'Still up' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : h < 22 ? 'Good evening' : 'Late night';
   }
   function hidePop() { if (pop) { pop.remove(); owned.delete(pop); pop = null; } }
+  // A teacher's comment, shown in the page instead of "Hover To View Comments". Long ones are cut short; Show more opens the whole text in a box of its own.
+  const SHORT = 110;
+  let box = null;
+  function closeBox() { if (box) { box.remove(); owned.delete(box); box = null; } }
+  function openBox(title, text, from) {
+    closeBox();
+    box = make('div', 'bs-cmt-box'); box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true'); box.setAttribute('aria-label', title);
+    const card = make('div', 'bs-cmt-card'), head = make('div', 'bs-cmt-head'), x = make('button', 'bs-cmt-x', 'Close'); x.type = 'button';
+    head.append(make('b', '', title), x);
+    card.append(head, make('div', 'bs-cmt-text', text)); box.append(card);
+    const done = () => { closeBox(); if (from && from.isConnected) from.focus(); };
+    x.addEventListener('click', done); box.addEventListener('mousedown', e => { if (e.target === box) done(); });
+    box.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); done(); } });
+    document.body.append(box); x.focus();
+  }
+  function showComment(label, text) {
+    const clean = text.replace(/\s+/g, ' ').trim();
+    const wrap = make('div', 'bs-cmt');
+    if (/^(no remarks?|no comments?|---|n\/a|none)\.?$/i.test(clean)) { wrap.classList.add('none'); wrap.textContent = /remarks/i.test(clean) ? 'No remarks' : 'No comments'; }
+    else {
+      wrap.append(make('span', 'bs-cmt-short', clean.length > SHORT ? clean.slice(0, SHORT).replace(/\s+\S*$/, '') + '…' : clean));
+      if (clean.length > SHORT) { const more = make('button', 'bs-cmt-more', 'Show more'); more.type = 'button'; more.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); openBox('Comment', text.trim(), more); }); wrap.append(more); }
+    }
+    label.after(wrap); mark(label, 'data-bs-cmt');
+  }
   function showPop(target) {
     hidePop();
     const text = target.getAttribute('data-bs-title');
@@ -306,7 +331,7 @@
     resizer = make('div', 'bs-resizer');
     resizer.setAttribute('role', 'separator'); resizer.setAttribute('aria-orientation', 'vertical'); resizer.setAttribute('aria-label', 'Resize sidebar (double-click to reset)');
     resizer.setAttribute('aria-valuemin', '200'); resizer.setAttribute('aria-valuemax', '420'); resizer.tabIndex = 0;
-    side.append(resizer);
+    document.body.append(resizer);   // beside the sidebar, not inside its scrolling box, so it never sits on the menu's scrollbar
     resizer.addEventListener('pointerdown', e => {
       forgetNarrowest(); resizer.setAttribute('aria-valuemin', String(minSide()));
       e.preventDefault(); resizer.setPointerCapture(e.pointerId); resizer.classList.add('dragging'); document.documentElement.classList.add('bs-dragging');
@@ -345,6 +370,7 @@
       label.setAttribute('data-bs-title', text); label.setAttribute('data-bs-tip', ''); label.dataset.bsTipId = String(++counter);
       label.tabIndex = 0; label.setAttribute('role', 'button'); label.setAttribute('aria-label', label.textContent.trim() + ': ' + text);
       attrs.set(label, new Set(['data-bs-title', 'data-bs-tip', 'data-bs-tip-id', 'tabindex', 'role', 'aria-label']));
+      if (/^hover to view/i.test(label.textContent.trim()) && /assignments?|quiz/i.test(location.pathname)) showComment(label, text);
     });
     if (!listening) { listening = true; document.addEventListener('click', onClick); document.addEventListener('keydown', onKey); addEventListener('scroll', hidePop, true); }
     mountResizer();
@@ -353,7 +379,7 @@
     try { remMount(); } catch (e) { /* no reminder, nothing else affected */ }
   }
   function disable() {
-    hidePop(); dueClear(); remDisable();
+    hidePop(); closeBox(); dueClear(); remDisable();
     if (listening) { listening = false; document.removeEventListener('click', onClick); document.removeEventListener('keydown', onKey); removeEventListener('scroll', hidePop, true); }
     owned.forEach(node => node.remove()); owned.clear();
     titles.forEach((text, node) => node.setAttribute('title', text)); titles.clear();

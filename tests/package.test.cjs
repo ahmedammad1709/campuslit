@@ -103,6 +103,13 @@ test('audit: anything that could send data or run remote or generated code is ca
   assert.ok(mentions(await run(build('chrome', c => c.files.set('content.js', B("fetch('https://lms.bahria.edu.pk/a')")))), 'fetch()'), 'a content script may not fetch');
   assert.ok(mentions(await run(build('chrome', c => c.files.set('popup.js', B("importScripts('a.js')")))), 'importScripts'));
   assert.ok(mentions(await run(build('chrome', c => c.files.set('background.js', B("fetch('https://x.example/a')")))), 'x.example'), 'the worker may not reach another site');
+  // the file preview may fetch, but only the checked address with the student's own sign-in
+  const good = "const safe = P.fileUrl(href, location.href); const res = await fetch(safe, { credentials: 'same-origin', signal: a.signal });";
+  assert.deepEqual(await run(build('chrome', c => c.files.set('previewer.js', B(good)))), [], 'the preview may fetch the checked address');
+  assert.ok(mentions(await run(build('chrome', c => c.files.set('previewer.js', B("const safe = P.fileUrl(h); fetch('https://x.example/a');")))), 'fetch'), 'the preview may not fetch any other address');
+  assert.ok(mentions(await run(build('chrome', c => c.files.set('previewer.js', B("fetch(url, { credentials: 'include' });")))), 'fetch'), 'nor fetch without the check or with other credentials');
+  assert.ok(mentions(await run(build('chrome', c => c.files.set('previewer.js', B("fetch(safe, { credentials: 'same-origin' });")))), 'address check'), 'nor skip the address check');
+  assert.ok(mentions(await run(build('chrome', c => c.files.set('lms.js', B(good)))), 'fetch()'), 'no other page script may fetch, even in the same words');
   assert.deepEqual(await run(build('chrome', c => c.files.set('popup.js', B("const s = prefetch(); el.retrieval = 1; evaluate(2); obj.fetch(1);")))), [], 'similar-looking names are not flagged');
 });
 

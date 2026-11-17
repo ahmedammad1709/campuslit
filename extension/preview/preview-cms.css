@@ -55,3 +55,5 @@ body.Army > form#form1 > div#pageContainer.HideSideBar + footer#footer { left: 0
 header#header a#brandShortName, header#header a#brandAlias { display: none !important; }
 @media (max-width: 991px) { header#header a#brandName { display: none !important; } header#header a#brandShortName { display: flex !important; } }
 @media (max-width: 767px) { header#header a#brandShortName { display: none !important; } header#header a#brandAlias { display: flex !important; } }
+#sideMenuList > a.list-group-item { position: relative; padding-left: 52px; }
+#sideMenuList > a.list-group-item > .menu-icon { position: absolute; left: 10px; top: 9px; width: 30px; height: 30px; border-radius: 8px; background: rgba(255, 255, 255, .22); text-align: center; line-height: 30px; font-size: 14px; }

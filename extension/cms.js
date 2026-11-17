@@ -59,7 +59,7 @@
     resizer = make('div', 'bs-resizer');
     resizer.setAttribute('role', 'separator'); resizer.setAttribute('aria-orientation', 'vertical'); resizer.setAttribute('aria-label', 'Resize sidebar (double-click to reset)');
     resizer.setAttribute('aria-valuemin', '200'); resizer.setAttribute('aria-valuemax', '420'); resizer.tabIndex = 0;
-    side.append(resizer);
+    document.body.append(resizer);   // beside the sidebar, not inside its scrolling box, so it never sits on the menu's scrollbar
     resizer.addEventListener('pointerdown', e => {
       forgetNarrowest(); resizer.setAttribute('aria-valuemin', String(minSide()));
       e.preventDefault(); resizer.setPointerCapture(e.pointerId); resizer.classList.add('dragging'); document.documentElement.classList.add('bs-dragging');

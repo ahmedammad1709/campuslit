@@ -69,7 +69,7 @@
 
     const w1 = sx.wipe1, w2 = sx.wipe2;
     // page order: lms -> cms -> tt -> theme -> due -> att -> srch -> install ; each slides in from the right and out to the left
-    const order = [['lms', null, sx.slide1], ['cms', sx.slide1, sx.slide2], ['tt', sx.slide2, sx.slide3], ['theme', sx.slide3, sx.slide4], ['due', sx.slide4, sx.slide5], ['att', sx.slide5, sx.slide6], ['srch', sx.slide6, sx.slide7], ['install', sx.slide7, sx.end]];
+    const order = [['lms', null, sx.slide1], ['cms', sx.slide1, sx.slide2], ['tt', sx.slide2, sx.slide3], ['theme', sx.slide3, sx.slide4], ['due', sx.slide4, sx.slide5], ['att', sx.slide5, sx.slideN], ['ntf', sx.slideN, sx.slide6], ['srch', sx.slide6, sx.slide7], ['install', sx.slide7, sx.end]];
     for (const [name, inAt, outAt] of order) {
       const g = G[name], keys = [];
       if (inAt === null) keys.push([0, 0]); else keys.push([0, OFF], [inAt + .05, OFF], [inAt + .05 + SL, 0, 'io']);
@@ -177,7 +177,11 @@
   function paletteOf(key) {
     const th = BahriaStudio.themes[key]; return th ? [th.nav, th.accent] : ['#0b1d40', '#2f5bea'];
   }
-  function customAt(h) { return BahriaStudio.generateCustom({ accent: BahriaStudio.fromHsl(h, .7, .5), mode: 'light', side: 'deep', name: 'My theme' }); }
+  // the video's custom theme is vivid on purpose: a bright sidebar and banner and a tinted page, so every step of the slider visibly recolours the whole portal
+  function customAt(h) {
+    const F = BahriaStudio.fromHsl, base = BahriaStudio.generateCustom({ accent: F(h, .74, .5), mode: 'light', side: 'deep', name: 'My theme' });
+    return BahriaStudio.normalizeCustom({ ...base, nav: F(h, .68, .34), bg: F(h, .55, .94), accent: F(h, .78, .46) });
+  }
   function settingsFor(key, t) { return key === 'custom' ? { theme: 'custom', custom: customAt(track(hueKeys, t)) } : { theme: key }; }
   function buildDock() {
     const host = $('dots');
@@ -256,11 +260,50 @@
     return changed;
   }
 
+  // ---------------------------------------------------------------- the alerts: written by the extension's own code (notify-core.js) from invented sample data
+  const toastEls = [];
+  function buildToasts() {
+    const N = BahriaNotify, deadline = Date.UTC(2026, 10, 14, 18, 59), icon = '/icons/icon-128.png';
+    const c1 = { oc: 'c1', name: 'Data Structures' }, c2 = { oc: 'c2', name: 'Database Systems' };
+    const ev = [
+      N.diffAssignments(c1, [], [{ no: '3', title: 'Assignment 3: Linked Lists', marks: null, submitted: false, closed: false, deadline }])[0],
+      N.diffQuizzes(c2, [{ no: '2', title: 'SQL joins', marks: null }], [{ no: '2', title: 'SQL joins', marks: 9 }])[0],
+      N.diffAttendance({ CS201: { code: 'CS201', title: 'Data Structures', present: 44, absent: 4, total: 50, pct: 88 } }, { CS201: { code: 'CS201', title: 'Data Structures', present: 46, absent: 4, total: 50, pct: 92 } }, 75)[0],
+      N.dueReminders([{ oc: 'c3', course: 'Operating Systems', key: '4|Lab report 4', title: 'Lab report 4', deadline: deadline + 3600e3 * 22, submitted: false }], deadline + 3600e3 * 22 - 23.9 * 3600e3, { due2d: true, due24h: true, due7h: true }, {}).events[0],
+    ];
+    ev.forEach((e, i) => {
+      const el = document.createElement('div'); el.className = 'toast'; el.style.top = (i * 140) + 'px';
+      el.innerHTML = '<div class="app"><img src="' + icon + '" alt="">Campuslit</div><img class="ic" src="' + icon + '" alt=""><b></b><span></span>';
+      el.querySelector('b').textContent = e.title; el.querySelector('span').textContent = e.body;
+      $('toasts').append(el); toastEls.push(el);
+    });
+  }
+  function setToasts(t) {
+    const s = T.sx, out = 1 - ramp(t, s.askPop - .35, .3, 'in');
+    toastEls.forEach((el, i) => {
+      const u = ramp(t, s['toast' + (i + 1)], .5, 'back');
+      el.style.opacity = String(Math.min(1, u * 1.6) * out);
+      el.style.transform = 'translateX(' + ((1 - Math.min(1, u)) * 130) + '%)';
+    });
+  }
+  // the one-time question: the real toolbar popup, asking first
+  let askFrame = null;
+  async function setAsk(t) {
+    const s = T.sx, el = $('ask'), want = t >= s.askPop - 1.2 && t <= s.slide6 + .8;
+    if (want && !askFrame) {
+      askFrame = document.createElement('iframe'); askFrame.tabIndex = -1; askFrame.title = '';
+      el.append(askFrame); await new Promise(r => { askFrame.onload = r; askFrame.src = '/popup.html'; }); await settle(900);
+      try { askFrame.contentDocument.getAnimations().forEach(a => { try { a.finish(); } catch (e2) { /* done */ } }); } catch (e) { /* not ready */ }
+    } else if (!want && askFrame) { askFrame.remove(); askFrame = null; }
+    const u = ramp(t, s.askPop, .5, 'back'), v = 1 - ramp(t, s.slide6 - .1, .35, 'in');
+    el.style.opacity = String(Math.min(1, u * 1.4) * v); el.style.transform = 'translateY(' + ((1 - Math.min(1, u)) * 60) + 'px) scale(' + (.94 + .06 * Math.min(1, u)) + ')';
+  }
+
   // ---------------------------------------------------------------- install card, cursor, ripple, end card
   function buildInstall() {
     const g = group('install', 'campuslit-bu.vercel.app', false); g.el.classList.add('install');
     g.cam.remove();
-    g.el.innerHTML = '<svg viewBox="0 0 128 128" aria-hidden="true"><rect width="128" height="128" rx="30" fill="#0b1d40"/><path d="M80.57 81.21A30 30 0 1 1 80.57 46.79" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round"/><circle cx="98" cy="64" r="8.5" fill="#f2b84b"/></svg><h1>campus<span>lit</span></h1><p>The redesign for Bahria University</p><div class="row"><b>Free</b><b>Private</b><b>One click</b></div><div class="btn" id="btn">Add to Chrome</div>';
+    g.el.innerHTML = '<svg viewBox="0 0 128 128" aria-hidden="true"><rect width="128" height="128" rx="30" fill="#0b1d40"/><path d="M80.57 81.21A30 30 0 1 1 80.57 46.79" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round"/><circle cx="98" cy="64" r="8.5" fill="#f2b84b"/></svg><h1>campus<span>lit</span></h1><p>The redesign for Bahria University</p><div class="row"><b>Free</b><b>Private</b><b>One click</b></div><div class="btn" id="btn">Add to Chrome</div><div class="alt">Also on Firefox Add-ons</div>';
     g.cam = document.createElement('div');   // keeps setGroups happy (no camera on this page)
     g.el.style.transform = 'none';
     const box = $('frame').getBoundingClientRect(), r = $('btn').getBoundingClientRect();
@@ -311,14 +354,14 @@
     const calm = Math.max(ramp(t, s.slide3 - .3, .4, 'lin') * (1 - ramp(t, s.slide4 + .2, .4, 'lin')), ramp(t, s.slide7 - .2, .4, 'lin'));   // no sway while the cursor has to hit the dock and the button
     const fl = 1 - calm;
     let ry = -17 * tilt + fl * 1.2 * Math.sin(t * .9), rx = 13 * tilt + fl * .7 * Math.sin(t * .7 + 1), sc = WIN_S * (.84 + .16 * e), dz = -140 * tilt;
-    let sw = 0; for (let i = 1; i <= 7; i++) { const u = (t - s['slide' + i] - .05) / SL; if (u > 0 && u < 1) sw = Math.max(sw, Math.sin(Math.PI * u)); }
+    let sw = 0; for (const id of ['slide1', 'slide2', 'slide3', 'slide4', 'slide5', 'slideN', 'slide6', 'slide7']) { const u = (t - s[id] - .05) / SL; if (u > 0 && u < 1) sw = Math.max(sw, Math.sin(Math.PI * u)); }
     ry += 6 * sw; sc *= 1 - .03 * sw;
     if (t > s.hit1) sc *= 1 + .028 * Math.exp(-(t - s.hit1) * 7);
     sc *= 1 - .06 * endU;
     w.style.opacity = String(1 - endU);
     w.style.transform = `translateZ(${dz}px) rotateX(${rx}deg) rotateY(${ry}deg) scale(${sc})`;
     // glare sweeping over the window at every page change and both reveals
-    let sh = null; for (const a of [s.wipe1 + .15, s.wipe2 + .15, ...[1, 2, 3, 4, 5, 6, 7].map(i => s['slide' + i] + .05)]) { const u = (t - a) / .75; if (u > 0 && u < 1) sh = u; }
+    let sh = null; for (const a of [s.wipe1 + .15, s.wipe2 + .15, ...['slide1', 'slide2', 'slide3', 'slide4', 'slide5', 'slideN', 'slide6', 'slide7'].map(id => s[id] + .05)]) { const u = (t - a) / .75; if (u > 0 && u < 1) sh = u; }
     const el = $('shine'); el.style.opacity = sh === null ? '0' : String(.9 * Math.sin(Math.PI * sh)); el.style.transform = `translateX(${((sh || 0) * 2 - 1) * 100}%)`;
   }
   function setBackdrop(t) {
@@ -354,20 +397,23 @@
     const sc = name || 'full';
     const timing = await (await fetch('/__out/' + sc + '/timing.json', { cache: 'no-store' })).json();
     const gl = group('lms', 'lms.bahria.edu.pk', true), gc = group('cms', 'cms.bahria.edu.pk', true), gt = group('tt', 'cms.bahria.edu.pk', false);
-    const gh = group('theme', 'lms.bahria.edu.pk', false), gd = group('due', 'lms.bahria.edu.pk', false), ga = group('att', 'cms.bahria.edu.pk', false), gs = group('srch', 'lms.bahria.edu.pk', false);
+    const gh = group('theme', 'lms.bahria.edu.pk', false), gd = group('due', 'lms.bahria.edu.pk', false), ga = group('att', 'cms.bahria.edu.pk', false), gs = group('srch', 'lms.bahria.edu.pk', false), gn = group('ntf', 'lms.bahria.edu.pk', false);
     const navy = { theme: 'navy' }, off = { enabled: false };
     const LMS = '/preview/lms/dashboard.html', CMS = '/preview/cms/dashboard.html', TT = '/preview/cms/timetable.html', ATT = '/preview/cms/attendance.html';
     const HIDE = '.bs-remind, .bs-tip { display: none !important; }';
     gl.specs = [['lmsOld', LMS, off], ['lmsNew', LMS, navy]]; gc.specs = [['cmsOld', CMS, off], ['cmsNew', CMS, navy]]; gt.specs = [['ttNew', TT, navy]];
     gh.specs = [['thA', LMS, navy, HIDE], ['thB', LMS, navy, HIDE]]; gd.specs = [['due', '/preview/lms/assignments.html', navy, '.bs-remind { display: none !important; }']];
     ga.specs = [['att', ATT, navy]]; gs.specs = [['srch', LMS, navy]];
+    gn.specs = [['ntf', '/preview/lms/assignments.html', navy, '.bs-remind, .bs-tip { display: none !important; }']];
+    try { localStorage.setItem('bahriaStudioGuide', JSON.stringify({ v: 1, welcome: true, tour: false, seen: [] })); } catch (e) { /* the sample pages then show their own hints */ }
+    buildToasts();
     buildInstall(); build(timing); buildDock();
     for (const g of Object.values(G)) g.need = [g.inAt == null ? -1e9 : g.inAt - 1.2, (g.outAt || 1e9) + .05 + SL + .4];
     ready = true; return T.duration;
   };
   window.__frame = async function (t) {
     for (const g of Object.values(G)) await ensure(g, t >= g.need[0] && t <= g.need[1]);
-    setGroups(t); setCaptions(t); setBackdrop(t); setInstall(t); setCursor(t); setEnd(t); if (LAND) setWindow(t);
+    setGroups(t); setCaptions(t); setBackdrop(t); setInstall(t); setCursor(t); setEnd(t); if (LAND) setWindow(t); setToasts(t); await setAsk(t);
     const a = await setThemes(t), b = await setSearch(t);
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
     return a || b || true;

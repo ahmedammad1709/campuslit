@@ -9,3 +9,6 @@ body { font-family: 'Source Sans Pro', 'Segoe UI', Arial, sans-serif; }
 .sidebar-menu > li.active > a { background: linear-gradient(#ffb340, #f39c12) !important; color: #fff; }
 .main-header .logo img { height: 36px; width: 36px; margin-right: 8px; }
 .user-image { width: 28px; height: 28px; }
+
+/* stock AdminLTE paints the wrapper pale; in a dark theme it showed through the see-through footer */
+.wrapper { background-color: #f9fafc; }

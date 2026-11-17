@@ -176,3 +176,48 @@ test('quick search setting: on by default, only a true boolean is accepted', () 
   assert.equal(m.normalize({}).quickSearch, true); assert.equal(m.normalize({ quickSearch: false }).quickSearch, false);
   assert.equal(m.normalize({ quickSearch: 'no' }).quickSearch, true); assert.equal(m.normalize({ quickSearch: 0 }).quickSearch, true); assert.equal(m.normalize({ quickSearch: null }).quickSearch, true);
 });
+
+test('the LMS footer and the page wrapper take the theme background, so no pale strip shows in a dark theme', () => {
+  const css = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'extension', 'lms.css'), 'utf8');
+  assert.match(css, /& \.wrapper, & \.content-wrapper, & \.right-side \{ background: var\(--bs-bg\) !important/);
+  assert.match(css, /& \.main-footer \{[^}]*background: var\(--bs-bg\) !important/);
+  assert.ok(!/& \.main-footer \{[^}]*background: transparent/.test(css), 'a see-through footer lets the portal\'s own pale wrapper show');
+});
+
+test('CMS menus: the icons the university puts in the sidebar and the account menu are kept beside their labels, not on top of them', () => {
+  const css = fs.readFileSync(path.join(__dirname, '..', 'extension', 'cms.css'), 'utf8');
+  assert.match(css, /a\.list-group-item:has\(> \.menu-icon\)::before \{ content: none !important; display: none !important; \}/, 'Campuslit\'s own marker steps aside when the portal brings an icon');
+  assert.match(css, /a\.list-group-item > \.menu-icon \{ position: static !important;/, 'the sidebar icon sits in line with the label');
+  assert.match(css, /ul\.dropdown-menu > li > a > i \{ position: static !important;/, 'the account-menu icons sit in line with their labels');
+  const page = fs.readFileSync(path.join(__dirname, '..', 'extension', 'preview', 'cms', 'dashboard.html'), 'utf8');
+  assert.match(page, /<span aria-hidden="true" class="menu-icon fas fa-[a-z-]+"><\/span>Profile Information/, 'the sample page uses the university\'s new menu markup');
+});
+
+test('CMS sub-menu: the university\'s own line and dots are cleared, so there is one line and one dot per item', () => {
+  const css = fs.readFileSync(path.join(__dirname, '..', 'extension', 'cms.css'), 'utf8');
+  assert.match(css, /div\.list-group-subMenu::before, & aside#sideBar div#sideMenuList div\.list-group-subMenu::after \{ content: none !important;/);
+  assert.match(css, /div\.list-group-subMenu > a\.list-group-item:not\(\[data-bs-current\]\)::after \{ content: none !important;/);
+  assert.match(css, /div\.list-group-subMenu > a\.list-group-item::before \{ content: ""; position: static !important;/, 'our dot is a normal item in the row, not placed on top of the label');
+});
+
+test('CMS sub-menu: laid out and coloured by Campuslit alone (a row per item, no white highlight or box from the university\'s style)', () => {
+  const css = fs.readFileSync(path.join(__dirname, '..', 'extension', 'cms.css'), 'utf8');
+  assert.match(css, /aside#sideBar#sideBar div#sideMenuList#sideMenuList div\.list-group-subMenu > a\.list-group-item \{ display: flex !important;/);
+  assert.match(css, /list-group-subMenu \{ box-shadow: none !important;/);
+  assert.match(css, /a\.list-group-item\.active, [^{]*a\.list-group-item\[data-bs-current\] \{ background: color-mix\(in srgb, var\(--bs-accent\) 22%, transparent\) !important;/);
+});
+
+test('CMS main menu: the current page is highlighted by Campuslit (a tint), not by the university\'s white pill or icon box', () => {
+  const css = fs.readFileSync(path.join(__dirname, '..', 'extension', 'cms.css'), 'utf8');
+  assert.match(css, /div#sideMenuList#sideMenuList > a\.list-group-item\.active, [^{]*\[data-bs-current\] \{ background: color-mix\(in srgb, var\(--bs-accent\) 22%, transparent\) !important;/);
+  assert.match(css, /div#sideMenuList#sideMenuList > a\.list-group-item > \.menu-icon \{ background: none !important;/);
+});
+
+test('CMS menu: hover, focus and click keep the theme tint (no white pill); LMS: comments are shown in the page with a Show more box', () => {
+  const css = fs.readFileSync(path.join(__dirname, '..', 'extension', 'cms.css'), 'utf8');
+  assert.match(css, /a\.list-group-item:hover, [^{]*a\.list-group-item:active[^{]*\{ background: color-mix\(in srgb, var\(--bs-navInk\) 12%, transparent\) !important;/);
+  const js = fs.readFileSync(path.join(__dirname, '..', 'extension', 'lms.js'), 'utf8');
+  assert.ok(js.includes('function showComment') && js.includes("'Show more'") && js.includes('function openBox'), 'comments in the page, long ones in a box');
+  const pv = fs.readFileSync(path.join(__dirname, '..', 'extension', 'previewer.js'), 'utf8');
+  assert.ok(pv.includes('timedOut') && pv.includes('arrayBuffer()'), 'the preview reads the file in one go and says so when the portal is too slow');
+});

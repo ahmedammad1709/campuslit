@@ -17,14 +17,14 @@
     "bpm": 110,
     "drop": 3.75,
     "breakdown": [
-      25.05,
-      28.35
+      31.05,
+      34.35
     ],
-    "fade": 33,
+    "fade": 39.0,
     "level": -17
   },
   "full": {
-    "duration": 34.2,
+    "duration": 40.2,
     "lines": [
       {
         "id": "hook",
@@ -67,19 +67,29 @@
         "at": 21.75
       },
       {
+        "id": "n1",
+        "text": "Alerts for new work, marks, attendance and deadlines.",
+        "at": 23.6
+      },
+      {
+        "id": "n2",
+        "text": "Only if you say yes.",
+        "at": 27.2
+      },
+      {
         "id": "srch",
         "text": "Search anything.",
-        "at": 23.55
+        "at": 29.55
       },
       {
         "id": "one",
         "text": "One click. Free. Private.",
-        "at": 25.5
+        "at": 31.5
       },
       {
         "id": "outro",
         "text": "Campuslit. For Bahria students. Link in bio.",
-        "at": 28.55,
+        "at": 34.55,
         "note": "Optional: record outro.mp4 yourself"
       }
     ],
@@ -156,66 +166,100 @@
         "at": 21.45
       },
       {
-        "id": "slide6",
+        "id": "slideN",
         "kind": "swish",
         "at": 23.25
       },
       {
+        "id": "toast1",
+        "kind": "ding",
+        "at": 24.15,
+        "gain": -3
+      },
+      {
+        "id": "toast2",
+        "kind": "ding",
+        "at": 24.7,
+        "gain": -3
+      },
+      {
+        "id": "toast3",
+        "kind": "ding",
+        "at": 25.3,
+        "gain": -3
+      },
+      {
+        "id": "toast4",
+        "kind": "ding",
+        "at": 25.95,
+        "gain": -3
+      },
+      {
+        "id": "askPop",
+        "kind": "pop",
+        "at": 27.2
+      },
+      {
+        "id": "slide6",
+        "kind": "swish",
+        "at": 29.25
+      },
+      {
         "id": "key",
         "kind": "tick",
-        "at": 23.95,
+        "at": 29.95,
         "gain": 2
       },
       {
         "id": "type1",
         "kind": "tick",
-        "at": 24.3,
+        "at": 30.3,
         "gain": -8
       },
       {
         "id": "type2",
         "kind": "tick",
-        "at": 24.42,
+        "at": 30.42,
         "gain": -8
       },
       {
         "id": "type3",
         "kind": "tick",
-        "at": 24.54,
+        "at": 30.54,
         "gain": -8
       },
       {
         "id": "type4",
         "kind": "tick",
-        "at": 24.66,
+        "at": 30.66,
         "gain": -8
       },
       {
         "id": "type5",
         "kind": "tick",
-        "at": 24.78,
+        "at": 30.78,
         "gain": -8
       },
       {
         "id": "slide7",
         "kind": "swish",
-        "at": 25.05
+        "at": 31.05
       },
       {
         "id": "click",
         "kind": "tick",
-        "at": 26.55,
+        "at": 32.55,
         "gain": 2
       },
       {
         "id": "ding",
         "kind": "ding",
-        "at": 26.6
+        "at": 32.6
       },
       {
         "id": "end",
         "kind": "hit",
-        "at": 28.35
+        "at": 34.35
       }
     ]
   },
@@ -709,5 +753,602 @@
         "at": 49
       }
     ]
+  },
+  "glowup2": {
+    "duration": 68.2,
+    "music": {
+      "bpm": 120,
+      "drop": 5,
+      "breakdown": [
+        [
+          7,
+          9
+        ],
+        [
+          21.5,
+          23
+        ],
+        [
+          32.5,
+          34
+        ],
+        [
+          40.5,
+          42
+        ],
+        [
+          48,
+          49.5
+        ],
+        [
+          59.6,
+          62.6
+        ]
+      ],
+      "fade": 66.5,
+      "level": -17,
+      "pump": 0.55
+    },
+    "lines": [
+      {
+        "id": "hook",
+        "text": "Five things wrong with the Bahria University Portal. All fixed.",
+        "at": 0.5,
+        "bot": true
+      },
+      {
+        "id": "c1",
+        "text": "One. It looks old.",
+        "at": 5.15
+      },
+      {
+        "id": "c1b",
+        "text": "Now it looks like this.",
+        "at": 9.05
+      },
+      {
+        "id": "th1",
+        "text": "Six themes. Or make your own.",
+        "at": 12.15
+      },
+      {
+        "id": "th2",
+        "text": "Pick a colour, and the whole portal follows.",
+        "at": 15.3
+      },
+      {
+        "id": "c2",
+        "text": "Two. Your timetable is a wide grid.",
+        "at": 19.15
+      },
+      {
+        "id": "c2b",
+        "text": "Now it's a real calendar.",
+        "at": 23.05
+      },
+      {
+        "id": "c2c",
+        "text": "Download it to your own calendar.",
+        "at": 25
+      },
+      {
+        "id": "c3",
+        "text": "Three. Nothing reminds you.",
+        "at": 31.15
+      },
+      {
+        "id": "c3b",
+        "text": "Now it counts down every deadline.",
+        "at": 34.05
+      },
+      {
+        "id": "c3c",
+        "text": "And reminds you on every page.",
+        "at": 36.75
+      },
+      {
+        "id": "c4",
+        "text": "Four. You can't search.",
+        "at": 39.15
+      },
+      {
+        "id": "c4b",
+        "text": "Press Ctrl K, and search any page, on both portals.",
+        "at": 42.05
+      },
+      {
+        "id": "n5",
+        "text": "Five. You find out too late.",
+        "at": 46.65
+      },
+      {
+        "id": "n5b",
+        "text": "Now it tells you.",
+        "at": 49.6
+      },
+      {
+        "id": "n5c1",
+        "text": "A new assignment.",
+        "at": 50.9
+      },
+      {
+        "id": "n5c2",
+        "text": "Quiz marks.",
+        "at": 52.15
+      },
+      {
+        "id": "n5c3",
+        "text": "Attendance.",
+        "at": 53.25
+      },
+      {
+        "id": "n5c4",
+        "text": "Deadlines.",
+        "at": 54.25
+      },
+      {
+        "id": "n6",
+        "text": "You choose what you get.",
+        "at": 56.0
+      },
+      {
+        "id": "n7",
+        "text": "And it asks first.",
+        "at": 58.0
+      },
+      {
+        "id": "c5",
+        "text": "Add it to Chrome or Firefox. One click.",
+        "at": 60.3
+      },
+      {
+        "id": "cta",
+        "text": "Campuslit. Free for Bahria students. Link in the comments.",
+        "at": 63.15
+      }
+    ],
+    "sfx": [
+      {
+        "id": "riser",
+        "kind": "riser",
+        "at": 3.4
+      },
+      {
+        "id": "card1",
+        "kind": "hit",
+        "at": 5
+      },
+      {
+        "id": "card1end",
+        "kind": "swish",
+        "at": 7
+      },
+      {
+        "id": "mk1a",
+        "kind": "pop",
+        "at": 7.5
+      },
+      {
+        "id": "mk1b",
+        "kind": "pop",
+        "at": 8
+      },
+      {
+        "id": "mk1c",
+        "kind": "pop",
+        "at": 8.5
+      },
+      {
+        "id": "wipe1",
+        "kind": "whoosh",
+        "at": 9
+      },
+      {
+        "id": "hw1",
+        "kind": "hit",
+        "at": 9.15,
+        "gain": -4
+      },
+      {
+        "id": "dockIn",
+        "kind": "mark",
+        "at": 12.5
+      },
+      {
+        "id": "th1",
+        "kind": "tick",
+        "at": 13
+      },
+      {
+        "id": "th2",
+        "kind": "tick",
+        "at": 13.5
+      },
+      {
+        "id": "th3",
+        "kind": "tick",
+        "at": 14
+      },
+      {
+        "id": "th4",
+        "kind": "tick",
+        "at": 14.5
+      },
+      {
+        "id": "custom",
+        "kind": "pop",
+        "at": 15
+      },
+      {
+        "id": "dockOut",
+        "kind": "mark",
+        "at": 18.5
+      },
+      {
+        "id": "card2",
+        "kind": "hit",
+        "at": 19
+      },
+      {
+        "id": "card2end",
+        "kind": "swish",
+        "at": 21.5
+      },
+      {
+        "id": "mk2a",
+        "kind": "pop",
+        "at": 22
+      },
+      {
+        "id": "mk2b",
+        "kind": "pop",
+        "at": 22.5
+      },
+      {
+        "id": "wipe2",
+        "kind": "whoosh",
+        "at": 23
+      },
+      {
+        "id": "hw2",
+        "kind": "hit",
+        "at": 23.15,
+        "gain": -4
+      },
+      {
+        "id": "click1",
+        "kind": "tick",
+        "at": 25.9,
+        "gain": 2
+      },
+      {
+        "id": "openPanel",
+        "kind": "mark",
+        "at": 25.95
+      },
+      {
+        "id": "goClick",
+        "kind": "tick",
+        "at": 27,
+        "gain": 2
+      },
+      {
+        "id": "chipIn",
+        "kind": "pop",
+        "at": 27.05
+      },
+      {
+        "id": "slideCal",
+        "kind": "swish",
+        "at": 28
+      },
+      {
+        "id": "fill1",
+        "kind": "tick",
+        "at": 28.7,
+        "gain": -6
+      },
+      {
+        "id": "fill2",
+        "kind": "tick",
+        "at": 28.821,
+        "gain": -6
+      },
+      {
+        "id": "fill3",
+        "kind": "tick",
+        "at": 28.943,
+        "gain": -6
+      },
+      {
+        "id": "fill4",
+        "kind": "tick",
+        "at": 29.064,
+        "gain": -6
+      },
+      {
+        "id": "fill5",
+        "kind": "tick",
+        "at": 29.186,
+        "gain": -6
+      },
+      {
+        "id": "fill6",
+        "kind": "tick",
+        "at": 29.307,
+        "gain": -6
+      },
+      {
+        "id": "fill7",
+        "kind": "tick",
+        "at": 29.429,
+        "gain": -6
+      },
+      {
+        "id": "fill8",
+        "kind": "tick",
+        "at": 29.55,
+        "gain": -6
+      },
+      {
+        "id": "fill9",
+        "kind": "tick",
+        "at": 29.671,
+        "gain": -6
+      },
+      {
+        "id": "fill10",
+        "kind": "tick",
+        "at": 29.793,
+        "gain": -6
+      },
+      {
+        "id": "fill11",
+        "kind": "tick",
+        "at": 29.914,
+        "gain": -6
+      },
+      {
+        "id": "fill12",
+        "kind": "tick",
+        "at": 30.036,
+        "gain": -6
+      },
+      {
+        "id": "card3",
+        "kind": "hit",
+        "at": 31
+      },
+      {
+        "id": "card3end",
+        "kind": "swish",
+        "at": 32.5
+      },
+      {
+        "id": "mk3a",
+        "kind": "pop",
+        "at": 33
+      },
+      {
+        "id": "mk3b",
+        "kind": "pop",
+        "at": 33.5
+      },
+      {
+        "id": "wipe3",
+        "kind": "whoosh",
+        "at": 34
+      },
+      {
+        "id": "hw3",
+        "kind": "hit",
+        "at": 34.15,
+        "gain": -4
+      },
+      {
+        "id": "slideRem",
+        "kind": "swish",
+        "at": 36.6
+      },
+      {
+        "id": "remPop",
+        "kind": "ding",
+        "at": 37.3
+      },
+      {
+        "id": "card4",
+        "kind": "hit",
+        "at": 39
+      },
+      {
+        "id": "card4end",
+        "kind": "swish",
+        "at": 40.5
+      },
+      {
+        "id": "mk4a",
+        "kind": "pop",
+        "at": 41
+      },
+      {
+        "id": "mk4b",
+        "kind": "pop",
+        "at": 41.5
+      },
+      {
+        "id": "wipe4",
+        "kind": "whoosh",
+        "at": 42
+      },
+      {
+        "id": "hw4",
+        "kind": "hit",
+        "at": 42.15,
+        "gain": -4
+      },
+      {
+        "id": "key1",
+        "kind": "tick",
+        "at": 42.75,
+        "gain": 2
+      },
+      {
+        "id": "k1t1",
+        "kind": "tick",
+        "at": 43.05,
+        "gain": -8
+      },
+      {
+        "id": "k1t2",
+        "kind": "tick",
+        "at": 43.17,
+        "gain": -8
+      },
+      {
+        "id": "k1t3",
+        "kind": "tick",
+        "at": 43.29,
+        "gain": -8
+      },
+      {
+        "id": "slideL",
+        "kind": "swish",
+        "at": 44
+      },
+      {
+        "id": "key2",
+        "kind": "tick",
+        "at": 44.55,
+        "gain": 2
+      },
+      {
+        "id": "k2t1",
+        "kind": "tick",
+        "at": 44.95,
+        "gain": -8
+      },
+      {
+        "id": "k2t2",
+        "kind": "tick",
+        "at": 45.07,
+        "gain": -8
+      },
+      {
+        "id": "k2t3",
+        "kind": "tick",
+        "at": 45.19,
+        "gain": -8
+      },
+      {
+        "id": "k2t4",
+        "kind": "tick",
+        "at": 45.31,
+        "gain": -8
+      },
+      {
+        "id": "k2t5",
+        "kind": "tick",
+        "at": 45.43,
+        "gain": -8
+      },
+      {
+        "id": "card5",
+        "kind": "hit",
+        "at": 46.5
+      },
+      {
+        "id": "card5end",
+        "kind": "swish",
+        "at": 48
+      },
+      {
+        "id": "mk5a",
+        "kind": "pop",
+        "at": 48.5
+      },
+      {
+        "id": "mk5b",
+        "kind": "pop",
+        "at": 49
+      },
+      {
+        "id": "wipe5",
+        "kind": "whoosh",
+        "at": 49.5
+      },
+      {
+        "id": "hw5",
+        "kind": "hit",
+        "at": 49.65,
+        "gain": -4
+      },
+      {
+        "id": "toast1",
+        "kind": "ding",
+        "at": 50.9,
+        "gain": -3
+      },
+      {
+        "id": "toast2",
+        "kind": "ding",
+        "at": 52.15,
+        "gain": -3
+      },
+      {
+        "id": "toast3",
+        "kind": "ding",
+        "at": 53.25,
+        "gain": -3
+      },
+      {
+        "id": "toast4",
+        "kind": "ding",
+        "at": 54.25,
+        "gain": -3
+      },
+      {
+        "id": "slideSet",
+        "kind": "swish",
+        "at": 55.6
+      },
+      {
+        "id": "askPop",
+        "kind": "pop",
+        "at": 57.9
+      },
+      {
+        "id": "slideI",
+        "kind": "swish",
+        "at": 59.6
+      },
+      {
+        "id": "click",
+        "kind": "tick",
+        "at": 61.55,
+        "gain": 2
+      },
+      {
+        "id": "ding",
+        "kind": "ding",
+        "at": 61.6
+      },
+      {
+        "id": "end",
+        "kind": "hit",
+        "at": 62.6
+      }
+    ]
+  },
+  "reel": {
+    "extends": "full",
+    "lines": {
+      "hook": {
+        "bot": true,
+        "slowTail": null
+      },
+      "one": {
+        "text": "Free. No sign-up. Nothing leaves your browser."
+      }
+    }
   }
 }

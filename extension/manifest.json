@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Campuslit: Bahria University LMS & CMS Redesign",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Redesign the Bahria University LMS and CMS, with optional alerts for new work, marks, attendance and deadlines. Unofficial; private.",
   "permissions": ["storage", "alarms", "notifications"],
   "host_permissions": ["https://lms.bahria.edu.pk/*", "https://cms.bahria.edu.pk/*"],
@@ -12,7 +12,7 @@
   "icons": {"16": "icons/icon-16.png", "32": "icons/icon-32.png", "48": "icons/icon-48.png", "128": "icons/icon-128.png"},
   "content_scripts": [{
     "matches": ["*://cms.bahria.edu.pk/*", "*://lms.bahria.edu.pk/*"],
-    "js": ["themes.js", "guide.js", "login.js", "deadlines.js", "lms.js", "attendance.js", "calendar.js", "cms.js", "search.js", "quicksearch.js", "tips.js", "content.js"],
+    "js": ["themes.js", "guide.js", "login.js", "deadlines.js", "lms.js", "attendance.js", "calendar.js", "cms.js", "search.js", "quicksearch.js", "tips.js", "preview.js", "zip.js", "docx.js", "previewer.js", "content.js"],
     "css": ["portal.css", "login.css", "lms.css", "cms.css", "quicksearch.css", "tips.css"],
     "run_at": "document_start",
     "all_frames": true
