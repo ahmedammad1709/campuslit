@@ -59,7 +59,7 @@ function pdfOf(text) {
 }
 const FILES = {
   'Assignment-2.docx': { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', body: DOCX },
-  'Week-1-Notes.pdf': { type: 'application/pdf', body: pdfOf('Hello from the preview') },
+  'Week-1-Notes.pdf': { type: 'application/pdf', body: Buffer.concat([pdfOf('Hello from the preview'), Buffer.alloc(400000, 10)]) },
   'Diagram.png': { type: 'image/png', body: PNG },
   'Readme.txt': { type: 'text/plain', body: Buffer.from('Line one\nLine two <b>not bold</b>\n') },
   'Lecture-3-Slides.pptx': { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation', body: zipOf([['ppt/presentation.xml', '<p/>']]) },
@@ -93,6 +93,7 @@ const server = http.createServer(async (req, res) => {
       const f = FILES[name];
       if (!f) { res.statusCode = 404; return res.end('not found'); }
       res.setHeader('content-type', f.type); res.setHeader('content-disposition', `attachment; filename="${name}"`); res.setHeader('content-length', f.body.length);
+      if (name === 'Week-1-Notes.pdf') { const half = Math.floor(f.body.length / 2); res.write(f.body.subarray(0, half)); return setTimeout(() => res.end(f.body.subarray(half)), 1500); }   // arrives in two parts, to see the progress ring move
       return res.end(f.body);
     }
     if (p.startsWith('/preview/') || p.startsWith('/fonts/')) {
@@ -165,6 +166,9 @@ try {
 
   // PDF
   await press('Week-1-Notes.pdf');
+  const mid = await tab.waitFor("(() => { const p = document.querySelector('.bs-pv-pct'); const n = p ? parseInt(p.textContent, 10) : 0; return n > 0 && n < 100 ? n : 0; })()", 'the ring shows a real percentage while the file arrives', 5000);
+  assert.ok(mid > 20 && mid < 80, 'about half way: ' + mid);
+  assert.ok(await tab.evaluate("parseFloat(document.querySelector('.bs-pv-arc').getAttribute('stroke-dashoffset')) < parseFloat(document.querySelector('.bs-pv-arc').getAttribute('stroke-dasharray'))"), 'the ring has started to fill');
   await tab.waitFor("!!document.querySelector('.bs-pv iframe.bs-pv-frame')", 'the PDF is shown in a frame');
   assert.equal(await tab.evaluate("document.querySelector('.bs-pv-frame').src.startsWith('blob:')"), true, 'the PDF is shown from memory');
   assert.equal(await tab.evaluate("[...document.querySelectorAll('.bs-pv-act')].map(a => a.textContent).sort().join(',')"), 'Download,Open in new tab', 'open in a tab and download');

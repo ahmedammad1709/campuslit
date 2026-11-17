@@ -221,3 +221,15 @@ test('CMS menu: hover, focus and click keep the theme tint (no white pill); LMS:
   const pv = fs.readFileSync(path.join(__dirname, '..', 'extension', 'previewer.js'), 'utf8');
   assert.ok(pv.includes('timedOut') && pv.includes('arrayBuffer()'), 'the preview reads the file in one go and says so when the portal is too slow');
 });
+
+test('CMS menu: the university\'s own "current" class (white pill) is restyled with the theme tint', () => {
+  const css = fs.readFileSync(path.join(__dirname, '..', 'extension', 'cms.css'), 'utf8');
+  assert.match(css, /div#sideMenuList#sideMenuList > a\.list-group-item\.current, [^{]*\.current:hover[^{]*\{ background: color-mix\(in srgb, var\(--bs-accent\) 22%, transparent\) !important;/);
+  assert.match(css, /a\.list-group-item\.current > \.menu-icon \{ background: none !important;/);
+});
+
+test('CMS menu icon: no box behind it in any state (hover, focus, current)', () => {
+  const css = fs.readFileSync(path.join(__dirname, '..', 'extension', 'cms.css'), 'utf8');
+  assert.match(css, /span\.menu-icon\.menu-icon::after \{ background: none !important; background-color: transparent !important;/);
+  assert.match(css, /a\.list-group-item\.list-group-item:hover > span\.menu-icon\.menu-icon/);
+});

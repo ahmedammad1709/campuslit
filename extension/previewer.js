@@ -15,6 +15,22 @@
     const c = document.createElementNS(ns, 'circle'); c.setAttribute('cx', '12'); c.setAttribute('cy', '12'); c.setAttribute('r', '3');
     s.append(a, c); return s;
   };
+  // A progress ring: fills as the file arrives, with the percentage in the middle. With no usable size it turns instead of filling.
+  const R = 32, C = 2 * Math.PI * R;
+  function ring() {
+    const ns = 'http://www.w3.org/2000/svg', wrap = el('span', 'bs-pv-ring'), svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('viewBox', '0 0 80 80'); svg.setAttribute('aria-hidden', 'true');
+    const mk = cls => { const c = document.createElementNS(ns, 'circle'); c.setAttribute('cx', '40'); c.setAttribute('cy', '40'); c.setAttribute('r', String(R)); c.setAttribute('fill', 'none'); c.setAttribute('class', cls); return c; };
+    const bar = mk('bs-pv-arc'); bar.setAttribute('stroke-dasharray', String(C)); bar.setAttribute('stroke-dashoffset', String(C));
+    svg.append(mk('bs-pv-track'), bar);
+    const pct = el('span', 'bs-pv-pct', '0%');
+    wrap.append(svg, pct);
+    return { node: wrap, set(f) {
+      if (f === null) { wrap.classList.add('turn'); bar.setAttribute('stroke-dashoffset', String(C * .72)); pct.textContent = ''; return; }
+      wrap.classList.remove('turn'); const p = Math.max(0, Math.min(1, f));
+      bar.setAttribute('stroke-dashoffset', String(C * (1 - p))); pct.textContent = Math.round(p * 100) + '%';
+    } };
+  }
   const keep = blob => { const u = URL.createObjectURL(blob); urls.push(u); return u; };
 
   // ---------------------------------------------------------------- the viewer
@@ -40,7 +56,7 @@
     actions.append(closeBtn);
     bar.append(head, actions);
     const body = el('div', 'bs-pv-body'), msg = el('div', 'bs-pv-msg'), label = el('span', 'bs-pv-label', 'Loading…'); msg.setAttribute('role', 'status');
-    msg.append(el('span', 'bs-pv-spin'), label);
+    const dial = ring(); msg.append(dial.node, label);
     body.append(msg);
     card.append(bar, body); box.append(card);
     box.addEventListener('mousedown', e => { if (e.target === box) close(); });
@@ -56,7 +72,7 @@
     document.addEventListener('keydown', keyHandler, true);
     overlay = box; document.body.append(box); document.documentElement.classList.add('bs-pv-open');
     closeBtn.focus();
-    return { box, body, msg, label, actions, closeBtn, meta };
+    return { box, body, msg, label, dial, actions, closeBtn, meta };
   }
   function action(view, label, href, extra, primary) {
     const a = el('a', 'bs-pv-act' + (primary ? ' primary' : ''), label); a.href = href; Object.assign(a, extra || {});
@@ -69,12 +85,24 @@
     view.body.append(msg);
   }
 
-  async function readLimited(res) {
-    // One read of the whole body is the fastest way. The size is checked before and after (a percentage was misleading: the portal's length is for the compressed file).
-    if ((+res.headers.get('content-length') || 0) > P.MAX_BYTES) throw new Error('big');
-    const buf = new Uint8Array(await res.arrayBuffer());
-    if (buf.length > P.MAX_BYTES) throw new Error('big');
-    return buf;
+  async function readLimited(res, onProgress) {
+    const known = +res.headers.get('content-length') || 0;
+    if (known > P.MAX_BYTES) throw new Error('big');
+    if (!res.body || !res.body.getReader) { const buf = new Uint8Array(await res.arrayBuffer()); if (buf.length > P.MAX_BYTES) throw new Error('big'); return buf; }
+    const reader = res.body.getReader(), parts = []; let total = 0, last = 0;
+    onProgress(known ? 0 : null);
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.length;
+      if (total > P.MAX_BYTES) { try { await reader.cancel(); } catch (e) { /* stopped */ } throw new Error('big'); }
+      parts.push(value);
+      const now = performance.now();
+      if (now - last > 50) { last = now; onProgress(known && total <= known ? total / known : null); }   // more bytes than announced: the length was for a compressed copy, so show a turning ring instead
+    }
+    const out = new Uint8Array(total); let at = 0; for (const p of parts) { out.set(p, at); at += p.length; }
+    onProgress(1);
+    return out;
   }
 
   async function open(href, info, from) {
@@ -89,8 +117,8 @@
       if (!res.ok) throw new Error('The portal answered ' + res.status + '. Try again, or sign in again.');
       if (/text\/html/i.test(res.headers.get('content-type') || '') && P.kindOf(info.ext) !== 'text') throw new Error('The portal sent a page instead of the file. Your sign-in may have ended: sign in again and retry.');
       const slow = setTimeout(() => { if (mine === run) view.label.textContent = 'Still loading… the portal is slow to answer.'; }, 8000);
-      let bytes; try { bytes = await readLimited(res); } finally { clearTimeout(slow); clearTimeout(giveUp); }
-      if (mine === run) view.label.textContent = 'Opening…';
+      let bytes; try { bytes = await readLimited(res, f => { if (mine === run) view.dial.set(f); }); } finally { clearTimeout(slow); clearTimeout(giveUp); }
+      if (mine === run) { view.label.textContent = 'Opening…'; view.dial.set(1); }
       if (mine !== run) return;
       if (!P.sniff(bytes, info.ext)) throw new Error('This file does not look like a real ' + info.ext.toUpperCase() + ' file, so it is not shown.');
       view.meta.textContent = info.ext.toUpperCase() + ' · ' + P.readableSize(bytes.length);
