@@ -30,8 +30,35 @@
     } catch (e) { return null; }
   }
 
+  // The portal now scrambles k=, so the link no longer says what the file is. The answer comes back with the file: its name in Content-Disposition, its Content-Type, or at last its first bytes.
+  function nameFromHeaders(headers) {
+    const cd = headers && headers.get && headers.get('content-disposition') || '';
+    let m = /filename\*\s*=\s*utf-8''([^;]+)/i.exec(cd), name = '';
+    if (m) { try { name = decodeURIComponent(m[1].trim().replace(/^"|"$/g, '')); } catch (e) { name = m[1]; } }
+    else if ((m = /filename\s*=\s*"([^"]*)"/i.exec(cd)) || (m = /filename\s*=\s*([^;]+)/i.exec(cd))) name = m[1].trim();
+    name = name.replace(/[\\/\u0000-\u001f]/g, '').trim().slice(0, 180);
+    const dot = name.lastIndexOf('.');
+    return name && dot > 0 ? { name, ext: name.slice(dot + 1).toLowerCase() } : null;
+  }
+  const TYPES = { 'application/pdf': 'pdf', 'image/png': 'png', 'image/jpeg': 'jpg', 'image/gif': 'gif', 'image/webp': 'webp', 'text/plain': 'txt', 'text/csv': 'csv',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx', 'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'pptx',
+    'application/zip': 'zip', 'application/x-zip-compressed': 'zip', 'application/msword': 'doc', 'application/vnd.ms-excel': 'xls', 'application/vnd.ms-powerpoint': 'ppt' };
+  const extFromType = type => TYPES[String(type || '').split(';')[0].trim().toLowerCase()] || '';
+  function extFromBytes(b) {
+    if (!b || b.length < 4) return '';
+    if (starts(b, [0x25, 0x50, 0x44, 0x46, 0x2d])) return 'pdf';
+    if (starts(b, [0x89, 0x50, 0x4e, 0x47])) return 'png';
+    if (starts(b, [0xff, 0xd8, 0xff])) return 'jpg';
+    if (starts(b, [0x47, 0x49, 0x46, 0x38])) return 'gif';
+    if (starts(b, [0x52, 0x49, 0x46, 0x46]) && starts(b, [0x57, 0x45, 0x42, 0x50], 8)) return 'webp';
+    if (starts(b, [0x50, 0x4b, 0x03, 0x04])) return 'zip';
+    if (starts(b, [0xd0, 0xcf, 0x11, 0xe0])) return 'doc';   // an old Office file
+    return '';
+  }
+
   const KINDS = { pdf: 'pdf', png: 'image', jpg: 'image', jpeg: 'image', gif: 'image', webp: 'image', txt: 'text', csv: 'text', log: 'text', md: 'text', docx: 'docx', xlsx: 'xlsx', pptx: 'pptx', zip: 'zip', doc: 'legacy', xls: 'legacy', ppt: 'legacy' };
   const SUPPORTED = new Set(['pdf', 'image', 'text', 'docx']);   // grows step by step: spreadsheets, slides and archives come next
+  const starts = (b, sig, at = 0) => sig.every((v, i) => b[at + i] === v);
   const MIME = { pdf: 'application/pdf', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp', txt: 'text/plain', csv: 'text/plain', log: 'text/plain', md: 'text/plain',
     docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation', zip: 'application/zip' };
   const kindOf = ext => KINDS[String(ext || '').toLowerCase()] || 'other';
@@ -39,7 +66,6 @@
   const mimeFor = ext => MIME[String(ext || '').toLowerCase()] || 'application/octet-stream';
 
   // The bytes must look like the kind of file the name claims. A page that says "PDF" but sends something else is never shown.
-  const starts = (b, sig, at = 0) => sig.every((v, i) => b[at + i] === v);
   function sniff(bytes, ext) {
     const b = bytes, kind = kindOf(ext);
     if (!b || !b.length) return false;
@@ -59,5 +85,5 @@
 
   const readableSize = n => !Number.isFinite(n) || n < 0 ? '' : n < 1024 ? n + ' B' : n < 1048576 ? Math.round(n / 1024) + ' KB' : (Math.round(n / 104857.6) / 10) + ' MB';
 
-  root.BahriaPreview = { MAX_BYTES, fileUrl, parseKey, kindOf, supported, mimeFor, sniff, readableSize };
+  root.BahriaPreview = { MAX_BYTES, fileUrl, parseKey, nameFromHeaders, extFromType, extFromBytes, kindOf, supported, mimeFor, sniff, readableSize };
 })(globalThis);

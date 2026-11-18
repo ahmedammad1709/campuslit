@@ -47,8 +47,8 @@
   function viewer(info) {
     const box = el('div', 'bs-pv'); box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true'); box.setAttribute('aria-label', 'Preview of ' + info.name);
     const card = el('div', 'bs-pv-card'), bar = el('div', 'bs-pv-bar'), head = el('div', 'bs-pv-head');
-    const title = el('b', 'bs-pv-title', info.name), meta = el('span', 'bs-pv-meta', info.ext.toUpperCase());
-    const badge = el('span', 'bs-pv-badge k-' + P.kindOf(info.ext), info.ext.slice(0, 4).toUpperCase()); badge.setAttribute('aria-hidden', 'true');
+    const title = el('b', 'bs-pv-title', info.name || 'File'), meta = el('span', 'bs-pv-meta', info.ext.toUpperCase());
+    const badge = el('span', 'bs-pv-badge k-' + P.kindOf(info.ext), (info.ext || 'file').slice(0, 4).toUpperCase()); badge.setAttribute('aria-hidden', 'true');
     const lines = el('div', 'bs-pv-lines'); lines.append(title, meta);
     head.append(badge, lines);
     const actions = el('div', 'bs-pv-actions');
@@ -72,7 +72,9 @@
     document.addEventListener('keydown', keyHandler, true);
     overlay = box; document.body.append(box); document.documentElement.classList.add('bs-pv-open');
     closeBtn.focus();
-    return { box, body, msg, label, dial, actions, closeBtn, meta };
+    // The link did not say what the file is; once the answer comes back the heading learns it.
+    const learn = got => { info = got; title.textContent = got.name; meta.textContent = got.ext.toUpperCase(); badge.textContent = got.ext.slice(0, 4).toUpperCase(); badge.className = 'bs-pv-badge k-' + P.kindOf(got.ext); box.setAttribute('aria-label', 'Preview of ' + got.name); };
+    return { box, body, msg, label, dial, actions, closeBtn, meta, learn };
   }
   function action(view, label, href, extra, primary) {
     const a = el('a', 'bs-pv-act' + (primary ? ' primary' : ''), label); a.href = href; Object.assign(a, extra || {});
@@ -115,11 +117,26 @@
       const res = await fetch(safe, { credentials: 'same-origin', signal: abort.signal });
       if (mine !== run) return;
       if (!res.ok) throw new Error('The portal answered ' + res.status + '. Try again, or sign in again.');
-      if (/text\/html/i.test(res.headers.get('content-type') || '') && P.kindOf(info.ext) !== 'text') throw new Error('The portal sent a page instead of the file. Your sign-in may have ended: sign in again and retry.');
+      const ctype = res.headers.get('content-type') || '';
+      if (!info.ext) {   // the link was scrambled: the answer says what the file is
+        const named = P.nameFromHeaders(res.headers), ext = named ? named.ext : P.extFromType(ctype);
+        if (ext) {
+          info = { name: named ? named.name : 'File.' + ext, ext }; view.learn(info);
+          if (!P.supported(ext)) { try { await res.body.cancel(); } catch (e) { /* stopped */ } clearTimeout(giveUp); throw new Error('A .' + ext + ' file cannot be previewed yet. Download it from the portal.'); }
+        }
+      }
+      if (/text\/html/i.test(ctype) && P.kindOf(info.ext) !== 'text') throw new Error('The portal sent a page instead of the file. Your sign-in may have ended: sign in again and retry.');
       const slow = setTimeout(() => { if (mine === run) view.label.textContent = 'Still loading… the portal is slow to answer.'; }, 8000);
       let bytes; try { bytes = await readLimited(res, f => { if (mine === run) view.dial.set(f); }); } finally { clearTimeout(slow); clearTimeout(giveUp); }
       if (mine === run) { view.label.textContent = 'Opening…'; view.dial.set(1); }
       if (mine !== run) return;
+      if (!info.ext) {   // still unknown: the first bytes decide
+        let ext = P.extFromBytes(bytes);
+        if (ext === 'zip') { try { const z = Z.open(bytes); ext = z.has('word/document.xml') ? 'docx' : z.has('xl/workbook.xml') ? 'xlsx' : z.has('ppt/presentation.xml') ? 'pptx' : 'zip'; } catch (e) { /* stays a zip */ } }
+        if (!ext) throw new Error('This kind of file cannot be previewed. Download it from the portal.');
+        info = { name: 'File.' + ext, ext }; view.learn(info);
+        if (!P.supported(ext)) throw new Error('A .' + ext + ' file cannot be previewed yet. Download it from the portal.');
+      }
       if (!P.sniff(bytes, info.ext)) throw new Error('This file does not look like a real ' + info.ext.toUpperCase() + ' file, so it is not shown.');
       view.meta.textContent = info.ext.toUpperCase() + ' · ' + P.readableSize(bytes.length);
       const mime = P.mimeFor(info.ext), blob = new Blob([bytes], { type: mime }), kind = P.kindOf(info.ext);
@@ -159,10 +176,12 @@
     if (window !== window.top || location.hostname !== 'lms.bahria.edu.pk' || !document.body) return;
     document.querySelectorAll('a[href*="Download.php"]').forEach(a => {
       if (a.hasAttribute('data-bs-pv') || a.closest('.bs-pv')) return;   // never decorate the viewer's own links
-      const safe = P.fileUrl(a.getAttribute('href'), location.href), info = safe && P.parseKey(safe);
-      if (!info || !P.supported(info.ext)) return;
+      const safe = P.fileUrl(a.getAttribute('href'), location.href);
+      if (!safe) return;
+      const info = P.parseKey(safe) || { name: '', ext: '' };   // the portal scrambles k= now: then the kind is learned when the file comes
+      if (info.ext && !P.supported(info.ext)) return;
       a.setAttribute('data-bs-pv', '');
-      const b = el('button', 'bs-pv-btn'); b.type = 'button'; b.title = 'View ' + info.name + ' here, without downloading it'; b.setAttribute('aria-label', 'Preview ' + info.name);
+      const b = el('button', 'bs-pv-btn'); b.type = 'button'; b.title = 'View ' + (info.name || 'this file') + ' here, without downloading it'; b.setAttribute('aria-label', 'Preview ' + (info.name || 'file'));
       b.append(eye(), document.createTextNode(' Preview'));
       b.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); open(safe, info, b); });
       a.after(b); owned.add(b);

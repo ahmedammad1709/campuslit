@@ -95,3 +95,18 @@ test('the zip reader refuses damaged files and tricks', async () => {
   const damaged = makeZip([['a.txt', 'abc', 0]]); damaged.set([0, 0, 0, 0], 0);
   await assert.rejects(() => Z.open(damaged).read('a.txt'), /damaged/);
 });
+
+test('a scrambled link is learned from the answer: name, type, then the first bytes', () => {
+  const h = o => ({ get: k => o[k.toLowerCase()] || null });
+  assert.deepEqual({ ...P.nameFromHeaders(h({ 'content-disposition': 'attachment; filename="Lab 3.pptx"' })) }, { name: 'Lab 3.pptx', ext: 'pptx' });
+  assert.deepEqual({ ...P.nameFromHeaders(h({ 'content-disposition': "attachment; filename*=UTF-8''Quiz%201.pdf" })) }, { name: 'Quiz 1.pdf', ext: 'pdf' });
+  assert.deepEqual({ ...P.nameFromHeaders(h({ 'content-disposition': 'attachment; filename=notes.docx' })) }, { name: 'notes.docx', ext: 'docx' });
+  assert.equal(P.nameFromHeaders(h({})), null);
+  assert.equal(P.nameFromHeaders(h({ 'content-disposition': 'attachment; filename="readme"' })), null, 'a name with no dot gives no type');
+  assert.equal(P.extFromType('application/pdf; charset=binary'), 'pdf');
+  assert.equal(P.extFromType('application/vnd.openxmlformats-officedocument.wordprocessingml.document'), 'docx');
+  assert.equal(P.extFromType('application/octet-stream'), '');
+  assert.equal(P.extFromBytes(Uint8Array.from([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31])), 'pdf');
+  assert.equal(P.extFromBytes(Uint8Array.from([0x50, 0x4b, 0x03, 0x04, 0])), 'zip');
+  assert.equal(P.extFromBytes(Uint8Array.from([1, 2, 3, 4, 5])), '');
+});

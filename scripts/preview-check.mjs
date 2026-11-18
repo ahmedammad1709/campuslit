@@ -67,8 +67,17 @@ const FILES = {
   'Fake.pdf': { type: 'application/pdf', body: Buffer.from('<html><script>window.__pwned = 3</script>I am a web page, not a PDF</html>') },
   'Signed-out.pdf': { type: 'text/html', body: Buffer.from('<html><body>Please sign in</body></html>') },
 };
+FILES['Headerless.png'] = { type: 'application/octet-stream', body: PNG, bare: true };   // the portal names nothing: only the first bytes tell
 const names = Object.keys(FILES).concat(['Missing.pdf']);
-const keyOf = name => Buffer.from(`1001,2026-11-16,Lecture,0,${name},lms.bahria.edu.pk/Student/LectureNotes.php?s=MjAyNjM%3D&oc=MTUyMjAx`).toString('base64');
+// Since the university's update the portal scrambles k= (a version byte and then bytes that say nothing). Readme.txt keeps the old readable key, so both kinds are checked.
+const tokens = new Map();
+const keyOf = name => {
+  if (name === 'Readme.txt') return Buffer.from(`1001,2026-11-16,Lecture,0,${name},lms.bahria.edu.pk/Student/LectureNotes.php?s=MjAyNjM%3D&oc=MTUyMjAx`).toString('base64');
+  const k = Buffer.concat([Buffer.from([1]), Buffer.from(String(tokens.size + 1).padStart(4, '0')), Buffer.alloc(40, 0xa7 ^ tokens.size)]).toString('base64').replace(/[+]/g, '-').replace(/[/]/g, '_').replace(/=+$/, '');
+  for (const [t, n] of tokens) if (n === name) return t;
+  tokens.set(k, name); return k;
+};
+const nameOfKey = k => tokens.get(k) || Buffer.from(k, 'base64').toString('utf8').split(',')[4];
 
 // ---- the fake LMS ---------------------------------------------------------------------------------------------
 const hits = [];
@@ -88,11 +97,11 @@ const server = http.createServer(async (req, res) => {
     const host = (req.headers.host || '').split(':')[0], url = new URL(req.url, 'http://x'), p = decodeURIComponent(url.pathname);
     if (host.startsWith('lms') && p === '/Student/Assignments.php') { res.setHeader('content-type', 'text/html; charset=utf-8'); return res.end(assignmentsPage(await readFile(path.join(previewRoot, 'preview/lms/assignments.html'), 'utf8'))); }
     if (host.startsWith('lms') && p === '/Student/Download.php') {
-      const parts = Buffer.from(url.searchParams.get('k') || '', 'base64').toString('utf8').split(','), name = parts[4];
+      const name = nameOfKey(url.searchParams.get('k') || '');
       hits.push({ host, name, cookie: Boolean(req.headers.cookie) });
       const f = FILES[name];
       if (!f) { res.statusCode = 404; return res.end('not found'); }
-      res.setHeader('content-type', f.type); res.setHeader('content-disposition', `attachment; filename="${name}"`); res.setHeader('content-length', f.body.length);
+      res.setHeader('content-type', f.type); if (!f.bare) res.setHeader('content-disposition', `attachment; filename="${name}"`); res.setHeader('content-length', f.body.length);
       if (name === 'Week-1-Notes.pdf') { const half = Math.floor(f.body.length / 2); res.write(f.body.subarray(0, half)); return setTimeout(() => res.end(f.body.subarray(half)), 1500); }   // arrives in two parts, to see the progress ring move
       return res.end(f.body);
     }
@@ -139,16 +148,17 @@ try {
   const tab = await openTab('http://lms.bahria.edu.pk/Student/Assignments.php');
   await tab.waitFor("document.documentElement.dataset.bahriaStudio === 'lms' && document.querySelectorAll('.bs-pv-btn').length > 0", 'Preview buttons appear');
   const labels = await tab.evaluate("[...document.querySelectorAll('.bs-pv-btn')].map(b => b.getAttribute('aria-label'))");
-  for (const ok of ['Assignment-2.docx', 'Week-1-Notes.pdf', 'Diagram.png', 'Readme.txt', 'Fake.pdf', 'Signed-out.pdf', 'Missing.pdf']) assert.ok(labels.some(l => l.endsWith(ok)), 'a Preview button for ' + ok);
-  for (const no of ['Lecture-3-Slides.pptx', 'Archive.zip']) assert.ok(!labels.some(l => l.endsWith(no)), 'no Preview button yet for ' + no + ' (not supported in this step)');
-  assert.equal(await tab.evaluate("document.querySelectorAll('a[href*=\"Download.php\"]:not([data-bs-pv])').length >= 2"), true, 'unsupported types keep their plain download link only');
+  const hasButton = name => tab.evaluate(`[...document.querySelectorAll('.bs-pv-btn')].some(b => b.previousElementSibling && b.previousElementSibling.href.includes(${JSON.stringify(encodeURIComponent(keyOf(name)))}))`);
+  for (const ok of names) assert.ok(await hasButton(ok), 'a Preview button for ' + ok + ' (scrambled links cannot be told apart before the file comes)');
+  assert.ok(labels.some(l => l === 'Preview Readme.txt'), 'an old readable link still names its file');
+  assert.equal(await tab.evaluate("document.querySelectorAll('a[href*=\"Download.php\"]:not([data-bs-pv])').length"), 0, 'every download link got its button');
   assert.equal(await tab.evaluate("[...document.querySelectorAll('.bs-pv-btn')].every(b => b.previousElementSibling && b.previousElementSibling.matches('a[data-bs-pv]'))"), true, 'each button sits right after its link');
   assert.equal(hits.length, 0, 'nothing is requested until a Preview button is pressed');
   console.log('buttons:', labels.length, '| requests before any click:', hits.length);
   await tab.call('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
   await shot(tab, '1-page');
 
-  const press = async name => { await tab.evaluate(`[...document.querySelectorAll('.bs-pv-btn')].find(b => b.getAttribute('aria-label').endsWith(${JSON.stringify(name)})).click(); 0`); };
+  const press = async name => { await tab.evaluate(`[...document.querySelectorAll('.bs-pv-btn')].find(b => b.previousElementSibling.href.includes(${JSON.stringify(encodeURIComponent(keyOf(name)))})).click(); 0`); };
   const closeIt = async () => { await tab.call('Input.dispatchKeyEvent', { type: 'rawKeyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 }); await tab.call('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 }); await tab.waitFor("!document.querySelector('.bs-pv')", 'Escape closes the viewer'); };
 
   // Word
@@ -161,7 +171,7 @@ try {
   assert.equal(await tab.evaluate("document.activeElement.className"), 'bs-pv-x', 'focus moves into the viewer');
   await tab.waitFor("document.querySelector('.bs-docx img').complete && document.querySelector('.bs-docx img').naturalWidth > 0", 'the picture inside the document loads');
   await shot(tab, '2-word'); await closeIt();
-  assert.equal(await tab.evaluate("document.activeElement.getAttribute('aria-label')"), 'Preview Assignment-2.docx', 'focus goes back to the button');
+  assert.equal(await tab.evaluate("document.activeElement.classList.contains('bs-pv-btn')"), true, 'focus goes back to the button');
   assert.equal(await tab.evaluate("document.documentElement.classList.contains('bs-pv-open')"), false, 'the page scrolls again');
 
   // PDF
@@ -175,6 +185,8 @@ try {
   await tab.waitFor("document.activeElement && document.activeElement.className === 'bs-pv-x'", 'the PDF frame hands the keyboard back, so Escape works'); await sleep(1200); await shot(tab, '3-pdf'); await closeIt();
   // image and text
   await press('Diagram.png'); await tab.waitFor("!!document.querySelector('.bs-pv img.bs-pv-img')", 'the image is shown'); await closeIt();
+  await press('Headerless.png'); await tab.waitFor("!!document.querySelector('.bs-pv img.bs-pv-img')", 'a file with no name and no type is told by its first bytes'); assert.equal(await tab.evaluate("document.querySelector('.bs-pv-title').textContent"), 'File.png'); await closeIt();
+  for (const [n, ext] of [['Lecture-3-Slides.pptx', 'pptx'], ['Archive.zip', 'zip']]) { await press(n); await tab.waitFor(`/A \.${ext} file cannot be previewed yet/.test(document.querySelector('.bs-pv-msg') ? document.querySelector('.bs-pv-msg').textContent : '')`, ext + ' is explained, not shown'); assert.equal(await tab.evaluate("document.querySelector('.bs-pv-title').textContent"), n, 'the heading learned the name'); await closeIt(); }
   await press('Readme.txt'); await tab.waitFor("!!document.querySelector('.bs-pv pre.bs-pv-text')", 'the text is shown');
   assert.equal(await tab.evaluate("document.querySelector('.bs-pv-text').textContent.includes('<b>not bold</b>') && !document.querySelector('.bs-pv-text b')"), true, 'text is shown as text, never as markup');
   await closeIt();
