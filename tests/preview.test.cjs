@@ -37,10 +37,10 @@ test('the file name and type come from the link\'s code; damaged or odd codes ar
   assert.equal(P.parseKey('https://lms.bahria.edu.pk/Student/Download.php?k=' + b64('1,2')), null);
 });
 
-test('kinds, what can be shown, and the types that come next', () => {
-  for (const e of ['pdf', 'PDF', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'txt', 'csv', 'docx']) assert.ok(P.supported(e), e);
-  for (const e of ['xlsx', 'pptx', 'zip', 'doc', 'xls', 'ppt', 'exe', 'html', 'svg', 'js', '']) assert.ok(!P.supported(e), e + ' is not shown yet');
-  assert.equal(P.kindOf('pptx'), 'pptx'); assert.equal(P.kindOf('doc'), 'legacy'); assert.equal(P.kindOf('svg'), 'other'); assert.equal(P.kindOf('html'), 'other');
+test('kinds and what can be shown: documents, sheets, slides, archives and old Office files, but never web pages, scripts or programs', () => {
+  for (const e of ['pdf', 'PDF', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'txt', 'csv', 'docx', 'docm', 'xlsx', 'xlsm', 'pptx', 'pptm', 'ppsx', 'zip', 'doc', 'xls', 'ppt', 'pps']) assert.ok(P.supported(e), e);
+  for (const e of ['exe', 'html', 'htm', 'svg', 'js', 'rar', '7z', 'bat', '']) assert.ok(!P.supported(e), e + ' is not shown');
+  assert.equal(P.kindOf('pptx'), 'pptx'); assert.equal(P.kindOf('xlsm'), 'xlsx'); assert.ok(P.sniff(Uint8Array.from([0xd0,0xcf,0x11,0xe0,0xa1,0xb1,0x1a,0xe1]), 'xls') && !P.sniff(Uint8Array.from([0x50,0x4b,3,4]), 'xls')); assert.equal(P.kindOf('doc'), 'legacy'); assert.equal(P.kindOf('svg'), 'other'); assert.equal(P.kindOf('html'), 'other');
   assert.equal(P.mimeFor('pdf'), 'application/pdf'); assert.equal(P.mimeFor('exe'), 'application/octet-stream');
 });
 

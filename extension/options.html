@@ -11,6 +11,7 @@
 <script src="icons.js" defer></script>
 <script src="themes.js" defer></script>
 <script src="guide.js" defer></script>
+<script src="whatsnew.js" defer></script>
 <script src="deadlines.js" defer></script>
 <script src="storage.js" defer></script>
 <script src="studio.js" defer></script>
@@ -29,6 +30,7 @@
       <a id="nav-portals" href="#portals" data-section="portals"><span data-icon="layers"></span>Portals</a>
       <a id="nav-notifications" href="#notifications" data-section="notifications"><span data-icon="bell"></span>Notifications<span class="nav-tag">New</span></a>
       <a id="nav-guide" href="#guide" data-section="guide"><span data-icon="spark"></span>Guide</a>
+      <a id="nav-updates" href="#updates" data-section="updates"><span data-icon="reset"></span>Updates<span class="nav-tag">New</span></a>
       <a id="nav-privacy" href="#privacy" data-section="privacy"><span data-icon="shield"></span>Privacy &amp; data</a>
     </nav>
     <div class="side-foot">
@@ -324,12 +326,28 @@
         </section>
 
         <!-- Privacy & data -->
+        <!-- Updates -->
+        <section class="panel" id="section-updates" aria-labelledby="section-title" hidden>
+          <div class="group">
+            <div class="group-title"><h3>Your version</h3></div>
+            <div class="upd-now">
+              <div><strong id="upd-ver">Campuslit</strong><p id="upd-result" class="upd-result" role="status" aria-live="polite">Your browser looks for updates by itself every few hours.</p></div>
+              <div class="upd-actions"><button id="upd-check" class="btn secondary" type="button"><span data-icon="reset"></span>Check for updates</button><button id="upd-reload" class="btn primary" type="button" hidden>Restart Campuslit</button></div>
+            </div>
+            <p id="upd-note" class="group-note" style="margin:14px 0 0">Updates arrive by themselves and keep your settings. Open portal tabs need a reload afterwards.</p>
+          </div>
+          <div class="group">
+            <div class="group-title"><h3>What’s new</h3></div>
+            <ol id="upd-list" class="upd-list"></ol>
+          </div>
+        </section>
+
         <section class="panel" id="section-privacy" aria-labelledby="section-title" hidden>
           <div class="group">
             <div class="group-title"><h3>What Campuslit does with your data</h3></div>
             <ul class="facts">
               <li><span data-icon="check"></span><span>No accounts, no analytics, no tracking, and nothing sent to any server of ours. Only if you turn on notifications does Campuslit open pages on the two portals, with your own sign-in.</span></li>
-              <li><span data-icon="check"></span><span>Only your appearance choices are stored, in this browser, plus the short assignment-reminder note described under Portals (which you can turn off or forget) and a few yes/no flags for the tips you have dismissed.</span></li>
+              <li><span data-icon="check"></span><span>Only your appearance choices are stored, in this browser, plus the short assignment-reminder note described under Portals (which you can turn off or forget) a few yes/no flags for the tips you have dismissed, and, after an update, the version you updated from so What’s new shows only once.</span></li>
               <li><span data-icon="check"></span><span>Passwords and form fields are never read. A few screens are redrawn from figures the page already shows (your first name, courses, attendance, time table); they stay in memory and are never saved or sent.</span></li>
             </ul>
             <p class="group-note" style="margin:16px 0 0"><a class="link-out" href="privacy.html">Read the full privacy policy <span data-icon="arrow"></span></a></p>

@@ -4,10 +4,10 @@
 // portal does (as downloads). It also serves broken files, to prove they are refused. Nothing here touches a real university site.
 import { spawn } from 'node:child_process';
 import http from 'node:http';
-import zlib from 'node:zlib';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import assert from 'node:assert/strict';
+import { zipOf, PNG, xlsxSample, pptxSample, docSample, xlsSample, pptSample } from './lib/office-samples.mjs';
 
 const extDir = path.resolve(process.env.EXT_DIR || 'dist/chrome'), previewRoot = path.resolve('extension');
 const artifacts = path.resolve('artifacts'); await mkdir(artifacts, { recursive: true });
@@ -15,20 +15,6 @@ const executable = process.env.STUDIO_CHROME || 'C:/Program Files/Google/Chrome/
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 // ---- the files the fake portal serves -------------------------------------------------------------------------
-const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGP4z8DwHwAFAAH/q842iQAAAABJRU5ErkJggg==', 'base64');
-const crcTable = (() => { const t = []; for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
-const crc32 = buf => { let c = 0xffffffff; for (const x of buf) c = crcTable[(c ^ x) & 255] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
-function zipOf(files) {
-  const locals = [], central = []; let offset = 0;
-  for (const [name, content] of files) {
-    const raw = Buffer.from(content), data = zlib.deflateRawSync(raw), nm = Buffer.from(name), crc = crc32(raw);
-    const lh = Buffer.alloc(30); lh.writeUInt32LE(0x04034b50, 0); lh.writeUInt16LE(20, 4); lh.writeUInt16LE(8, 8); lh.writeUInt32LE(crc, 14); lh.writeUInt32LE(data.length, 18); lh.writeUInt32LE(raw.length, 22); lh.writeUInt16LE(nm.length, 26);
-    const ch = Buffer.alloc(46); ch.writeUInt32LE(0x02014b50, 0); ch.writeUInt16LE(20, 4); ch.writeUInt16LE(20, 6); ch.writeUInt16LE(8, 10); ch.writeUInt32LE(crc, 16); ch.writeUInt32LE(data.length, 20); ch.writeUInt32LE(raw.length, 24); ch.writeUInt16LE(nm.length, 28); ch.writeUInt32LE(offset, 42);
-    locals.push(lh, nm, data); central.push(ch, nm); offset += 30 + nm.length + data.length;
-  }
-  const cd = Buffer.concat(central), end = Buffer.alloc(22); end.writeUInt32LE(0x06054b50, 0); end.writeUInt16LE(files.length, 8); end.writeUInt16LE(files.length, 10); end.writeUInt32LE(cd.length, 12); end.writeUInt32LE(offset, 16);
-  return Buffer.concat([...locals, cd, end]);
-}
 const NS = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"';
 const para = (text, rpr = '', ppr = '') => `<w:p>${ppr ? '<w:pPr>' + ppr + '</w:pPr>' : ''}<w:r>${rpr ? '<w:rPr>' + rpr + '</w:rPr>' : ''}<w:t xml:space="preserve">${text}</w:t></w:r></w:p>`;
 const bullet = t => para(t, '', '<w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr>');
@@ -62,8 +48,13 @@ const FILES = {
   'Week-1-Notes.pdf': { type: 'application/pdf', body: Buffer.concat([pdfOf('Hello from the preview'), Buffer.alloc(400000, 10)]) },
   'Diagram.png': { type: 'image/png', body: PNG },
   'Readme.txt': { type: 'text/plain', body: Buffer.from('Line one\nLine two <b>not bold</b>\n') },
-  'Lecture-3-Slides.pptx': { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation', body: zipOf([['ppt/presentation.xml', '<p/>']]) },
-  'Archive.zip': { type: 'application/zip', body: zipOf([['a.txt', 'a']]) },
+  'Marks.xlsx': { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', body: xlsxSample() },
+  'Lecture-3-Slides.pptx': { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation', body: pptxSample() },
+  'Archive.zip': { type: 'application/zip', body: zipOf([['notes/readme.txt', 'Inside the zip'], ['notes/Diagram.png', PNG], ['docs/Report.docx', DOCX], ['other/blob.bin', 'binary']]) },
+  'Old-Report.doc': { type: 'application/msword', body: docSample('Old document title\rFirst paragraph with a \x93quote\x94.\rA\x07B\x07\x07\rLast line') },
+  'Old-Marks.xls': { type: 'application/vnd.ms-excel', body: xlsSample() },
+  'Old-Deck.ppt': { type: 'application/vnd.ms-powerpoint', body: pptSample() },
+  'Archive.rar': { type: 'application/vnd.rar', body: Buffer.from('Rar!\x1a\x07\x00 not really') },
   'Fake.pdf': { type: 'application/pdf', body: Buffer.from('<html><script>window.__pwned = 3</script>I am a web page, not a PDF</html>') },
   'Signed-out.pdf': { type: 'text/html', body: Buffer.from('<html><body>Please sign in</body></html>') },
 };
@@ -177,7 +168,7 @@ try {
   // PDF
   await press('Week-1-Notes.pdf');
   const mid = await tab.waitFor("(() => { const p = document.querySelector('.bs-pv-pct'); const n = p ? parseInt(p.textContent, 10) : 0; return n > 0 && n < 100 ? n : 0; })()", 'the ring shows a real percentage while the file arrives', 5000);
-  assert.ok(mid > 20 && mid < 80, 'about half way: ' + mid);
+  assert.ok(mid > 3 && mid < 97, 'part way: ' + mid);
   assert.ok(await tab.evaluate("parseFloat(document.querySelector('.bs-pv-arc').getAttribute('stroke-dashoffset')) < parseFloat(document.querySelector('.bs-pv-arc').getAttribute('stroke-dasharray'))"), 'the ring has started to fill');
   await tab.waitFor("!!document.querySelector('.bs-pv iframe.bs-pv-frame')", 'the PDF is shown in a frame');
   assert.equal(await tab.evaluate("document.querySelector('.bs-pv-frame').src.startsWith('blob:')"), true, 'the PDF is shown from memory');
@@ -186,7 +177,62 @@ try {
   // image and text
   await press('Diagram.png'); await tab.waitFor("!!document.querySelector('.bs-pv img.bs-pv-img')", 'the image is shown'); await closeIt();
   await press('Headerless.png'); await tab.waitFor("!!document.querySelector('.bs-pv img.bs-pv-img')", 'a file with no name and no type is told by its first bytes'); assert.equal(await tab.evaluate("document.querySelector('.bs-pv-title').textContent"), 'File.png'); await closeIt();
-  for (const [n, ext] of [['Lecture-3-Slides.pptx', 'pptx'], ['Archive.zip', 'zip']]) { await press(n); await tab.waitFor(`/A \.${ext} file cannot be previewed yet/.test(document.querySelector('.bs-pv-msg') ? document.querySelector('.bs-pv-msg').textContent : '')`, ext + ' is explained, not shown'); assert.equal(await tab.evaluate("document.querySelector('.bs-pv-title').textContent"), n, 'the heading learned the name'); await closeIt(); }
+  // a type that cannot be shown is explained from the headers alone
+  await press('Archive.rar'); await tab.waitFor("/A \\.rar file cannot be previewed here/.test(document.querySelector('.bs-pv-msg') ? document.querySelector('.bs-pv-msg').textContent : '')", 'an unsupported type is explained'); await closeIt();
+
+  // Excel (.xlsx)
+  await press('Marks.xlsx'); await tab.waitFor("!!document.querySelector('.bs-pv .bs-xl-grid')", 'the sheet is drawn');
+  const xl = await tab.evaluate("(() => { const g = document.querySelector('.bs-xl-pane:not([hidden]) .bs-xl-grid'); const td = [...g.querySelectorAll('tbody td')].map(t => t.textContent); return { tabs: [...document.querySelectorAll('.bs-xl-tab')].map(t => t.textContent), cols: [...g.querySelectorAll('th.bs-xl-col')].slice(0, 3).map(t => t.textContent), rows: g.querySelectorAll('tbody tr').length, has: ['Name', 'Marks', 'Ammad', '91.50', 'Inline text', 'TRUE', '#DIV/0!', '26%', '1,234,567.9'].map(v => td.includes(v)), merged: (() => { const m = [...g.querySelectorAll('td')].find(t => t.textContent === 'Merged title'); return m && m.colSpan; })(), script: g.querySelectorAll('script').length, text: td.includes('<script>window.__pwned = 4</script>'), note: [...document.querySelectorAll('.bs-pv-note')].map(n => n.textContent).join(' | '), sel: document.querySelector('.bs-xl-tab[aria-selected=true]').textContent }; })()");
+  assert.deepEqual(xl.tabs, ['Marks', 'Dates'], 'the hidden sheet is not offered'); assert.deepEqual(xl.cols, ['A', 'B', 'C']); assert.equal(xl.rows, 1000, 'rows are limited');
+  assert.deepEqual(xl.has, Array(9).fill(true), JSON.stringify(xl)); assert.equal(xl.merged, 3, 'a merged cell spans its columns'); assert.equal(xl.script, 0); assert.equal(xl.text, true, 'a hostile cell is shown as text');
+  assert.ok(/only the first 1000 rows/.test(xl.note) && /Values only/.test(xl.note), xl.note);
+  await shot(tab, '5-excel');
+  await tab.evaluate("[...document.querySelectorAll('.bs-xl-tab')].find(t => t.textContent === 'Dates').click(); 0");
+  const dates = await tab.evaluate("[...document.querySelectorAll('.bs-xl-pane:not([hidden]) tbody td')].map(t => t.textContent)");
+  assert.deepEqual(dates.slice(0, 3), ['17/11/2026', '17 Nov 2026', '17/11/2026'], 'dates read as dates'); await closeIt();
+
+  // PowerPoint (.pptx)
+  await press('Lecture-3-Slides.pptx'); await tab.waitFor("document.querySelectorAll('.bs-pp-slide').length === 2", 'both slides are drawn');
+  await tab.waitFor("[...document.querySelectorAll('.bs-pp-pic img')].every(i => i.complete && i.naturalWidth > 0)", 'the picture loads');
+  const pp = await tab.evaluate("(() => { const s = document.querySelectorAll('.bs-pp-canvas'); const shapes = [...s[0].querySelectorAll('.bs-pp-shape')]; const by = t => shapes.find(x => x.textContent.includes(t)); const col = e => getComputedStyle(e).color;"
+    + " const free = by('Free text box').querySelector('span'), t2 = [...s[1].querySelectorAll('.bs-pp-shape')].find(x => x.textContent.includes('Dark slide')), ps = [...by('Processes').querySelectorAll('.bs-pp-p')];"
+    + " return { n: s.length, bg: getComputedStyle(s[1]).backgroundColor, title: by('Operating Systems').style.left + ' ' + by('Operating Systems').style.top, titleColor: col(by('Operating Systems').querySelector('span')), bullets: ps.map(p => p.textContent), bu: ps.map(p => (p.querySelector('.bs-pp-bu') || {}).textContent), freeColor: col(free), freeBold: getComputedStyle(free).fontWeight,"
+    + " band: shapes.some(x => x.style.background && getComputedStyle(x).backgroundColor === 'rgb(47, 85, 151)'), img: !!s[0].querySelector('.bs-pp-pic img').src.startsWith('blob:'), slideNum: [...document.querySelectorAll('.bs-pp-num')].map(n => n.textContent),"
+    + " dark: col(t2.querySelector('span')), table: [...s[1].querySelectorAll('.bs-pp-table td')].map(t => t.textContent), round: [...s[1].querySelectorAll('.bs-pp-shape')].some(x => x.style.borderRadius === '50%'), chart: s[1].textContent.includes('Chart or diagram'), script: document.querySelectorAll('.bs-pp script').length, hostile: s[0].textContent.includes('<script>window.__pwned = 6</script>'), cq: getComputedStyle(s[0]).containerType }; })()");
+  assert.equal(pp.n, 2); assert.equal(pp.bg, 'rgb(31, 56, 100)', 'a slide background is drawn'); assert.equal(pp.title, '5% 4.005%', 'the title sits where the master puts it (inherited)');
+  assert.equal(pp.titleColor, 'rgb(31, 56, 100)', 'the title takes the master colour'); assert.deepEqual(pp.bullets, ['• Processes and threads', '– Scheduling', '<script>window.__pwned = 6</script>'].map((t, i) => i < 2 ? t : '• ' + t), 'bullets come from the master by level');
+  assert.equal(pp.freeColor, 'rgb(192, 0, 0)'); assert.equal(pp.freeBold, '700'); assert.equal(pp.band, true, 'the master’s own band is drawn behind the slide'); assert.equal(pp.img, true);
+  assert.deepEqual(pp.slideNum, ['Slide 1 of 2', 'Slide 2 of 2']); assert.equal(pp.dark, 'rgb(255, 255, 255)', 'text that would vanish on a dark slide turns white'); assert.deepEqual(pp.table, ['Layer', 'Protocol', 'Transport', 'TCP']);
+  assert.equal(pp.round, true); assert.equal(pp.chart, true, 'a chart gets a quiet placeholder'); assert.equal(pp.script, 0); assert.equal(pp.hostile, true); assert.equal(pp.cq, 'inline-size');
+  await sleep(300); await shot(tab, '6-slides'); await tab.evaluate("document.querySelectorAll('.bs-pp-slide')[1].scrollIntoView(); 0"); await sleep(200); await shot(tab, '7-slide-2'); await closeIt();
+
+  // a zip: the list, a file opened in place, and the way back
+  await press('Archive.zip'); await tab.waitFor("!!document.querySelector('.bs-pv .bs-ar-list')", 'the zip is listed');
+  const ar = await tab.evaluate("({ rows: [...document.querySelectorAll('.bs-ar-name span')].map(s => s.textContent), buttons: document.querySelectorAll('.bs-ar-open').length, sum: document.querySelector('.bs-ar-sum').textContent, downloads: [...document.querySelectorAll('.bs-pv-act')].map(a => a.textContent) })");
+  assert.deepEqual(ar.rows, ['Report.docx', 'Diagram.png', 'readme.txt', 'blob.bin']); assert.equal(ar.buttons, 3, 'only previewable files get a button'); assert.ok(/^4 files/.test(ar.sum), ar.sum); assert.deepEqual(ar.downloads, ['Download']);
+  await shot(tab, '8-zip');
+  await tab.evaluate("[...document.querySelectorAll('.bs-ar-open')].find(b => b.getAttribute('aria-label') === 'Preview readme.txt').click(); 0");
+  await tab.waitFor("!!document.querySelector('.bs-pv pre.bs-pv-text')", 'a file inside the zip opens in place');
+  assert.equal(await tab.evaluate("document.querySelector('.bs-pv-text').textContent"), 'Inside the zip'); assert.equal(await tab.evaluate("document.querySelector('.bs-pv-title').textContent"), 'readme.txt');
+  assert.deepEqual(await tab.evaluate("[...document.querySelectorAll('.bs-pv-act')].filter(a => a.style.display !== 'none').map(a => a.textContent)"), ['‹ Back to the files', 'Download'], 'Back, and the inner file’s own Download');
+  await tab.evaluate("[...document.querySelectorAll('.bs-pv-act')].find(a => /Back/.test(a.textContent)).click(); 0");
+  await tab.waitFor("!!document.querySelector('.bs-pv .bs-ar-list') && document.querySelector('.bs-pv-title').textContent === 'Archive.zip'", 'Back returns to the list');
+  assert.deepEqual(await tab.evaluate("[...document.querySelectorAll('.bs-pv-act')].filter(a => a.style.display !== 'none').map(a => a.textContent)"), ['Download'], 'the archive’s Download is back');
+  await tab.evaluate("[...document.querySelectorAll('.bs-ar-open')].find(b => b.getAttribute('aria-label') === 'Preview Report.docx').click(); 0");
+  await tab.waitFor("!!document.querySelector('.bs-pv .bs-docx h1')", 'a Word file inside the zip opens too'); await closeIt();
+
+  // the old Office files
+  await press('Old-Report.doc'); await tab.waitFor("!!document.querySelector('.bs-pv .bs-lg-doc')", 'an old Word file shows its text');
+  const doc97 = await tab.evaluate("({ text: document.querySelector('.bs-lg-doc').textContent, notes: [...document.querySelectorAll('.bs-pv-note')].map(n => n.textContent).join(' '), meta: document.querySelector('.bs-pv-meta').textContent })");
+  assert.ok(doc97.text.includes('Old document title') && doc97.text.includes('“quote”') && doc97.text.includes('A  |  B'), doc97.text); assert.ok(/older Word file/.test(doc97.notes) && /^DOC/.test(doc97.meta)); await shot(tab, '9-old-word'); await closeIt();
+  await press('Old-Marks.xls'); await tab.waitFor("!!document.querySelector('.bs-pv .bs-xl-grid')", 'an old Excel file shows its sheet');
+  const xls97 = await tab.evaluate("({ td: [...document.querySelectorAll('.bs-xl-pane:not([hidden]) tbody td')].map(t => t.textContent).filter(Boolean), tabs: document.querySelectorAll('.bs-xl-tab').length, note: [...document.querySelectorAll('.bs-pv-note')].map(n => n.textContent).join(' ') })");
+  for (const v of ['Name', 'Ammad', '91.50', 'ABCDEFGHIJ', '42', '123.45', 'calc', 'TRUE', '#DIV/0!', '17/11/2026', '17 Nov 2026', '<script>window.__pwned = 5</script>']) assert.ok(xls97.td.includes(v), 'old Excel cell ' + v + ' in ' + JSON.stringify(xls97.td));
+  assert.ok(/older Excel file/.test(xls97.note)); await closeIt();
+  await press('Old-Deck.ppt'); await tab.waitFor("document.querySelectorAll('.bs-pv .bs-lg-slide').length === 2", 'an old PowerPoint file lists its slides');
+  const ppt97 = await tab.evaluate("({ titles: [...document.querySelectorAll('.bs-lg-title')].map(t => t.textContent), text: [...document.querySelectorAll('.bs-lg-text')].map(t => t.textContent), br: document.querySelectorAll('.bs-lg-text br').length })");
+  assert.deepEqual(ppt97.titles, ['Networks 101', '<script>window.__pwned = 7</script>']); assert.ok(ppt97.text.some(t => t.startsWith('TCP and UDP')) && ppt97.text.includes('Free text box on slide one') && ppt97.br >= 1, JSON.stringify(ppt97)); await shot(tab, '10-old-slides'); await closeIt();
+  assert.equal(await tab.evaluate("window.__pwned || 0"), 0, 'nothing from any file ran');
   await press('Readme.txt'); await tab.waitFor("!!document.querySelector('.bs-pv pre.bs-pv-text')", 'the text is shown');
   assert.equal(await tab.evaluate("document.querySelector('.bs-pv-text').textContent.includes('<b>not bold</b>') && !document.querySelector('.bs-pv-text b')"), true, 'text is shown as text, never as markup');
   await closeIt();

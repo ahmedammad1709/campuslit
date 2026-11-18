@@ -197,6 +197,31 @@ document.addEventListener('keydown', e => {
 });
 addEventListener('resize', () => { if (!tourBox.hidden && step >= 0) place(); });
 
+// ---------- what's new, once, after an update ----------
+// background.js keeps { from, to } when an update arrives. The list comes from what is bundled in the extension (whatsnew.js): nothing is fetched.
+const W = BahriaWhatsNew, extApi = globalThis.browser || globalThis.chrome;
+let news = null;
+const clearBadge = () => { try { if (extApi.action && extApi.action.setBadgeText) extApi.action.setBadgeText({ text: '' }); } catch { /* no badge */ } };
+function renderNews() {
+  const box = document.getElementById('news'), releases = news ? W.since(news.from, news.to) : [];
+  if (!releases.length) { box.hidden = true; return; }
+  const { items, more } = W.summary(releases, 4);
+  document.getElementById('news-ver').textContent = news.to;
+  document.getElementById('news-list').replaceChildren(...items.map(t => el('li', '', t)));
+  const note = document.getElementById('news-more'); note.hidden = !more; note.textContent = more ? 'And ' + more + ' more in All changes.' : '';
+  if (box.hidden) { box.hidden = false; StudioIcons.render(box); clearBadge(); }
+}
+async function closeNews(openAll) {
+  news = null; renderNews();
+  try { await StudioStorage.clearNews(); } catch { /* it may show once more */ }
+  if (openAll) { if (StudioStorage.isExtension && extApi.tabs && extApi.tabs.create) extApi.tabs.create({ url: extApi.runtime.getURL('options.html#updates') }); else location.href = 'options.html#updates'; }
+}
+document.getElementById('news-ok').addEventListener('click', () => closeNews(false));
+document.getElementById('news-all').addEventListener('click', () => closeNews(true));
+try { document.getElementById('ver').textContent = 'v' + extApi.runtime.getManifest().version; } catch { document.getElementById('ver').hidden = true; }
+StudioStorage.news().then(value => { news = value; renderNews(); }).catch(() => { /* no news card */ });
+StudioStorage.subscribeNews(value => { news = value; renderNews(); });
+
 StudioStorage.subscribe(value => { if (!saving) { settings = value; setAnimation(); render(); } });
 StudioStorage.subscribeGuide(value => { guide = value; renderAsk(); });
 StudioStorage.read().then(value => { settings = value; setAnimation(); render(); maybeWelcome(); }).catch(() => { setAnimation(); render(); status.textContent = 'Could not load saved preferences.'; });

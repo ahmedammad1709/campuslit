@@ -60,9 +60,9 @@ test('storage failure leaves the original portal untouched',async()=>{
 test('extension storage writes only preferences locally and reset removes its key',async()=>{
   let value,removed;
   const ctx=vm.createContext({chrome:{runtime:{id:'test'},storage:{local:{get:async()=>({bahriaStudioPreferences:{theme:'rose'}}),set:async data=>value=data,remove:async key=>removed=key},onChanged:{addListener(){}}}}});
-  vm.runInContext(source,ctx);vm.runInContext(fs.readFileSync('extension/guide.js','utf8'),ctx);vm.runInContext(fs.readFileSync('extension/storage.js','utf8'),ctx);
+  vm.runInContext(source,ctx);vm.runInContext(fs.readFileSync('extension/guide.js','utf8'),ctx);vm.runInContext(fs.readFileSync('extension/whatsnew.js','utf8'),ctx);vm.runInContext(fs.readFileSync('extension/storage.js','utf8'),ctx);
   assert.equal((await ctx.StudioStorage.read()).theme,'rose');await ctx.StudioStorage.write({theme:'sage',password:'never-store'});
-  assert.deepEqual(Object.keys(value),['bahriaStudioPreferences']);assert.equal(value.bahriaStudioPreferences.theme,'sage');assert.ok(!('password' in value.bahriaStudioPreferences));await ctx.StudioStorage.clear();assert.equal(JSON.stringify(removed),JSON.stringify(['bahriaStudioPreferences','bahriaStudioReminders','bahriaStudioGuide']),'reset also forgets the reminder note and which tips were shown');await ctx.StudioStorage.forgetReminders();assert.equal(removed,'bahriaStudioReminders');
+  assert.deepEqual(Object.keys(value),['bahriaStudioPreferences']);assert.equal(value.bahriaStudioPreferences.theme,'sage');assert.ok(!('password' in value.bahriaStudioPreferences));await ctx.StudioStorage.clear();assert.equal(JSON.stringify(removed),JSON.stringify(['bahriaStudioPreferences','bahriaStudioReminders','bahriaStudioGuide','bahriaStudioNews']),'reset also forgets the reminder note and which tips were shown');await ctx.StudioStorage.forgetReminders();assert.equal(removed,'bahriaStudioReminders');
 });
 
 // ---------------------------------------------------------------- custom theme (Studio) and switches
@@ -129,7 +129,7 @@ test('master switch controls both portals; a portal switch moves only itself and
 test('storage keeps the custom theme and validates it on the way in', async () => {
   let value;
   const ctx = vm.createContext({ chrome: { runtime: { id: 'test' }, storage: { local: { get: async () => ({ bahriaStudioPreferences: { theme: 'custom', custom: goodCustom } }), set: async d => value = d, remove: async () => {} }, onChanged: { addListener() {} } } } });
-  vm.runInContext(source, ctx); vm.runInContext(fs.readFileSync('extension/guide.js', 'utf8'), ctx); vm.runInContext(fs.readFileSync('extension/storage.js', 'utf8'), ctx);
+  vm.runInContext(source, ctx); vm.runInContext(fs.readFileSync('extension/guide.js', 'utf8'), ctx); vm.runInContext(fs.readFileSync('extension/whatsnew.js', 'utf8'), ctx); vm.runInContext(fs.readFileSync('extension/storage.js', 'utf8'), ctx);
   const read = await ctx.StudioStorage.read(); assert.equal(read.theme, 'custom'); assert.equal(read.custom.name, 'Mine');
   await ctx.StudioStorage.write({ theme: 'custom', custom: { ...goodCustom, accent: 'nope' } });
   assert.equal(value.bahriaStudioPreferences.custom, null, 'an invalid custom theme is never stored'); assert.equal(value.bahriaStudioPreferences.theme, 'navy');

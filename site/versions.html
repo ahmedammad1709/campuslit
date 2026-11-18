@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Campuslit Version History: What Is New in Each Release</title>
-<meta name="description" content="Every Campuslit release for the Bahria University LMS and CMS, newest first, with its date and what changed. Latest version: 1.2.1, released 17 November 2026.">
+<meta name="description" content="Every Campuslit release for the Bahria University LMS and CMS, newest first, with its date and what changed. Latest version: 1.2.2, released 18 November 2026.">
 <meta name="theme-color" content="#f6f8fd">
 <link rel="canonical" href="https://campuslit-bu.vercel.app/versions">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
@@ -16,7 +16,7 @@
 <meta property="og:locale" content="en_PK">
 <meta property="og:url" content="https://campuslit-bu.vercel.app/versions">
 <meta property="og:title" content="Campuslit Version History: What Is New in Each Release">
-<meta property="og:description" content="Every Campuslit release for the Bahria University LMS and CMS, newest first, with its date and what changed. Latest version: 1.2.1, released 17 November 2026.">
+<meta property="og:description" content="Every Campuslit release for the Bahria University LMS and CMS, newest first, with its date and what changed. Latest version: 1.2.2, released 18 November 2026.">
 <meta property="og:image" content="https://campuslit-bu.vercel.app/assets/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="styles.css">
@@ -30,8 +30,8 @@
    "@id": "https://campuslit-bu.vercel.app/versions#page",
    "url": "https://campuslit-bu.vercel.app/versions",
    "name": "Campuslit Version History: What Is New in Each Release",
-   "description": "Every Campuslit release for the Bahria University LMS and CMS, newest first, with its date and what changed. Latest version: 1.2.1, released 17 November 2026.",
-   "dateModified": "2026-11-17",
+   "description": "Every Campuslit release for the Bahria University LMS and CMS, newest first, with its date and what changed. Latest version: 1.2.2, released 18 November 2026.",
+   "dateModified": "2026-11-18",
    "isPartOf": {
     "@id": "https://campuslit-bu.vercel.app/#website"
    },
@@ -65,7 +65,7 @@
      "name": "What is the latest version of Campuslit?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "The latest version is 1.2.1, released on 17 November 2026. It adds a progress ring to file previews, shows teachers’ comments in the page, and polishes the updated CMS menus. Before it, 1.2.0 added file previews, 1.1.3 fixed the sidebar scrollbar, 1.1.2 fixed the white strip at the bottom of the LMS in dark themes, and 1.1.1 and 1.1.0 added optional notifications for new assignments, quiz marks, lecture notes, attendance and deadlines."
+      "text": "The latest version is 1.2.2, released on 18 November 2026. It brings file previews back after the university changed its download links and adds previews for Excel, PowerPoint, zip and old Office files, plus an Updates page. Before it, 1.2.1 added a progress ring and teachers’ comments in the page, 1.2.0 added file previews, 1.1.3 fixed the sidebar scrollbar, 1.1.2 fixed the white strip at the bottom of the LMS in dark themes, and 1.1.1 and 1.1.0 added optional notifications for new assignments, quiz marks, lecture notes, attendance and deadlines."
      }
     },
     {
@@ -122,7 +122,7 @@
     <div class="wrap">
       <p class="kicker">Version history</p>
       <h1>What is new in Campuslit.</h1>
-      <p>The latest version is <b>1.2.1</b>, released on <b>17 November 2026</b>. Every release is below, newest first, with its date and what changed. Dates are the days each version was built; the stores show an update after their own review, which can take a few days.</p>
+      <p>The latest version is <b>1.2.2</b>, released on <b>18 November 2026</b>. Every release is below, newest first, with its date and what changed. Dates are the days each version was built; the stores show an update after their own review, which can take a few days.</p>
       <div class="cta-row left"><a class="btn btn-primary" href="https://chromewebstore.google.com/detail/kldmhhiopdefjapkebnelablimikghio" rel="noopener">Add to Chrome, it is free</a><a class="btn btn-ghost" href="https://addons.mozilla.org/en-US/firefox/addon/campuslit-bahria-cms-redesign/" rel="noopener">Add to Firefox</a></div>
     </div>
   </div>
@@ -131,6 +131,7 @@
     <nav class="toc" aria-label="On this page">
       <h2>On this page</h2>
       <ol>
+        <li><a href="#v1-2-2">1.2.2 &middot; 18 Nov 2026</a></li>
         <li><a href="#v1-2-1">1.2.1 &middot; 17 Nov 2026</a></li>
         <li><a href="#v1-2-0">1.2.0 &middot; 17 Nov 2026</a></li>
         <li><a href="#v1-1-3">1.1.3 &middot; 10 Nov 2026</a></li>
@@ -145,8 +146,24 @@
     </nav>
 
     <article class="prose">
+      <section id="v1-2-2">
+        <h2>Version 1.2.2 <span class="badge ok">Latest</span></h2>
+        <p class="rel-date"><time datetime="2026-11-18">18 November 2026</time></p>
+        <p>Preview works again after the university changed its download links, now for more kinds of files, and a clearer way to see and get updates. No new permissions, so nothing needs re-enabling.</p>
+        <h3>New</h3>
+        <ul class="list">
+          <li><b>Excel and PowerPoint previews.</b> Excel (.xlsx) opens as sheets with tabs, and PowerPoint (.pptx) opens as slides with their text, colours, tables and pictures.</li>
+          <li><b>Zip files.</b> The preview lists what is inside, and a file inside opens in place with a way back to the list.</li>
+          <li><b>Old Office files.</b> Word (.doc) shows its text, Excel (.xls) its values and PowerPoint (.ppt) the text of each slide.</li>
+          <li><b>What’s new and updates.</b> After an update, the popup tells you what changed, once. The new Updates page in Settings lists every version and, in Chrome, has a button that asks the browser to check for a new one.</li>
+        </ul>
+        <h3>Fixed</h3>
+        <ul class="list">
+          <li><b>Preview buttons were missing.</b> The university scrambled the codes in its download links, so Campuslit could no longer tell what a file was. It now finds out when the file opens, and the Preview button is on every download link again.</li>
+        </ul>
+      </section>
       <section id="v1-2-1">
-        <h2>Version 1.2.1 <span class="badge ok">Latest</span></h2>
+        <h2>Version 1.2.1</h2>
         <p class="rel-date"><time datetime="2026-11-17">17 November 2026</time></p>
         <p>Polish for file previews and the updated CMS menus. No new permissions, so nothing needs re-enabling.</p>
         <h3>New</h3>
@@ -166,7 +183,7 @@
         <p>Preview files without downloading them, and support for the university’s updated CMS.</p>
         <h3>New</h3>
         <ul class="list">
-          <li><b>File preview on the LMS.</b> A Preview button appears next to PDF, Word (.docx), image and text files in Lecture Notes and Assignments. The file opens on the page with Download and Close buttons. Nothing is requested until you press Preview, and the file is kept in memory only, never saved or sent anywhere. Excel and PowerPoint previews are coming.</li>
+          <li><b>File preview on the LMS.</b> A Preview button appears next to PDF, Word (.docx), image and text files in Lecture Notes and Assignments. The file opens on the page with Download and Close buttons. Nothing is requested until you press Preview, and the file is kept in memory only, never saved or sent anywhere. Excel and PowerPoint came in 1.2.2.</li>
         </ul>
         <h3>Fixed</h3>
         <ul class="list">
@@ -270,7 +287,7 @@
 
       <section id="update">
         <h2>Check and update</h2>
-        <details class="reveal"><summary>What is the latest version of Campuslit?</summary><div class="details-body"><p>The latest version is 1.2.1, released on 17 November 2026. It adds a progress ring to file previews, shows teachers’ comments in the page, and polishes the updated CMS menus. Before it, 1.2.0 added file previews, 1.1.3 fixed the sidebar scrollbar, 1.1.2 fixed the white strip at the bottom of the LMS in dark themes, and 1.1.1 and 1.1.0 added optional notifications for new assignments, quiz marks, lecture notes, attendance and deadlines.</p></div></details>
+        <details class="reveal"><summary>What is the latest version of Campuslit?</summary><div class="details-body"><p>The latest version is 1.2.2, released on 18 November 2026. It brings file previews back after the university changed its download links and adds previews for Excel, PowerPoint, zip and old Office files, plus an Updates page. Before it, 1.2.1 added a progress ring and teachers’ comments in the page, 1.2.0 added file previews, 1.1.3 fixed the sidebar scrollbar, 1.1.2 fixed the white strip at the bottom of the LMS in dark themes, and 1.1.1 and 1.1.0 added optional notifications for new assignments, quiz marks, lecture notes, attendance and deadlines.</p></div></details>
         <details class="reveal"><summary>How do I check which version of Campuslit I have?</summary><div class="details-body"><p>In Chrome, Edge or Brave, open chrome://extensions (or edge://extensions) and look under Campuslit. In Firefox, open about:addons, choose Extensions, then Campuslit, and look at the Version line on the Details tab.</p></div></details>
         <details class="reveal"><summary>How do I update Campuslit?</summary><div class="details-body"><p>Browsers update extensions by themselves, usually within a day or so of a version being approved by the store. To check straight away, open chrome://extensions, switch on Developer mode and click Update. In Firefox, open about:addons, click the gear icon and choose Check for Updates.</p></div></details>
         <details class="reveal"><summary>Where can I see every change in detail?</summary><div class="details-body"><p>The full history, commit by commit, is public on GitHub. This page lists the changes that matter to people who use Campuslit.</p></div></details>

@@ -56,11 +56,11 @@
     return '';
   }
 
-  const KINDS = { pdf: 'pdf', png: 'image', jpg: 'image', jpeg: 'image', gif: 'image', webp: 'image', txt: 'text', csv: 'text', log: 'text', md: 'text', docx: 'docx', xlsx: 'xlsx', pptx: 'pptx', zip: 'zip', doc: 'legacy', xls: 'legacy', ppt: 'legacy' };
-  const SUPPORTED = new Set(['pdf', 'image', 'text', 'docx']);   // grows step by step: spreadsheets, slides and archives come next
+  const KINDS = { pdf: 'pdf', png: 'image', jpg: 'image', jpeg: 'image', gif: 'image', webp: 'image', txt: 'text', csv: 'text', log: 'text', md: 'text', docx: 'docx', docm: 'docx', xlsx: 'xlsx', xlsm: 'xlsx', pptx: 'pptx', pptm: 'pptx', ppsx: 'pptx', zip: 'zip', doc: 'legacy', xls: 'legacy', ppt: 'legacy', pps: 'legacy' };
+  const SUPPORTED = new Set(['pdf', 'image', 'text', 'docx', 'xlsx', 'pptx', 'zip', 'legacy']);
   const starts = (b, sig, at = 0) => sig.every((v, i) => b[at + i] === v);
   const MIME = { pdf: 'application/pdf', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp', txt: 'text/plain', csv: 'text/plain', log: 'text/plain', md: 'text/plain',
-    docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation', zip: 'application/zip' };
+    docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation', zip: 'application/zip', doc: 'application/msword', xls: 'application/vnd.ms-excel', ppt: 'application/vnd.ms-powerpoint' };
   const kindOf = ext => KINDS[String(ext || '').toLowerCase()] || 'other';
   const supported = ext => SUPPORTED.has(kindOf(ext));
   const mimeFor = ext => MIME[String(ext || '').toLowerCase()] || 'application/octet-stream';
@@ -78,6 +78,7 @@
       if (e === 'webp') return starts(b, [0x52, 0x49, 0x46, 0x46]) && starts(b, [0x57, 0x45, 0x42, 0x50], 8);
       return false;
     }
+    if (kind === 'legacy') return starts(b, [0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]);   // an old Office file
     if (kind === 'docx' || kind === 'xlsx' || kind === 'pptx' || kind === 'zip') return starts(b, [0x50, 0x4b, 0x03, 0x04]) || starts(b, [0x50, 0x4b, 0x05, 0x06]);
     if (kind === 'text') { for (let i = 0; i < Math.min(b.length, 4096); i++) if (b[i] === 0) return false; return true; }   // no binary bytes
     return false;

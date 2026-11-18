@@ -3,6 +3,7 @@
   const api = globalThis.browser || globalThis.chrome;
   const key = 'bahriaStudioPreferences';
   const guideKey = BahriaGuide.KEY;   // which tips have been shown (a few yes/no facts)
+  const newsKey = BahriaWhatsNew.KEY;   // the one-time "what's new" after an update
   const remindersKey = 'bahriaStudioReminders';   // the short note behind the assignment reminder (course, title, deadline)
   const isExtension = Boolean(api?.runtime?.id);
   globalThis.StudioStorage = {
@@ -18,8 +19,8 @@
       return settings;
     },
     async clear() {
-      if (isExtension) await api.storage.local.remove([key, remindersKey, guideKey]);
-      else { localStorage.removeItem(key); localStorage.removeItem(remindersKey); localStorage.removeItem(guideKey); }
+      if (isExtension) await api.storage.local.remove([key, remindersKey, guideKey, newsKey]);
+      else { localStorage.removeItem(key); localStorage.removeItem(remindersKey); localStorage.removeItem(guideKey); localStorage.removeItem(newsKey); }
     },
     async remembered() {
       const raw = isExtension ? (await api.storage.local.get(remindersKey))[remindersKey] : JSON.parse(localStorage.getItem(remindersKey) || 'null');
@@ -38,6 +39,16 @@
       const next = BahriaGuide.sanitize(change(await this.guide()));
       if (isExtension) await api.storage.local.set({ [guideKey]: next }); else localStorage.setItem(guideKey, JSON.stringify(next));
       return next;
+    },
+    // What's new: the record kept after an update ({ from, to }), or null; closing the card removes it.
+    async news() {
+      const raw = isExtension ? (await api.storage.local.get(newsKey))[newsKey] : JSON.parse(localStorage.getItem(newsKey) || 'null');
+      return BahriaWhatsNew.sanitizeNews(raw);
+    },
+    async clearNews() { if (isExtension) await api.storage.local.remove(newsKey); else localStorage.removeItem(newsKey); },
+    subscribeNews(callback) {
+      if (isExtension) api.storage.onChanged.addListener((changes, area) => { if (area === 'local' && changes[newsKey]) callback(BahriaWhatsNew.sanitizeNews(changes[newsKey].newValue)); });
+      else addEventListener('storage', e => { if (e.key === newsKey) callback(BahriaWhatsNew.sanitizeNews(JSON.parse(e.newValue || 'null'))); });
     },
     async resetGuide() {
       if (isExtension) await api.storage.local.remove(guideKey); else localStorage.removeItem(guideKey);

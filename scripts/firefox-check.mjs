@@ -102,7 +102,7 @@ try {
   await go('lms.bahria.edu.pk/Student/Dashboard.php');
   await waitFor("document.documentElement.dataset.bahriaStudio === 'lms' && !!document.querySelector('.bs-hero')", 'LMS dashboard restyled');
   assert.ok(await evaluate("getComputedStyle(document.body).getPropertyValue('--bs-accent').trim().length > 0"), 'theme colours are defined');
-  assert.match(await evaluate("document.querySelector('.bs-hero').textContent"), /Good (morning|afternoon|evening)|Late night|Hello/, 'greeting drawn');
+  assert.match(await evaluate("document.querySelector('.bs-hero').textContent"), /Good (morning|afternoon|evening)|Late night|Still up|Hello/, 'greeting drawn');
   assert.ok(await evaluate("document.querySelectorAll('.bs-qs-btn').length === 1"), 'the search button is in the header');
   console.log('LMS dashboard restyled in Firefox');
 

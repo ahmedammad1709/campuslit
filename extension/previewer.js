@@ -2,8 +2,8 @@
 // The file is fetched with the student's own sign-in, kept in memory only, shown, and forgotten when the viewer closes. Nothing is saved, stored or sent anywhere.
 (function () {
   'use strict';
-  const P = globalThis.BahriaPreview, Z = globalThis.BahriaZip, D = globalThis.BahriaDocx;
-  if (!P || !Z || !D) return;
+  const P = globalThis.BahriaPreview, Z = globalThis.BahriaZip, D = globalThis.BahriaDocx, X = globalThis.BahriaXlsx, Pp = globalThis.BahriaPptx, A = globalThis.BahriaArchive, L = globalThis.BahriaLegacy, G = globalThis.BahriaGrid;
+  if (!P || !Z || !D || !X || !Pp || !A || !L || !G) return;
   const owned = new Set();
   let overlay = null, timedOut = false, urls = [], abort = null, opener = null, keyHandler = null, run = 0;
 
@@ -63,7 +63,7 @@
     keyHandler = e => {
       if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); return; }
       if (e.key !== 'Tab' || !overlay) return;
-      const loop = [...overlay.querySelectorAll('a.bs-pv-act, button.bs-pv-x')], first = loop[0], last = loop[loop.length - 1];   // Tab stays inside the viewer
+      const loop = [...overlay.querySelectorAll('a.bs-pv-act, button.bs-pv-act, button.bs-pv-x')], first = loop[0], last = loop[loop.length - 1];   // Tab stays inside the viewer
       if (!first) return;
       if (!overlay.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
       else if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
@@ -107,6 +107,77 @@
     return out;
   }
 
+  // Shows one file's bytes in the viewer, by kind. A zip lists its files and lets each previewable one open in place (depth 1), with a way back to the list.
+  async function present(view, bytes, info, mine, depth) {
+    if (!P.sniff(bytes, info.ext)) throw new Error('This file does not look like a real ' + info.ext.toUpperCase() + ' file, so it is not shown.');
+    view.meta.textContent = info.ext.toUpperCase() + ' · ' + P.readableSize(bytes.length);
+    const kind = P.kindOf(info.ext), saved = keep(new Blob([bytes], { type: P.mimeFor(info.ext) })), added = [];
+    view.body.textContent = '';
+    const note = text => view.body.append(el('p', 'bs-pv-note', text));
+    const adopt = made => { made.urls.forEach(u => urls.push(u)); };
+    if (kind === 'pdf') {
+      const frame = el('iframe', 'bs-pv-frame'); frame.title = info.name; frame.src = saved; view.body.append(frame);
+      const back = () => { if (overlay === view.box && (document.activeElement === frame || document.activeElement === document.body)) view.closeBtn.focus(); };
+      frame.addEventListener('load', back); setTimeout(back, 500);
+      added.push(action(view, 'Open in new tab', saved, { target: '_blank', rel: 'noopener' }));
+    } else if (kind === 'image') {
+      const img = el('img', 'bs-pv-img'); img.alt = info.name; img.src = saved; view.body.append(img);
+      added.push(action(view, 'Open in new tab', saved, { target: '_blank', rel: 'noopener' }));
+    } else if (kind === 'text') {
+      const text = new TextDecoder('utf-8').decode(bytes.subarray(0, 1000000)), pre = el('pre', 'bs-pv-text'); pre.textContent = text; view.body.append(pre);
+      if (bytes.length > 1000000) note('Only the first part of this file is shown. Download it to see everything.');
+    } else if (kind === 'docx') {
+      const made = await D.render(Z.open(bytes), document);
+      if (mine !== run) { made.urls.forEach(u => URL.revokeObjectURL(u)); return added; }
+      adopt(made); view.body.append(made.node);
+      if (made.cut) note('This is a long document, so only the first part is shown. Download it to see everything.');
+      note('A simple preview: some layout, fonts and shapes are not shown. Download the file for the exact look.');
+    } else if (kind === 'xlsx') {
+      const made = await X.render(Z.open(bytes), document);
+      if (mine !== run) return added;
+      view.body.append(made.node);
+      if (made.cut) note('This is a large workbook, so only the first ' + G.LIMITS.rows + ' rows and ' + G.LIMITS.cols + ' columns of each sheet are shown. Download it to see everything.');
+      note('Values only: formulas show their last saved result, and charts, pictures and colours are not shown. Download the file for the exact look.');
+    } else if (kind === 'pptx') {
+      const made = await Pp.render(Z.open(bytes), document);
+      if (mine !== run) { made.urls.forEach(u => URL.revokeObjectURL(u)); return added; }
+      adopt(made); view.body.append(made.node);
+      if (made.cut) note('This is a large presentation, so only part of it is shown. Download it to see everything.');
+      note('A simple preview: gradients, shadows, charts, animations and some fonts are not shown. Download the file for the exact look.');
+    } else if (kind === 'legacy') {
+      const made = L.render(bytes, document);
+      if (mine !== run) return added;
+      view.meta.textContent = made.type.toUpperCase() + ' · ' + P.readableSize(bytes.length);
+      view.body.append(made.node);
+      if (made.cut) note('This is a long file, so only the first part is shown. Download it to see everything.');
+      note(made.note);
+    } else if (kind === 'zip') {
+      const zip = Z.open(bytes), made = A.render(zip, document, ext => P.supported(ext) && (depth > 0 ? P.kindOf(ext) !== 'zip' : true), async (name, ext, from) => {
+        if (mine !== run) return;
+        const list = made.node, label = name.slice(name.lastIndexOf('/') + 1), inner = { name: label, ext }, mark = view.body.scrollTop;
+        const back = el('button', 'bs-pv-act', '‹ Back to the files'); back.type = 'button';
+        view.body.textContent = ''; view.body.append(el('div', 'bs-pv-msg', 'Opening ' + label + '…'));
+        let extras = [];
+        added.forEach(a => { a.style.display = 'none'; });   // the archive's own Download waits while a file inside is open
+        const restore = () => { extras.forEach(x => x.remove()); back.remove(); added.forEach(a => { a.style.display = ''; }); view.body.textContent = ''; view.body.append(list); view.meta.textContent = info.ext.toUpperCase() + ' · ' + P.readableSize(bytes.length); view.learn(info); view.body.scrollTop = mark; if (from && from.isConnected) from.focus(); };
+        back.addEventListener('click', restore); view.actions.insertBefore(back, view.closeBtn); back.focus();
+        try {
+          const data = await zip.read(name, P.MAX_BYTES);
+          if (mine !== run) return;
+          view.learn(inner); extras = await present(view, data, inner, mine, depth + 1);
+        } catch (e) {
+          if (mine !== run) return;
+          view.body.textContent = ''; const msg = el('div', 'bs-pv-msg'), bad = el('span', 'bs-pv-bad', '!'); bad.setAttribute('aria-hidden', 'true');
+          msg.append(bad, el('p', '', e && e.message === 'big' ? 'This file is larger than ' + P.readableSize(P.MAX_BYTES) + ', so it is not previewed.' : (e && e.message) || 'This file could not be opened.')); view.body.append(msg);
+        }
+      });
+      view.body.append(made.node);
+      if (made.cut) note('Only the first part of the list is shown. Download the file to see everything.');
+    } else throw new Error('This type of file cannot be previewed.');
+    added.push(action(view, 'Download', saved, { download: info.name }, true));
+    return added;
+  }
+
   async function open(href, info, from) {
     close(); opener = from;
     const view = viewer(info), mine = run, portalHref = href;
@@ -122,7 +193,7 @@
         const named = P.nameFromHeaders(res.headers), ext = named ? named.ext : P.extFromType(ctype);
         if (ext) {
           info = { name: named ? named.name : 'File.' + ext, ext }; view.learn(info);
-          if (!P.supported(ext)) { try { await res.body.cancel(); } catch (e) { /* stopped */ } clearTimeout(giveUp); throw new Error('A .' + ext + ' file cannot be previewed yet. Download it from the portal.'); }
+          if (!P.supported(ext)) { try { await res.body.cancel(); } catch (e) { /* stopped */ } clearTimeout(giveUp); throw new Error('A .' + ext + ' file cannot be previewed here. Download it from the portal.'); }
         }
       }
       if (/text\/html/i.test(ctype) && P.kindOf(info.ext) !== 'text') throw new Error('The portal sent a page instead of the file. Your sign-in may have ended: sign in again and retry.');
@@ -133,35 +204,12 @@
       if (!info.ext) {   // still unknown: the first bytes decide
         let ext = P.extFromBytes(bytes);
         if (ext === 'zip') { try { const z = Z.open(bytes); ext = z.has('word/document.xml') ? 'docx' : z.has('xl/workbook.xml') ? 'xlsx' : z.has('ppt/presentation.xml') ? 'pptx' : 'zip'; } catch (e) { /* stays a zip */ } }
+        else if (ext === 'doc') { try { ext = L.detect(L.open(bytes)) || 'doc'; } catch (e) { /* stays doc */ } }
         if (!ext) throw new Error('This kind of file cannot be previewed. Download it from the portal.');
         info = { name: 'File.' + ext, ext }; view.learn(info);
-        if (!P.supported(ext)) throw new Error('A .' + ext + ' file cannot be previewed yet. Download it from the portal.');
+        if (!P.supported(ext)) throw new Error('A .' + ext + ' file cannot be previewed here. Download it from the portal.');
       }
-      if (!P.sniff(bytes, info.ext)) throw new Error('This file does not look like a real ' + info.ext.toUpperCase() + ' file, so it is not shown.');
-      view.meta.textContent = info.ext.toUpperCase() + ' · ' + P.readableSize(bytes.length);
-      const mime = P.mimeFor(info.ext), blob = new Blob([bytes], { type: mime }), kind = P.kindOf(info.ext);
-      const saved = keep(blob);
-      view.body.textContent = '';
-      if (kind === 'pdf') {
-        const frame = el('iframe', 'bs-pv-frame'); frame.title = info.name; frame.src = saved; view.body.append(frame);
-        const back = () => { if (overlay === view.box && (document.activeElement === frame || document.activeElement === document.body)) view.closeBtn.focus(); };
-        frame.addEventListener('load', back); setTimeout(back, 500);
-        action(view, 'Open in new tab', saved, { target: '_blank', rel: 'noopener' });
-      } else if (kind === 'image') {
-        const img = el('img', 'bs-pv-img'); img.alt = info.name; img.src = saved; view.body.append(img);
-        action(view, 'Open in new tab', saved, { target: '_blank', rel: 'noopener' });
-      } else if (kind === 'text') {
-        const text = new TextDecoder('utf-8').decode(bytes.subarray(0, 1000000)), pre = el('pre', 'bs-pv-text'); pre.textContent = text; view.body.append(pre);
-        if (bytes.length > 1000000) view.body.append(el('p', 'bs-pv-note', 'Only the first part of this file is shown. Download it to see everything.'));
-      } else if (kind === 'docx') {
-        const made = await D.render(Z.open(bytes), document);
-        if (mine !== run) { made.urls.forEach(u => URL.revokeObjectURL(u)); return; }
-        made.urls.forEach(u => urls.push(u));
-        view.body.append(made.node);
-        if (made.cut) view.body.append(el('p', 'bs-pv-note', 'This is a long document, so only the first part is shown. Download it to see everything.'));
-        view.body.append(el('p', 'bs-pv-note', 'A simple preview: some layout, fonts and shapes are not shown. Download the file for the exact look.'));
-      } else throw new Error('This type of file cannot be previewed yet.');
-      action(view, 'Download', saved, { download: info.name }, true);
+      await present(view, bytes, info, mine, 0);
     } catch (e) {
       if (mine !== run) return;
       if (timedOut) return fail(view, 'The portal took too long to send this file. Try again, or download it from the portal.', portalHref);

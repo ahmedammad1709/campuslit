@@ -292,6 +292,61 @@
     & .bs-docx ul { margin: 0 0 .8em 1.4em; padding: 0; } & .bs-docx li { margin: 0 0 .25em; }
     & .bs-docx table { width: 100%; margin: .6em 0 1em; border-collapse: collapse; font-size: .95em; } & .bs-docx td { padding: 6px 9px; border: 1px solid #c4c9d4; vertical-align: top; }
     & .bs-docx img { display: block; max-width: 100%; height: auto; margin: .6em auto; }
+    /* spreadsheets (.xlsx and .xls) */
+    & .bs-xl { display: flex; flex-direction: column; min-height: 100%; }
+    & .bs-xl-tabs { display: flex; gap: 4px; overflow-x: auto; padding: 10px 14px 0; border-bottom: 1px solid var(--bs-line); background: var(--bs-bg); }
+    & .bs-xl-tab { flex: none; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 7px 15px; border: 1px solid var(--bs-line); border-bottom: 0; border-radius: 10px 10px 0 0; background: var(--bs-surface); color: var(--bs-muted); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+    & .bs-xl-tab[aria-selected="true"] { border-color: var(--bs-accent); background: var(--bs-soft); color: var(--bs-link); }
+    & .bs-xl-tab:focus-visible { outline: 3px solid color-mix(in srgb, var(--bs-accent) 45%, transparent); outline-offset: -2px; }
+    & .bs-xl-pane { padding: 0; }
+    & .bs-xl-pane[hidden] { display: none; }
+    & .bs-xl-grid { border-collapse: separate; border-spacing: 0; background: #fff; color: #111; font: 13px/1.35 Calibri, "Segoe UI", Arial, sans-serif; }
+    & .bs-xl-grid td { max-width: 380px; padding: 4px 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border-right: 1px solid #e3e6ec; border-bottom: 1px solid #e3e6ec; }
+    & .bs-xl-grid td.r { text-align: right; font-variant-numeric: tabular-nums; }
+    & .bs-xl-grid td.m { text-align: center; background: #fafbfd; }
+    & .bs-xl-grid th { padding: 4px 9px; background: #f1f3f7; color: #5a6578; font-size: 11.5px; font-weight: 700; border-right: 1px solid #d9dde5; border-bottom: 1px solid #d9dde5; }
+    & .bs-xl-grid thead th { position: sticky; top: 0; z-index: 2; text-align: center; }
+    & .bs-xl-grid th.bs-xl-row { position: sticky; left: 0; z-index: 1; min-width: 42px; text-align: right; }
+    & .bs-xl-grid th.bs-xl-corner { position: sticky; left: 0; z-index: 3; }
+    & .bs-xl-numcol { width: 46px; }
+
+    /* slides (.pptx): each slide is a canvas that scales as a whole, so text keeps its place */
+    & .bs-pp { display: grid; justify-items: center; gap: 22px; padding: 22px 18px 8px; }
+    & .bs-pp-slide { width: min(100%, 960px); }
+    & .bs-pp-canvas { position: relative; width: 100%; overflow: hidden; container-type: inline-size; border-radius: 4px; background: #fff; color: #111; box-shadow: 0 2px 14px rgba(0, 0, 0, .3); font-family: Calibri, "Segoe UI", Arial, sans-serif; }
+    & .bs-pp-shape, & .bs-pp-pic, & .bs-pp-frame { position: absolute; box-sizing: border-box; }
+    & .bs-pp-shape { display: flex; flex-direction: column; }
+    & .bs-pp-p { margin: 0; overflow-wrap: anywhere; }
+    & .bs-pp-pic { overflow: hidden; }
+    & .bs-pp-pic img { display: block; width: 100%; height: 100%; }
+    & .bs-pp-frame { overflow: hidden; }
+    & .bs-pp-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    & .bs-pp-table td { padding: .5cqw .8cqw; vertical-align: top; border: 1px solid rgba(0, 0, 0, .28); }
+    & .bs-pp-cell { display: flex; flex-direction: column; }
+    & .bs-pp-skip { display: grid; place-items: center; height: 100%; border: 1px dashed #aab2c2; color: #667086; font: 600 1.5cqw Calibri, "Segoe UI", Arial, sans-serif; text-align: center; }
+    & .bs-pp-num { margin-top: 7px; color: var(--bs-muted); font-size: 12px; font-weight: 700; text-align: center; }
+
+    /* archives (.zip) */
+    & .bs-ar { max-width: 900px; margin: 0 auto; padding: 18px 18px 8px; }
+    & .bs-ar-sum { margin: 0 0 10px; color: var(--bs-muted); font-size: 13px; font-weight: 700; }
+    & .bs-ar-list { width: 100%; border-collapse: collapse; overflow: hidden; border: 1px solid var(--bs-line); border-radius: 12px; background: var(--bs-surface); }
+    & .bs-ar-list td { padding: 8px 12px; border-bottom: 1px solid var(--bs-line); color: var(--bs-ink); font-size: 13.5px; vertical-align: middle; }
+    & .bs-ar-list tr:last-child td { border-bottom: 0; }
+    & .bs-ar-name span { display: inline-block; overflow-wrap: anywhere; }
+    & .bs-ar-list .dir .bs-ar-name { font-weight: 800; }
+    & .bs-ar-size { width: 90px; color: var(--bs-muted); text-align: right; white-space: nowrap; }
+    & .bs-ar-act { width: 120px; text-align: right; }
+    & .bs-ar-open { padding: 3px 12px; border: 1px solid var(--bs-line); border-radius: 999px; background: var(--bs-surface); color: var(--bs-link); font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+    & .bs-ar-open:hover, & .bs-ar-open:focus-visible { border-color: var(--bs-accent); background: var(--bs-soft); }
+    & .bs-ar-lock { color: var(--bs-muted); font-size: 12px; }
+
+    /* old Office files (.doc, .ppt): text only */
+    & .bs-lg-gap { height: .5em; margin: 0 !important; }
+    & .bs-lg-slide { max-width: 820px; margin: 16px auto; padding: 20px 26px; border: 1px solid var(--bs-line); border-radius: 14px; background: var(--bs-surface); color: var(--bs-ink); }
+    & .bs-lg-slide-n { margin-bottom: 10px; color: var(--bs-muted); font-size: 12px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+    & .bs-lg-title { margin: 0 0 10px; font-size: 20px; font-weight: 800; line-height: 1.3; }
+    & .bs-lg-text { margin: 0 0 8px; line-height: 1.55; overflow-wrap: anywhere; }
+    & .bs-lg-empty { margin: 0; color: var(--bs-muted); font-style: italic; }
     &.bs-pv-open body { overflow: hidden; }
     @media (max-width: 640px) { & .bs-pv { padding: 0; } & .bs-pv-card { height: 100%; border-radius: 0; } & .bs-docx { margin: 0; padding: 26px 20px; border-radius: 0; box-shadow: none; } & .bs-pv-bar { flex-wrap: wrap; } }
 

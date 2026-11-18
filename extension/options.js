@@ -74,6 +74,7 @@ const SECTIONS = {
   portals: ['Portals', 'Choose where Campuslit runs, and a couple of small extras.'],
   notifications: ['Notifications', 'Choose what Campuslit tells you about: new work, marks, attendance and deadlines.'],
   guide: ['Guide', 'What Campuslit adds, and where to find it.'],
+  updates: ['Updates', 'Your version, what changed in each one, and a way to check for a new one.'],
   privacy: ['Privacy & data', 'What Campuslit stores, and your controls.']
 };
 function showSection(name, focusFirst, push = false) {
@@ -248,6 +249,42 @@ $('forget-reminders').addEventListener('click', async () => {
   catch { status('Could not forget them. Please try again.'); }
 });
 showRemembered();
+// ---------- updates ----------
+// The list is bundled in the extension (whatsnew.js). "Check for updates" asks the browser's own updater (Chrome); nothing is sent to anyone else.
+(function updates() {
+  const api = globalThis.browser || globalThis.chrome, W = BahriaWhatsNew;
+  let version = ''; try { version = api.runtime.getManifest().version; } catch { /* preview page */ }
+  $('upd-ver').textContent = version ? 'Campuslit ' + version : 'Campuslit';
+  const list = $('upd-list');
+  for (const r of W.RELEASES) {
+    const li = document.createElement('li'); li.className = 'upd-item';
+    const head = document.createElement('div'); head.className = 'upd-head';
+    const name = document.createElement('strong'); name.textContent = 'Version ' + r.version; head.append(name);
+    if (r.version === version) { const tag = document.createElement('span'); tag.className = 'upd-current'; tag.textContent = 'Current'; head.append(tag); }
+    const when = document.createElement('span'); when.className = 'upd-date'; when.textContent = r.date; head.append(when);
+    const ul = document.createElement('ul'); for (const t of r.items) { const i = document.createElement('li'); i.textContent = t; ul.append(i); }
+    li.append(head, ul); list.append(li);
+  }
+  const canCheck = !!(StudioStorage.isExtension && api.runtime && typeof api.runtime.requestUpdateCheck === 'function');
+  if (!canCheck) {
+    $('upd-check').hidden = true;
+    $('upd-result').textContent = StudioStorage.isExtension ? 'Firefox updates add-ons by itself, usually within a day.' : 'Updates show here in the installed extension.';
+    return;
+  }
+  const say = text => { $('upd-result').textContent = text; };
+  $('upd-check').addEventListener('click', async () => {
+    const button = $('upd-check'); button.disabled = true; say('Checking\u2026');
+    try {
+      const result = await api.runtime.requestUpdateCheck(), status = result && (result.status || (Array.isArray(result) ? result[0] : ''));
+      if (status === 'update_available') { say('A new version' + (result.version ? ' (' + result.version + ')' : '') + ' is ready. Restart Campuslit to use it, then reload your portal tabs.'); $('upd-reload').hidden = false; }
+      else if (status === 'throttled') say('Your browser checked a moment ago. Try again in a few minutes.');
+      else say('You have the latest version.');
+    } catch { say('Your browser could not check right now. It will keep looking by itself.'); }
+    finally { button.disabled = false; }
+  });
+  $('upd-reload').addEventListener('click', () => { try { api.runtime.reload(); } catch { say('Please restart your browser to finish the update.'); } });
+})();
+
 // ---------- guide ----------
 document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => showSection(b.dataset.goto, true, true)));
 function showGuideState(guide) {

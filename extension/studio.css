@@ -413,8 +413,8 @@ body.popup:not([data-anim]) { visibility: hidden; }   /* until the animation set
 .pop-btn.sm { min-height: 34px; padding: 0 14px; border-radius: 9px; font-size: 13px; }
 
 /* ---------- settings: guide ---------- */
-.work[data-section="guide"], .work[data-section="notifications"] { grid-template-columns: minmax(0, 720px); }
-.work[data-section="guide"] .preview, .work[data-section="notifications"] .preview { display: none; }
+.work[data-section="guide"], .work[data-section="notifications"], .work[data-section="updates"] { grid-template-columns: minmax(0, 720px); }
+.work[data-section="guide"] .preview, .work[data-section="notifications"] .preview, .work[data-section="updates"] .preview { display: none; }
 #n-kinds.is-off, #n-due.is-off, #n-how.is-off { opacity: .55; }
 .guide { display: grid; margin: 0; padding: 0; list-style: none; }
 .guide-item { display: flex; gap: 16px; padding: 18px 0; }
@@ -488,3 +488,31 @@ code { padding: 2px 7px; border-radius: 6px; background: var(--sunken); font-fam
 .pop-ask .w-ico.big svg { width: 24px; height: 24px; }
 .pop-ask .w-sub { max-width: 300px; margin-top: 6px; line-height: 1.45; }
 .pop-ask .na-note { max-width: 300px; margin: 10px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.45; }
+
+/* ---------- what's new (popup card) and Updates (settings page) ---------- */
+.pop-news { margin: 0 0 12px; padding: 14px 14px 12px; border: 1px solid var(--accent-soft); border-radius: 14px; background: linear-gradient(180deg, var(--accent-soft), var(--card) 70%); box-shadow: var(--shadow); }
+.pop-news[hidden] { display: none; }
+.news-head { display: flex; align-items: center; gap: 9px; }
+.news-head h2 { margin: 0; font-size: 15px; font-weight: 750; }
+.news-ico { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 8px; background: var(--accent); color: #fff; }
+.news-ico svg { width: 15px; height: 15px; }
+.news-list { margin: 10px 0 0; padding: 0 0 0 18px; display: grid; gap: 6px; color: var(--ink-2); font-size: 13px; line-height: 1.45; }
+.news-more { margin: 8px 0 0; color: var(--muted); font-size: 12.5px; }
+.news-actions { display: flex; gap: 8px; margin-top: 12px; }
+.pop-foot .foot-links a.foot-btn { text-decoration: none; color: var(--muted); font-variant-numeric: tabular-nums; }
+.pop-foot .foot-links a.foot-btn:hover { color: var(--accent); text-decoration: underline; }
+
+.upd-now { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.upd-now strong { font-size: 17px; font-weight: 750; }
+.upd-result { margin: 4px 0 0; color: var(--muted); font-size: 13.5px; line-height: 1.5; max-width: 46ch; }
+.upd-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.upd-list { margin: 0; padding: 0 0 0 22px; list-style: none; position: relative; display: grid; gap: 0; }
+.upd-list::before { content: ""; position: absolute; left: 5px; top: 10px; bottom: 10px; width: 2px; border-radius: 2px; background: var(--line-2); }
+.upd-item { position: relative; padding: 4px 0 22px; }
+.upd-item:last-child { padding-bottom: 4px; }
+.upd-item::before { content: ""; position: absolute; left: -22px; top: 8px; width: 12px; height: 12px; box-sizing: border-box; border: 3px solid var(--accent); border-radius: 50%; background: var(--card); }
+.upd-head { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.upd-head strong { font-size: 16px; font-weight: 750; color: var(--accent-2); }
+.upd-current { padding: 2px 8px; border-radius: 999px; background: var(--accent); color: #fff; font-size: 11px; font-weight: 750; letter-spacing: .04em; text-transform: uppercase; }
+.upd-date { margin-left: auto; color: var(--muted); font-size: 12.5px; }
+.upd-item ul { margin: 8px 0 0; padding: 0 0 0 18px; display: grid; gap: 6px; color: var(--ink-2); font-size: 14px; line-height: 1.5; }

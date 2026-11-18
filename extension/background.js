@@ -6,7 +6,7 @@
 // never signs in, talks to no one but lms.bahria.edu.pk and cms.bahria.edu.pk, and keeps its notes in this browser only.
 (function () {
   'use strict';
-  if (typeof importScripts === 'function') importScripts('themes.js', 'deadlines.js', 'attendance.js', 'notify-core.js');   // Firefox lists these in the manifest instead
+  if (typeof importScripts === 'function') importScripts('themes.js', 'deadlines.js', 'attendance.js', 'notify-core.js', 'whatsnew.js');   // Firefox lists these in the manifest instead
   const api = globalThis.browser || globalThis.chrome;
   const B = globalThis.BahriaStudio, N = globalThis.BahriaNotify;
   const SETTINGS_KEY = 'bahriaStudioPreferences', notifyStateKey = 'bahriaNotifyState';
@@ -189,7 +189,17 @@
   function ensureAlarm() { try { api.alarms.get('bs-tick').then(a => { if (!a) api.alarms.create('bs-tick', { periodInMinutes: 15, delayInMinutes: 1 }); }); } catch (e) { /* alarms unavailable */ } }
   ensureAlarm();
   api.runtime.onInstalled.addListener(ensureAlarm);
-  api.runtime.onStartup.addListener(() => { ensureAlarm(); exclusive(tick); });
+  // An update has just arrived: remember which version it came from (the popup tells the news once, from what is bundled in the extension) and put a small "New" on the toolbar icon.
+  const badge = text => { try { if (api.action && api.action.setBadgeText) { api.action.setBadgeText({ text }); if (text && api.action.setBadgeBackgroundColor) api.action.setBadgeBackgroundColor({ color: '#2f5597' }); } } catch (e) { /* no badge */ } };
+  api.runtime.onInstalled.addListener(async details => {
+    try {
+      const W = globalThis.BahriaWhatsNew, news = W && details && details.reason === 'update' ? W.recordFor(details.previousVersion, api.runtime.getManifest().version) : null;
+      if (!news) return;
+      await api.storage.local.set({ [W.KEY]: news }); badge('New');
+    } catch (e) { /* nothing to tell this time */ }
+  });
+  const restoreBadge = async () => { try { const W = globalThis.BahriaWhatsNew; if (W && W.sanitizeNews((await api.storage.local.get(W.KEY))[W.KEY])) badge('New'); } catch (e) { /* no badge */ } };
+  api.runtime.onStartup.addListener(() => { ensureAlarm(); restoreBadge(); exclusive(tick); });
   api.alarms.onAlarm.addListener(a => { if (a.name === 'bs-tick') exclusive(tick); });
   api.notifications.onClicked.addListener(async id => {
     try { const s = await loadState(); const url = s.links[id]; api.notifications.clear(id); api.tabs.create({ url: OURS.test(url || '') ? url : LMS + 'Dashboard.php' }); } catch (e) { /* nothing to open */ }
