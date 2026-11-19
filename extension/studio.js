@@ -19,7 +19,7 @@ const StudioUI = (() => {
     { key: 'navInk', label: 'Sidebar text', hint: 'Menu items' },
     { key: 'gold', label: 'Highlight marker', hint: 'Marks the current page' }
   ];
-  let ctx = null, root = null, built = false, undo = null, toastTimer = 0, armTimer = 0;
+  let ctx = null, root = null, shareRoot = null, built = false, undo = null, toastTimer = 0, armTimer = 0;
   let qp = { brand: '#2f5bea', mode: 'light', side: 'deep' }, qpReady = false, lastQuick = 0, quickTimer = 0;
   const refs = { rows: {}, fine: {} };
 
@@ -97,23 +97,46 @@ const StudioUI = (() => {
   }
   const currentName = () => { const c = ctx.get().custom; return c ? c.name : 'My theme'; };
 
-  // Paste a theme code from a friend. It goes into the live preview (and can be undone); nothing is saved until Save is pressed.
-  function importBlock(heading) {
-    const wrap = el('div', 'share-import'), row = el('div', 'share-row');
-    const input = document.createElement('input'); input.type = 'text'; input.className = 'share-input'; input.placeholder = 'Paste a code, like CL1-…'; input.autocomplete = 'off'; input.spellcheck = false; input.name = 'theme-code-in'; input.setAttribute('aria-label', 'Theme code to add');
-    const add = btn('primary sm', 'Add theme'), msg = el('p', 'share-msg'); msg.setAttribute('role', 'status'); msg.setAttribute('aria-live', 'polite');
+  // The sharing bar, at the top of the page: copy this theme as a code, or paste one a friend sent. It sits outside the editor so it is there
+  // whether or not a custom theme exists yet. A pasted code goes into the live preview (and can be undone); nothing is saved until Save is pressed.
+  const SHARE_HINT = 'Send the code to a friend. It holds only this theme\u2019s name and colors.', ADD_HINT = 'Paste a friend\u2019s code and press Add. You can undo it, and nothing is saved until you press Save changes.';
+  function buildShare() {
+    shareRoot.replaceChildren();
+    const msgEl = text => { const p = el('p', 'share-msg', text); p.setAttribute('role', 'status'); p.setAttribute('aria-live', 'polite'); return p; };
+    // share this theme
+    const mine = el('div', 'share-half'), mineRow = el('div', 'share-row'), copyMsg = msgEl(SHARE_HINT);
+    refs.code = document.createElement('input'); refs.code.type = 'text'; refs.code.readOnly = true; refs.code.className = 'share-input'; refs.code.name = 'theme-code-out'; refs.code.setAttribute('aria-label', 'Your theme code');
+    refs.code.addEventListener('focus', () => refs.code.select());
+    refs.copy = btn('secondary share-copy', 'Copy code', 'download');
+    refs.copy.addEventListener('click', async () => {
+      const code = refs.code.value; if (!code) return;
+      try { await navigator.clipboard.writeText(code); copyMsg.textContent = 'Code copied. Send it to a friend.'; copyMsg.className = 'share-msg ok'; }
+      catch { refs.code.focus(); refs.code.select(); copyMsg.textContent = 'Press Ctrl+C to copy the selected code.'; copyMsg.className = 'share-msg'; }
+    });
+    mineRow.append(refs.code, refs.copy); mine.append(el('span', 'share-title', 'Share this theme'), mineRow, copyMsg);
+    // add a theme from a code
+    const theirs = el('div', 'share-half'), theirRow = el('div', 'share-row'), addMsg = msgEl(ADD_HINT);
+    const input = document.createElement('input'); input.type = 'text'; input.className = 'share-input'; input.placeholder = 'Paste a code here, like CL1-…'; input.autocomplete = 'off'; input.spellcheck = false; input.name = 'theme-code-in'; input.setAttribute('aria-label', 'Theme code to add');
+    const add = btn('primary share-add', 'Add theme');
     const go = () => {
       const result = BahriaShare.decode(input.value, B().normalizeCustom);
-      if (!result.ok) { msg.textContent = BahriaShare.MESSAGES[result.reason]; msg.className = 'share-msg bad'; input.setAttribute('aria-invalid', 'true'); return; }
+      if (!result.ok) { addMsg.textContent = BahriaShare.MESSAGES[result.reason]; addMsg.className = 'share-msg bad'; input.setAttribute('aria-invalid', 'true'); return; }
       const replaced = Boolean(ctx.get().custom);
-      input.removeAttribute('aria-invalid'); input.value = ''; msg.textContent = ''; msg.className = 'share-msg';
+      input.removeAttribute('aria-invalid'); input.value = ''; addMsg.textContent = ADD_HINT; addMsg.className = 'share-msg';
       bulk(result.custom, '“' + result.custom.name + '” ' + (replaced ? 'replaced your custom theme. Save to keep it, or Undo.' : 'added. Save to keep it.'));
     };
     add.addEventListener('click', go);
     input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); go(); } });
-    input.addEventListener('input', () => { msg.textContent = ''; msg.className = 'share-msg'; input.removeAttribute('aria-invalid'); });
-    row.append(input, add); wrap.append(el('span', 'field-label', heading), row, msg);
-    return wrap;
+    input.addEventListener('input', () => { if (input.getAttribute('aria-invalid')) { addMsg.textContent = ADD_HINT; addMsg.className = 'share-msg'; input.removeAttribute('aria-invalid'); } });
+    theirRow.append(input, add); theirs.append(el('span', 'share-title', 'Add a theme from a code'), theirRow, addMsg);
+    shareRoot.append(mine, theirs);
+  }
+  function syncShare(c) {
+    if (!refs.code) return;
+    const code = c ? BahriaShare.encode(c) : '';
+    if (refs.code.value !== code) refs.code.value = code;
+    refs.code.placeholder = c ? '' : 'Create or add a theme to get its code';
+    refs.copy.disabled = !code;
   }
 
   function build() {
@@ -127,7 +150,7 @@ const StudioUI = (() => {
     const rowBtns = el('div', 'btn-row'); rowBtns.append(refs.start, random0);
     const steps = el('ol', 'steps');
     for (const t of ['Start from the theme you are using, or from a random palette.', 'Change any color. Campuslit works out the rest and checks that text stays readable.', 'Save, and it appears as your seventh theme here and in the toolbar popup.']) steps.append(el('li', '', t));
-    empty.append(el('h3', '', 'No custom theme yet'), el('p', '', 'Make a theme that is yours. You can change every color afterwards.'), steps, rowBtns, importBlock('Or add a theme a friend shared with you'));
+    empty.append(el('h3', '', 'No custom theme yet'), el('p', '', 'Make a theme that is yours. You can change every color afterwards.'), steps, rowBtns);
     refs.empty = empty;
 
     // ---- editor ----
@@ -188,20 +211,6 @@ const StudioUI = (() => {
     ah.append(at, refs.summary); refs.list = el('ul'); refs.fix = btn('secondary sm', 'Fix automatically'); refs.fix.addEventListener('click', () => bulk(B().fixCustom(ctx.get().custom), 'Readability fixed.'));
     a11y.append(ah, refs.list, refs.fix);
 
-    // sharing: the theme as one short code, and a place to paste one
-    const share = el('section', 'group share'), sh = el('div', 'group-title'); sh.append(el('h3', '', 'Share this theme'));
-    refs.code = document.createElement('input'); refs.code.type = 'text'; refs.code.readOnly = true; refs.code.className = 'share-input'; refs.code.name = 'theme-code-out'; refs.code.setAttribute('aria-label', 'Your theme code');
-    refs.code.addEventListener('focus', () => refs.code.select());
-    const copy = btn('secondary sm', 'Copy code', 'download'), copyMsg = el('p', 'share-msg'); copyMsg.setAttribute('role', 'status'); copyMsg.setAttribute('aria-live', 'polite');
-    copy.addEventListener('click', async () => {
-      const code = refs.code.value; if (!code) return;
-      try { await navigator.clipboard.writeText(code); copyMsg.textContent = 'Code copied. Send it to a friend: they paste it under Custom theme.'; copyMsg.className = 'share-msg ok'; }
-      catch { refs.code.focus(); refs.code.select(); copyMsg.textContent = 'Press Ctrl+C to copy the selected code.'; copyMsg.className = 'share-msg'; }
-    });
-    const codeRow = el('div', 'share-row'); codeRow.append(refs.code, copy);
-    share.append(sh, el('p', 'quick-hint', 'The code holds only this theme\u2019s name and colors. It works offline and is safe to post in a chat.'), codeRow, copyMsg, importBlock('Add a theme from a code'));
-    refs.share = share;
-
     refs.toast = el('div'); refs.toast.setAttribute('aria-live', 'polite');
     const foot = el('div', 'studio-foot');
     refs.remove = btn('danger sm', 'Remove custom theme', 'trash');
@@ -210,7 +219,7 @@ const StudioUI = (() => {
       disarm(); undo = null; ctx.removeCustom();
     });
     foot.append(refs.remove);
-    ed.append(bar, refs.inactive, refs.strip, refs.toast, quick, colors, a11y, share, foot);
+    ed.append(bar, refs.inactive, refs.strip, refs.toast, quick, colors, a11y, foot);
     refs.editor = ed;
     root.append(empty, ed);
     built = true;
@@ -230,6 +239,7 @@ const StudioUI = (() => {
   function refresh() {
     if (!built) return;
     const s = ctx.get(), c = s.custom;
+    syncShare(c);
     refs.empty.hidden = Boolean(c); refs.editor.hidden = !c;
     if (!c) { qpReady = false; disarm(); return; }
     const p = B().deriveCustom(c);
@@ -238,7 +248,6 @@ const StudioUI = (() => {
     refs.inactive.hidden = s.theme === 'custom';
     [p.bg, p.surface, p.nav, p.ink, p.accent].forEach((v, i) => { refs.stripCells[i].style.background = v; refs.stripCells[i].style.color = B().ratio(v, '#ffffff') >= B().ratio(v, '#000000') ? '#ffffff' : '#000000'; });
     refs.strip.setAttribute('aria-label', 'Palette preview: ' + c.name);
-    { const code = BahriaShare.encode(c); if (refs.code.value !== code) refs.code.value = code; }
     for (const def of ESSENTIAL) refs.rows[def.key].control.set(c[def.key]);
     for (const def of FINE) { const r = refs.fine[def.key]; r.control.set(p[def.key]); r.pill.hidden = Boolean(c[def.key]); r.reset.hidden = !c[def.key]; }
     // readability checks
@@ -254,6 +263,6 @@ const StudioUI = (() => {
       li.append(aa, t, score); return li;
     }));
   }
-  function init(context) { ctx = context; root = document.getElementById('studio-root'); build(); refresh(); }
+  function init(context) { ctx = context; root = document.getElementById('studio-root'); shareRoot = document.getElementById('share-bar'); build(); buildShare(); refresh(); }
   return { init, refresh };
 })();

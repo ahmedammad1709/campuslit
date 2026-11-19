@@ -84,6 +84,7 @@ function showSection(name, focusFirst, push = false) {
     if (on) $('nav-' + key).setAttribute('aria-current', 'page'); else $('nav-' + key).removeAttribute('aria-current');
     $('section-' + key).hidden = !on;
   }
+  $('share-bar').hidden = name !== 'studio';
   document.querySelector('.work').dataset.section = name;   // the Guide uses the full width: the live preview has nothing to show for it
   $('section-title').textContent = SECTIONS[name][0]; $('section-desc').textContent = SECTIONS[name][1];
   document.title = SECTIONS[name][0] + ' · Campuslit settings';
