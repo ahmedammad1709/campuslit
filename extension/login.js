@@ -55,7 +55,12 @@
     panel.querySelectorAll('.panel-heading,.card-header').forEach(node => tag(node, 'data-bs-login-old-heading'));
     // Hide only the superseded page title and its empty visual strip.
     document.querySelectorAll('h1,h2').forEach(heading => {
-      if (panel.contains(heading) || heading.textContent.replace(/\s+/g, '').toLowerCase() !== role.toLowerCase()) return;
+      if (panel.contains(heading)) return;
+      const text = heading.textContent.replace(/\s+/g, '').toLowerCase(), name = role.toLowerCase();
+      if (text !== name) {   // "Faculty Member" is kept (it names the portal), but made readable on the photo
+        if (text.startsWith(name) && text.length <= name.length + 12) tag(heading, 'data-bs-login-title');
+        return;
+      }
       const parent = heading.parentElement;
       tag(parent && parent.children.length === 1 && !parent.contains(panel) && parent !== document.body ? parent : heading, 'data-bs-login-old-heading');
     });
@@ -86,13 +91,8 @@
     });
     group.append(toggle);
 
-    // Help password managers (and users who cannot easily type) recognise the fields; never touches values.
+    // The page asks browsers not to autofill (autocomplete="off" on its form). That is left exactly as it is: changing it made Chrome show its own password popup over the page.
     const enrollment = panel.querySelector('input[type="text"]');
-    [[enrollment, 'username'], [password, 'current-password']].forEach(([node, value]) => {
-      if (!node || hints.has(node)) return;
-      hints.set(node, node.hasAttribute('autocomplete') ? node.getAttribute('autocomplete') : null);
-      node.setAttribute('autocomplete', value);
-    });
     // Caps Lock warning: state comes from the keyboard event, the typed text is never read.
     const caps = make('div', 'bs-caps', 'Caps Lock is on'); caps.hidden = true; caps.setAttribute('role', 'status');
     group.after(caps);

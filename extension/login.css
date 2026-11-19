@@ -136,7 +136,11 @@
   html[data-bahria-studio][data-bs-login] [data-bs-login-card] select { text-overflow: ellipsis; }
   html[data-bahria-studio][data-bs-login] [data-bs-login-submit] { height: 46px !important; min-height: 46px !important; margin: 4px 0 14px !important; }
   html[data-bahria-studio][data-bs-login] [data-bs-login-card] .text-danger { display: block; margin-top: 5px; font-size: 12px !important; font-weight: 500; color: var(--bs-bad, #dc2626) !important; }
-  html[data-bahria-studio][data-bs-login] .bs-caps { margin: -6px 0 12px; font-size: 12px; font-weight: 600; color: var(--bs-warn, #d97706); }
+  html[data-bahria-studio][data-bs-login] .bs-caps { display: inline-flex; align-items: center; margin: -8px 0 14px; padding: 4px 10px; border-radius: 8px; background: color-mix(in srgb, var(--bs-warn, #d97706) 12%, transparent); font-size: 12.5px; font-weight: 650; line-height: 1.4; color: var(--bs-warn, #b45309); }
+  html[data-bahria-studio][data-bs-login] .bs-caps[hidden] { display: none; }
+  /* the page's own title above the card (for example "Faculty Member"): a frosted pill like the card, so it reads on any background */
+  html[data-bahria-studio][data-bs-login] :is(h1,h2)[data-bs-login-title][data-bs-login-title] { display: table !important; margin: 0 auto 16px !important; padding: 8px 22px !important; border: 1px solid var(--bs-line) !important; border-radius: 999px !important; background: color-mix(in srgb, var(--bs-surface) 88%, transparent) !important; -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); box-shadow: 0 8px 28px #0b142b2e !important; color: var(--bs-ink) !important; font-family: var(--bs-font) !important; font-size: 20px !important; font-weight: 650 !important; letter-spacing: -.3px; line-height: 1.3 !important; text-align: center !important; text-shadow: none !important; }
+  html[data-bahria-studio][data-bs-login] #pageHeading:has([data-bs-login-title]) { background: none !important; border: 0 !important; box-shadow: none !important; }
   html[data-bahria-studio][data-bs-login] .bs-caps::before { content: "\21EA\00a0"; }
   /* Login errors from the portal appear above the card, same width, so they are impossible to miss */
   html[data-bahria-studio][data-bs-login] #pageAlerts_up { width: min(100%, 480px); }
