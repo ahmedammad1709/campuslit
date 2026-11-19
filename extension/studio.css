@@ -273,6 +273,16 @@ details.fine > summary small { margin-left: 8px; color: var(--muted); font-size:
 .a11y .score.ok { color: var(--ok); } .a11y .score.bad { color: var(--bad); }
 .a11y .score [data-icon] { width: 15px; height: 15px; }
 .a11y .btn { width: 100%; margin-top: 10px; }
+.share-row { display: flex; gap: 8px; align-items: center; }
+.share-input { flex: 1 1 auto; min-width: 0; min-height: 40px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: var(--r-s); background: #fff; color: var(--ink); font: 600 13px/1 ui-monospace, "Cascadia Mono", Consolas, monospace; }
+.share-input:focus-visible { outline: 0; border-color: var(--accent); box-shadow: var(--ring); }
+.share-input[aria-invalid="true"] { border-color: #d92d20; }
+.share-msg { min-height: 18px; margin: 8px 0 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
+.share-msg.ok { color: var(--ok); }
+.share-msg.bad { color: #b42318; }
+.share-import { margin-top: 16px; }
+.share-import .field-label { margin-top: 0; }
+.studio-empty .share-import { margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--line); max-width: 52ch; }
 .studio-foot { display: flex; justify-content: space-between; gap: 8px; padding: 4px 0 18px; }
 .toast { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; padding: 9px 10px 9px 14px; border-radius: var(--r-s); background: #131c33; color: #fff; font-size: 13.5px; font-weight: 600; }
 .toast button { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 0 10px; border: 0; border-radius: 8px; background: rgba(255, 255, 255, .14); color: #fff; font-size: 13px; font-weight: 700; }
