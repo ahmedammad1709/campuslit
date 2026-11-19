@@ -61,7 +61,7 @@ await call('Input.dispatchKeyEvent', {type: 'rawKeyDown', key: 'End', code: 'End
 assert.equal(await ev("document.querySelector('.tabpanel:not([hidden])').id"), 'p-popup', 'End goes to the last tab');
 await ev("document.getElementById('t-assignments').click(); 0");
 // the home page is short
-assert.ok(await ev("document.documentElement.scrollHeight") < 9400, 'desktop page height: ' + await ev("document.documentElement.scrollHeight"));
+assert.ok(await ev("document.documentElement.scrollHeight") < 10100, 'desktop page height: ' + await ev("document.documentElement.scrollHeight"));
 // themes gallery
 await ev("document.querySelector('.chip[data-theme=midnight]').click(); 0");
 assert.match(await ev("document.getElementById('theme-shot').getAttribute('src')"), /lms-midnight\.webp$/);
@@ -94,6 +94,24 @@ assert.equal(await ev("document.documentElement.scrollWidth <= innerWidth"), tru
 for (const url of ['/privacy', '/license']) { await open(url, 390, 844); assert.equal(await ev("document.documentElement.scrollWidth <= innerWidth"), true, url + ' no sideways scroll'); }
 // tablet width
 for (const url of ['/', '/privacy', '/license']) { await open(url, 820, 1000); assert.equal(await ev("document.documentElement.scrollWidth <= innerWidth"), true, url + ' fits a tablet'); }
+// the 800+ installs milestone: counts up once when it scrolls into view with a short burst of confetti, and is simply static with reduced motion
+await open('/');
+assert.equal(await ev("document.querySelector('.nav-stat').textContent"), '800+ installs'); assert.equal(await ev("document.querySelector('.nav-stat').getAttribute('href')"), '#milestone');
+assert.equal(await ev("document.querySelector('[data-count]').textContent"), '0', 'before it is seen the number waits at zero');
+await ev("document.querySelector('#milestone').scrollIntoView({block: 'center'}); 0");
+const until = async (expr, ok, ms) => { const end = Date.now() + ms; let v; while (Date.now() < end) { v = await ev(expr); if (ok(v)) return v; await sleep(100); } return v; };   // the page scrolls smoothly, so give it time
+assert.ok(await until("document.querySelectorAll('.confetti span').length", n => n > 20, 5000) > 20, 'confetti falls when it is seen');
+assert.equal(await until("document.querySelector('[data-count]').textContent", t => t === '800', 5000), '800', 'the number counts up to 800');
+assert.equal(await ev("getComputedStyle(document.querySelector('.confetti')).pointerEvents"), 'none', 'confetti never blocks a click');
+assert.equal(await until("document.querySelectorAll('.confetti span').length", n => n === 0, 9000), 0, 'and it cleans up after itself');
+await ev("document.querySelector('.nav-stat').click(); 0"); await sleep(400); assert.ok((await ev("location.hash")) === '#milestone', 'the navbar pill goes to the milestone');
+await call('Emulation.setEmulatedMedia', {features: [{name: 'prefers-reduced-motion', value: 'reduce'}]});
+await open('/');
+assert.equal(await ev("document.querySelector('[data-count]').textContent"), '800', 'with reduced motion the number is just there');
+await ev("document.querySelector('#milestone').scrollIntoView({block: 'center'}); 0"); await sleep(600);
+assert.equal(await ev("document.querySelectorAll('.confetti span').length"), 0, 'and nothing falls'); assert.equal(await ev("getComputedStyle(document.querySelector('.confetti')).display"), 'none');
+await call('Emulation.setEmulatedMedia', {features: []});
+await open('/');
 // 404
 await open('/does-not-exist'); assert.equal(await ev("document.querySelector('h1').textContent"), '404');
 assert.deepEqual(problems.filter(p => !/404/.test(p)), [], 'no console errors or policy violations');

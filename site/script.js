@@ -26,6 +26,31 @@
     items.forEach(el => io.observe(el));
   } else items.forEach(el => el.classList.add('in'));
 
+  // milestone: the number counts up once when it scrolls into view, with a short burst of confetti (neither with reduced motion: the final number is simply there)
+  document.querySelectorAll('[data-milestone]').forEach(card => {
+    const number = card.querySelector('[data-count]'), layer = card.querySelector('.confetti'), target = Number(number && number.dataset.count) || 0;
+    if (!number || reduced || !('IntersectionObserver' in window)) return;
+    number.textContent = '0';
+    const count = () => {
+      const start = performance.now(), span = 1600;
+      const tick = now => { const t = Math.min(1, (now - start) / span); number.textContent = String(Math.round(target * (1 - Math.pow(1 - t, 3)))); if (t < 1) requestAnimationFrame(tick); else number.textContent = String(target); };
+      requestAnimationFrame(tick);
+    };
+    const burst = () => {
+      if (!layer) return;
+      const colors = ['#f2b84b', '#ffd88a', '#2f5bea', '#8fb0ff', '#ffffff', '#ff7a8a'];
+      for (let i = 0; i < 46; i++) {
+        const piece = document.createElement('span'), rand = (a, b) => a + Math.random() * (b - a);
+        piece.style.left = rand(4, 96) + '%'; piece.style.background = colors[i % colors.length];
+        piece.style.setProperty('--x', rand(-70, 70) + 'px'); piece.style.setProperty('--r', rand(300, 900) + 'deg'); piece.style.setProperty('--d', rand(2.2, 3.6) + 's'); piece.style.setProperty('--delay', rand(0, .7) + 's');
+        layer.append(piece);
+      }
+      setTimeout(() => layer.replaceChildren(), 5000);
+    };
+    const io = new IntersectionObserver(entries => { if (!entries.some(e => e.isIntersecting)) return; io.disconnect(); count(); burst(); }, { threshold: .4 });
+    io.observe(card);
+  });
+
   // before / after comparisons: a range input drives the split
   document.querySelectorAll('[data-compare]').forEach(box => {
     const range = box.querySelector('.compare-range');

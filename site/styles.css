@@ -363,3 +363,30 @@ td:first-child { color: var(--ink); font-weight: 700; }
 }
 @media (max-width: 960px) { #praise .praise { grid-template-columns: minmax(0, 1fr); gap: 40px; } }
 @media (max-width: 640px) { .tcard { flex-basis: 300px; height: 250px; } .wall .track { gap: 20px; } .lp-embed { height: 640px; } }
+
+/* ---------- milestone: 800+ installs ---------- */
+.nav-links a.nav-stat { display: inline-flex; align-items: center; gap: 8px; padding: 6px 13px; border: 1px solid rgba(255, 255, 255, .3); border-radius: 999px; background: rgba(255, 255, 255, .09); color: #fff; font-size: 13.5px; font-weight: 700; white-space: nowrap; }
+.nav-links a.nav-stat:hover { background: rgba(255, 255, 255, .18); color: #fff; }
+.nav-stat i { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 3px rgba(242, 184, 75, .3); }
+.scrolled .nav-links a.nav-stat, .light .nav-links a.nav-stat { border-color: #ecd9a8; background: #fff8e6; color: #7a5200; }
+.scrolled .nav-links a.nav-stat:hover, .light .nav-links a.nav-stat:hover { background: #ffefc4; color: #6a4600; }
+.milestone { padding-top: 96px; }
+.milestone-card { position: relative; overflow: hidden; padding: 64px 28px 44px; border-radius: 28px; color: #fff; text-align: center; background: radial-gradient(700px 360px at 85% 0%, rgba(47, 91, 234, .45), transparent 62%), radial-gradient(520px 300px at 6% 100%, rgba(242, 184, 75, .2), transparent 60%), var(--navy); box-shadow: 0 40px 90px -40px rgba(11, 29, 64, .7); }
+.milestone-card > :not(.confetti) { position: relative; }
+.milestone .kicker { color: var(--gold); }
+.milestone-number { margin: 4px 0 0; font-size: clamp(92px, 19vw, 176px); font-weight: 800; letter-spacing: -.06em; line-height: 1; font-variant-numeric: tabular-nums; background: linear-gradient(100deg, #ffd88a, var(--gold) 45%, #ffe9bd); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.milestone-number sup { margin-left: .03em; font-size: .5em; vertical-align: top; }
+.milestone h2 { margin-top: 4px; font-size: clamp(26px, 3.6vw, 40px); font-weight: 800; letter-spacing: -.035em; }
+.milestone-text { max-width: 58ch; margin: 16px auto 0; color: rgba(255, 255, 255, .8); font-size: 18px; }
+.milestone .cta-row { justify-content: center; margin-top: 28px; }
+.milestone-foot { margin: 24px 0 0; color: rgba(255, 255, 255, .6); font-size: 13px; }
+.confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.confetti span { position: absolute; top: -16px; width: 9px; height: 15px; border-radius: 2px; opacity: 0; animation: confetti-fall var(--d, 2.8s) cubic-bezier(.2, .6, .35, 1) var(--delay, 0s) forwards; }
+@keyframes confetti-fall { 0% { opacity: 1; transform: translate3d(0, 0, 0) rotate(0); } 80% { opacity: 1; } 100% { opacity: 0; transform: translate3d(var(--x, 0px), 440px, 0) rotate(var(--r, 540deg)); } }
+@media (prefers-reduced-motion: reduce) { .confetti { display: none; } }
+@media (max-width: 800px) {
+  .nav-links a.nav-stat { justify-content: center; margin-top: 6px; padding: 10px 14px; border-color: #ecd9a8; background: #fff8e6; color: #7a5200; font-size: 14.5px; }
+  .milestone { padding-top: 72px; }
+  .milestone-card { padding: 48px 20px 34px; border-radius: 22px; }
+  .milestone-text { font-size: 16.5px; }
+}
