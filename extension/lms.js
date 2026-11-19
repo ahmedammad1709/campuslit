@@ -172,6 +172,12 @@
       r.tr.setAttribute('data-bs-due', c.state);
     });
     due.classified = classified;
+    // the calendar button: only deadlines that are still open and have a readable date
+    due.calItems = due.rows.map((r, i) => ({ title: r.info.title, due: classified[i].ms, state: classified[i].state })).filter(x => x.state === 'open' && Number.isFinite(x.due));
+    due.calBtn.hidden = due.noCourse || !due.calItems.length;
+    due.calBtn.textContent = due.calItems.length === 1 ? 'Add this deadline to calendar' : 'Add ' + due.calItems.length + ' deadlines to calendar';
+    if (due.calBtn.hidden) due.calNote.hidden = true;
+    due.calBtn.parentNode.hidden = due.calBtn.hidden && due.calNote.hidden;
     const sum = D.summarize(classified), next = sum.nextIndex >= 0 ? due.rows[sum.nextIndex] : null;
     const card = due.card;
     card.dataset.level = next ? classified[sum.nextIndex].level : sum.open ? 'warn' : 'none';
@@ -187,6 +193,35 @@
     const counts = card.querySelector('.bs-due-counts'); counts.textContent = '';
     if (!due.noCourse) [[sum.open, 'open'], [sum.submitted, 'submitted'], [sum.closed, 'closed, not submitted']].forEach(([n, label]) => { if (!n) return; const li = make('li', ''); li.append(make('b', '', String(n)), ' ' + label); counts.append(li); });
   }
+  // A calendar file handed straight to the browser as a download. Nothing is uploaded.
+  function saveFile(text, name, type) {
+    const url = URL.createObjectURL(new Blob([text], { type }));
+    const link = document.createElement('a'); link.href = url; link.download = name; link.style.display = 'none';
+    document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }
+  // "Add to calendar" for the open deadlines of the course on screen: built from the dates the table already shows.
+  function calendarButton() {
+    const button = make('button', 'bs-due-cal'); button.type = 'button'; button.hidden = true;
+    const note = make('p', 'bs-due-calnote'); note.hidden = true; note.setAttribute('role', 'status'); note.setAttribute('aria-live', 'polite');
+    const say = (text, bad) => { note.textContent = text; note.hidden = !text; note.dataset.bad = bad ? 'true' : 'false'; };
+    button.addEventListener('click', () => {
+      const lib = globalThis.BahriaCalendar;
+      if (!lib || !due) return;
+      try {
+        const course = chosen('#courseId'), built = lib.buildDeadlines(due.calItems, { course, now: Date.now() });
+        if (!built.ok) { say(built.error, true); return; }
+        saveFile(built.text, lib.deadlineFileName(course), 'text/calendar;charset=utf-8');
+        say('Downloaded ' + built.count + (built.count === 1 ? ' deadline' : ' deadlines') + ', each with reminders one day and three hours before. Open the file to add ' + (built.count === 1 ? 'it' : 'them') + ' to Google Calendar, Apple Calendar or Outlook. Opening it again later updates them instead of adding copies.', false);
+      } catch (err) { say('Could not create the calendar file. Please try again.', true); }
+    });
+    return { button, note };
+  }
+  // "Next class" under the greeting on the dashboard, from the time table opened on the CMS (see nextclass.js).
+  let nextOn = true;
+  function nextCard() {
+    const lib = globalThis.BahriaNextClass; if (!lib) return;
+    lib.mount(document, { on: nextOn, suggest: null, place(node) { const hero = document.querySelector('.content-wrapper > section.content .bs-hero'); if (!hero) return false; hero.after(node); return true; } });
+  }
   function assignmentsPage() {
     const D = DL();
     if (!D || document.readyState === 'loading') return;      // wait for the whole table: a partial one would give a wrong "next"
@@ -198,7 +233,8 @@
     dueClear();
     const card = make('section', 'bs-due'); card.setAttribute('role', 'region'); card.setAttribute('aria-label', 'Assignments at a glance');
     const head = make('div', 'bs-due-head'); head.append(make('h3', '', 'Due soon'), make('span', '', noCourse ? 'No course chosen' : 'This course only'));
-    card.append(head, make('p', 'bs-due-main'), make('ul', 'bs-due-counts'), make('p', 'bs-due-sub'), make('ul', 'bs-due-others'), make('p', 'bs-due-hint', noCourse ? 'The portal shows one course at a time.' : 'This is the course selected below. Choose another course to see its assignments.'));
+    const cal = calendarButton(), actions = make('div', 'bs-due-actions'); actions.append(cal.button, cal.note);
+    card.append(head, make('p', 'bs-due-main'), make('ul', 'bs-due-counts'), actions, make('p', 'bs-due-sub'), make('ul', 'bs-due-others'), make('p', 'bs-due-hint', noCourse ? 'The portal shows one course at a time.' : 'This is the course selected below. Choose another course to see its assignments.'));
     const nodes = [card], trs = [];
     const rows = found.rows.map(r => {
       const eff = D.effectiveDeadline(r.texts);
@@ -209,7 +245,7 @@
     });
     const anchor = found.table.closest('.box') || found.table.closest('.table-responsive') || found.table;
     anchor.parentNode.insertBefore(card, anchor);
-    due = { sig, rows, card, nodes, trs, noCourse, timer: setInterval(() => { if (!document.hidden) dueRender(); }, 30000) };
+    due = { sig, rows, card, nodes, trs, noCourse, calBtn: cal.button, calNote: cal.note, calItems: [], timer: setInterval(() => { if (!document.hidden) dueRender(); }, 30000) };
     dueRender(); remSave(due.classified);
   }
   const SIDE_KEY = 'bahriaStudioSidebarWidth';
@@ -350,6 +386,7 @@
     const root = document.documentElement;
     if (!document.body) return;
     if (settings && typeof settings.reminders === 'boolean') rem.on = settings.reminders;
+    nextOn = !(settings && settings.nextClass === false);
     if (env && env.preview) { rem.preview = true; rem.sample = env.sample; }
     const route = (location.pathname.split('/').pop() || 'index').replace(/\.(php|html)$/i, '').toLowerCase();
     if (root.dataset.bsRoute !== route) root.dataset.bsRoute = route;
@@ -374,12 +411,12 @@
     });
     if (!listening) { listening = true; document.addEventListener('click', onClick); document.addEventListener('keydown', onKey); addEventListener('scroll', hidePop, true); }
     mountResizer();
-    if (route === 'dashboard') dashboard();
+    if (route === 'dashboard') { dashboard(); try { nextCard(); } catch (e) { /* no next-class card */ } }
     if (route === 'assignments') { try { assignmentsPage(); } catch (e) { /* the original table stays as it was */ } }
     try { remMount(); } catch (e) { /* no reminder, nothing else affected */ }
   }
   function disable() {
-    hidePop(); closeBox(); dueClear(); remDisable();
+    hidePop(); closeBox(); dueClear(); remDisable(); if (globalThis.BahriaNextClass) globalThis.BahriaNextClass.unmount();
     if (listening) { listening = false; document.removeEventListener('click', onClick); document.removeEventListener('keydown', onKey); removeEventListener('scroll', hidePop, true); }
     owned.forEach(node => node.remove()); owned.clear();
     titles.forEach((text, node) => node.setAttribute('title', text)); titles.clear();

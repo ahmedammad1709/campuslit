@@ -1,6 +1,6 @@
 {
   "name": "campuslit",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "private": true,
   "license": "MIT",
   "description": "Campuslit: a cleaner look for the Bahria University student CMS and LMS (browser extension)",
@@ -15,6 +15,7 @@
     "test:preview": "node scripts/preview-check.mjs",
     "test:firefox": "node scripts/firefox-check.mjs",
     "test:site": "node scripts/site-check.mjs",
-    "site": "node scripts/site-tools.mjs serve"
+    "site": "node scripts/site-tools.mjs serve",
+    "test:features": "node scripts/features-check.mjs"
   }
 }

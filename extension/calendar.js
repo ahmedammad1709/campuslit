@@ -11,7 +11,7 @@
   const pad = (n, width = 2) => String(n).padStart(width, '0');
   // Strip control characters (so a title can never start a new line in the file), collapse spaces, cap the length.
   const clean = value => (typeof value === 'string' ? value : value === undefined || value === null ? '' : String(value))
-    .replace(/[\u0000-\u001f\u007f\u0085\u2028\u2029]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, MAX_TEXT);
+    .replace(/[\u0000-\u001f\u007f\u0085\u2028\u2029]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, MAX_TEXT).replace(/[\ud800-\udbff]$/, '');   // never ends on half an emoji
   // RFC 5545 text escaping: backslash, semicolon, comma. (Newlines are only ever added by this module, as the two characters \n.)
   const esc = value => clean(value).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,');
 
@@ -102,5 +102,41 @@
     return { ok: true, text: lines.map(fold).join('\r\n') + '\r\n', count, until: local(until).slice(0, 8) };
   }
 
-  root.BahriaCalendar = { build, mondayOf, fileName, fold, esc, dateStart, MIN_WEEKS, MAX_WEEKS, ALARMS };
+  // ---- assignment deadlines -> calendar file --------------------------------------------------------------------------------------------
+  // items: [{ title, due (epoch ms), course }]  (only the ones that are still open; anything already past is left out)
+  // opts:  { course, semester, now (ms), alarms (minutes before the deadline; default one day and three hours) }
+  // Each deadline becomes a short event that ENDS at the deadline (so the calendar shows the time it is due), with two reminders.
+  // The UID depends on the course and title only, so importing the file again after a deadline is extended updates the event instead of copying it.
+  const MAX_DEADLINES = 100, LEAD = 30 * MINUTE, DEADLINE_ALARMS = [24 * 60, 3 * 60];
+  function deadlineFileName(course) {
+    const part = clean(course).replace(/[^A-Za-z0-9-]+/g, '-').replace(/-{2,}/g, '-').replace(/^-+|-+$/g, '').slice(0, 30);
+    return 'campuslit-deadlines' + (part ? '-' + part : '') + '.ics';
+  }
+  function buildDeadlines(items, opts) {
+    const o = opts && typeof opts === 'object' ? opts : {};
+    const now = Number.isFinite(o.now) ? o.now : Date.now();
+    const alarms = (Array.isArray(o.alarms) ? o.alarms : DEADLINE_ALARMS).map(Number).filter(m => Number.isInteger(m) && m > 0 && m <= 14 * 24 * 60).slice(0, 4);
+    const course = clean(o.course), seen = new Map(), body = []; let count = 0;
+    (Array.isArray(items) ? items : []).slice(0, MAX_DEADLINES * 2).forEach(item => {
+      if (!item || typeof item !== 'object' || count >= MAX_DEADLINES) return;
+      const due = item.due;
+      if (!Number.isFinite(due) || due <= now || due > Date.UTC(2100, 0, 1)) return;
+      const title = clean(item.title) || 'Assignment', where = clean(item.course) || course;
+      const base = hash([where, title].join('|')), n = (seen.get(base) || 0) + 1; seen.set(base, n);   // two with the same title in one course still get their own event
+      const uid = base + (n > 1 ? '-' + n : '') + '-' + hash(title) + '@campuslit-due';
+      const lines = ['BEGIN:VEVENT', 'UID:' + uid, 'DTSTAMP:' + utc(now),
+        'DTSTART;TZID=Asia/Karachi:' + local(due - LEAD), 'DTEND;TZID=Asia/Karachi:' + local(due),
+        'SUMMARY:' + esc('Due: ' + title), 'TRANSP:TRANSPARENT'];
+      if (where) lines.push('DESCRIPTION:' + esc(where) + '\\n' + esc('Added by Campuslit. Check the deadline on the portal before relying on it.'));
+      for (const m of alarms) lines.push('BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:' + esc('Due: ' + title), 'TRIGGER;RELATED=END:-PT' + m + 'M', 'END:VALARM');
+      lines.push('END:VEVENT');
+      body.push(...lines); count++;
+    });
+    if (!body.length) return { ok: false, error: 'There is nothing open with a deadline to add.' };
+    const head = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Campuslit//Deadlines//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'X-WR-CALNAME:' + esc('Deadlines' + (course ? ' ' + course : '')), 'X-WR-TIMEZONE:Asia/Karachi',
+      'BEGIN:VTIMEZONE', 'TZID:Asia/Karachi', 'BEGIN:STANDARD', 'DTSTART:19700101T000000', 'TZOFFSETFROM:+0500', 'TZOFFSETTO:+0500', 'TZNAME:PKT', 'END:STANDARD', 'END:VTIMEZONE'];
+    return { ok: true, text: [...head, ...body, 'END:VCALENDAR'].map(fold).join('\r\n') + '\r\n', count };
+  }
+
+  root.BahriaCalendar = { build, buildDeadlines, deadlineFileName, mondayOf, fileName, fold, esc, dateStart, MIN_WEEKS, MAX_WEEKS, ALARMS };
 })(globalThis);

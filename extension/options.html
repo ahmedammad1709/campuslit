@@ -12,6 +12,7 @@
 <script src="themes.js" defer></script>
 <script src="guide.js" defer></script>
 <script src="whatsnew.js" defer></script>
+<script src="nextclass.js" defer></script>
 <script src="deadlines.js" defer></script>
 <script src="storage.js" defer></script>
 <script src="share.js" defer></script>
@@ -173,6 +174,18 @@
             </div>
           </div>
           <div class="group">
+            <div class="group-title"><h3>Next class</h3></div>
+            <label class="row">
+              <span class="row-text"><strong>Show my next class</strong><small>A small card on the CMS and LMS dashboards: the class that is on now or comes next, and how long until it.</small></span>
+              <input id="nextClass" name="nextClass" type="checkbox" role="switch" checked><span class="track" aria-hidden="true"></span>
+            </label>
+            <p class="group-note">Open your Time Table on the CMS once and Campuslit keeps a short note in this browser: the day, time, title and room of each class. It is never sent anywhere. Turning this off forgets the note.</p>
+            <div class="data-actions">
+              <button id="forget-timetable" class="btn secondary" type="button"><span data-icon="reset"></span>Forget saved time table</button>
+              <span id="remembered-tt" class="hint" role="status"></span>
+            </div>
+          </div>
+          <div class="group">
             <div class="group-title"><h3>Experience</h3></div>
             <label class="row">
               <span class="row-text"><strong>Plain sign-in background</strong><small>Hide the campus photo on the CMS landing and sign-in pages.</small></span>
@@ -312,6 +325,46 @@
                   <div class="guide-foot"><span class="guide-chip">CMS &rsaquo; Courses &rsaquo; Time Table</span></div>
                 </div>
               </li>
+              <li class="guide-item">
+                <span class="guide-ico" data-icon="clock"></span>
+                <div class="guide-text">
+                  <h4>Your next class</h4>
+                  <p>A card on the CMS and LMS dashboards says which class is on now or comes next, and how long until it. Open your Time Table once so Campuslit knows your classes.</p>
+                  <div class="guide-foot"><span class="guide-chip">CMS &rsaquo; Dashboard</span><span class="guide-chip">LMS &rsaquo; Dashboard</span><button class="guide-go" type="button" data-goto="portals">Next class settings</button></div>
+                </div>
+              </li>
+              <li class="guide-item">
+                <span class="guide-ico" data-icon="file"></span>
+                <div class="guide-text">
+                  <h4>Deadlines to your calendar</h4>
+                  <p>On the Assignments page, Add to calendar downloads the open deadlines of the course with reminders one day and three hours before.</p>
+                  <div class="guide-foot"><span class="guide-chip">LMS &rsaquo; Assignments</span></div>
+                </div>
+              </li>
+              <li class="guide-item">
+                <span class="guide-ico" data-icon="download"></span>
+                <div class="guide-text">
+                  <h4>Download all lecture notes</h4>
+                  <p>One button on the Lecture Notes page fetches every file of the course and saves them as a single zip. You can cancel and still keep what was fetched.</p>
+                  <div class="guide-foot"><span class="guide-chip">LMS &rsaquo; Lecture Notes</span></div>
+                </div>
+              </li>
+              <li class="guide-item">
+                <span class="guide-ico" data-icon="spark"></span>
+                <div class="guide-text">
+                  <h4>Marks overview</h4>
+                  <p>A button above the filters on the Quizzes page opens your marks for every course in one table, with a switch between Quizzes and Assignments. Courses with nothing marked say Not marked.</p>
+                  <div class="guide-foot"><span class="guide-chip">LMS &rsaquo; Quizzes</span></div>
+                </div>
+              </li>
+              <li class="guide-item">
+                <span class="guide-ico" data-icon="palette"></span>
+                <div class="guide-text">
+                  <h4>Share your theme</h4>
+                  <p>Copy your custom theme as a short code to send to a friend, or paste a friend’s code to try their theme. Nothing is saved until you press Save changes.</p>
+                  <div class="guide-foot"><span class="guide-chip">This page</span><button class="guide-go" type="button" data-goto="studio">Open Custom theme</button></div>
+                </div>
+              </li>
             </ul>
           </div>
           <div class="group">
@@ -351,7 +404,7 @@
             <div class="group-title"><h3>What Campuslit does with your data</h3></div>
             <ul class="facts">
               <li><span data-icon="check"></span><span>No accounts, no analytics, no tracking, and nothing sent to any server of ours. Only if you turn on notifications does Campuslit open pages on the two portals, with your own sign-in.</span></li>
-              <li><span data-icon="check"></span><span>Only your appearance choices are stored, in this browser, plus the short assignment-reminder note described under Portals (which you can turn off or forget) a few yes/no flags for the tips you have dismissed, and, after an update, the version you updated from so What’s new shows only once.</span></li>
+              <li><span data-icon="check"></span><span>Only your appearance choices are stored, in this browser, plus the short assignment-reminder note described under Portals (which you can turn off or forget) a few yes/no flags for the tips you have dismissed, your classes (day, time, title and room, so the dashboards can show your next class; Portals has a switch and a Forget button), and, after an update, the version you updated from so What’s new shows only once.</span></li>
               <li><span data-icon="check"></span><span>Passwords and form fields are never read. A few screens are redrawn from figures the page already shows (your first name, courses, attendance, time table); they stay in memory and are never saved or sent.</span></li>
             </ul>
             <p class="group-note" style="margin:16px 0 0"><a class="link-out" href="privacy.html">Read the full privacy policy <span data-icon="arrow"></span></a></p>

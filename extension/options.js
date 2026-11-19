@@ -109,7 +109,7 @@ function syncNotify() {
 }
 function syncControls() {
   syncNotify();
-  for (const key of ['enabled', 'cms', 'lms', 'cleanBackground', 'motion', 'reminders', 'quickSearch', 'tips', 'openingAnimation']) $(key).checked = settings[key];
+  for (const key of ['enabled', 'cms', 'lms', 'cleanBackground', 'motion', 'reminders', 'nextClass', 'quickSearch', 'tips', 'openingAnimation']) $(key).checked = settings[key];
   $('font').value = settings.font; $('fontSize').value = settings.fontSize; $('radius').value = settings.radius; $('semesterWeeks').value = settings.semesterWeeks;
   setPct($('fontSize')); setPct($('radius')); setPct($('semesterWeeks')); $('weeks-output').textContent = settings.semesterWeeks + ' weeks';
   $('size-output').textContent = settings.fontSize + ' px'; $('radius-output').textContent = settings.radius + ' px';
@@ -205,7 +205,7 @@ for (const key of ['fontSize', 'radius', 'semesterWeeks']) $(key).addEventListen
 document.querySelectorAll('#density-seg button').forEach(b => b.addEventListener('click', () => { settings.density = b.dataset.density; syncControls(); preview(); updateDirty(); }));
 $('system').addEventListener('change', e => { settings.mode = e.target.checked ? 'system' : 'preset'; renderAll(); updateDirty(); });
 system.addEventListener('change', () => { syncControls(); preview(); renderThemes(); });
-for (const key of ['cleanBackground', 'motion', 'reminders', 'quickSearch', 'tips', 'openingAnimation']) $(key).addEventListener('change', e => { settings[key] = e.target.checked; preview(); updateDirty(); });
+for (const key of ['cleanBackground', 'motion', 'reminders', 'nextClass', 'quickSearch', 'tips', 'openingAnimation']) $(key).addEventListener('change', e => { settings[key] = e.target.checked; preview(); updateDirty(); });
 for (const key of NOTIFY_SWITCHES) $('n-' + key).addEventListener('change', e => { settings.notify = { ...settings.notify, [key]: e.target.checked }; syncNotify(); updateDirty(); });
 document.querySelectorAll('#n-interval button').forEach(b => b.addEventListener('click', () => { settings.notify = { ...settings.notify, interval: +b.dataset.interval }; syncNotify(); updateDirty(); }));
 for (const key of ['enabled', 'cms', 'lms']) $(key).addEventListener('change', e => { Object.assign(settings, B.power(settings, key, e.target.checked)); syncControls(); preview(); updateDirty(); });
@@ -216,7 +216,8 @@ $('save').addEventListener('click', async () => {
   $('save-label').textContent = 'Saving…';
   const snapshot = B.normalize(settings);
   try {
-    await StudioStorage.write(snapshot); baseline = JSON.stringify(snapshot); $('save-label').textContent = 'Saved';
+    await StudioStorage.write(snapshot); baseline = JSON.stringify(snapshot);
+    if (snapshot.nextClass === false) { try { await StudioStorage.forgetTimetable(); showTimetable(); } catch { /* the dashboards forget it on their next visit */ } } $('save-label').textContent = 'Saved';
     status(JSON.stringify(settings) === baseline ? (StudioStorage.isExtension ? 'Saved. Your open portals update automatically.' : 'Saved to this browser preview.') : 'Saved. You have additional unsaved changes.');
     $('dirty').hidden = !isDirty();
   } catch { $('save-label').textContent = 'Try again'; status('Could not save. Your preview is intact; please try again.'); }
@@ -250,6 +251,18 @@ $('forget-reminders').addEventListener('click', async () => {
   catch { status('Could not forget them. Please try again.'); }
 });
 showRemembered();
+async function showTimetable() {
+  try {
+    const t = await StudioStorage.timetable(), n = t.events.length;
+    $('remembered-tt').textContent = n ? 'Remembering ' + n + (n === 1 ? ' class' : ' classes') + (t.semester ? ' from ' + t.semester : '') + '.' : 'Nothing remembered yet. Open your Time Table on the CMS once.';
+    $('forget-timetable').disabled = !n;
+  } catch { $('remembered-tt').textContent = ''; }
+}
+$('forget-timetable').addEventListener('click', async () => {
+  try { await StudioStorage.forgetTimetable(); await showTimetable(); status('Forgot the saved time table.'); }
+  catch { status('Could not forget it. Please try again.'); }
+});
+showTimetable();
 // ---------- updates ----------
 // The list is bundled in the extension (whatsnew.js). "Check for updates" asks the browser's own updater (Chrome); nothing is sent to anyone else.
 (function updates() {
@@ -308,7 +321,7 @@ $('retake-tour').addEventListener('click', async () => {
   }
   status('The tour starts the next time you open Campuslit from the toolbar.');
 });
-if (StudioStorage.isExtension) chrome.storage.onChanged.addListener((changes, area) => { if (area === 'local' && changes.bahriaStudioReminders) showRemembered(); });
+if (StudioStorage.isExtension) chrome.storage.onChanged.addListener((changes, area) => { if (area === 'local' && changes.bahriaStudioReminders) showRemembered(); if (area === 'local' && changes.bahriaStudioTimetable) showTimetable(); });
 $('reset').addEventListener('click', () => $('reset-dialog').showModal());
 $('cancel-reset').addEventListener('click', () => $('reset-dialog').close());
 $('confirm-reset').addEventListener('click', async () => {

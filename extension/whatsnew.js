@@ -4,6 +4,14 @@
   // One small record is kept in this browser when an update arrives ({ from, to }); the popup shows the news once, and closing it removes the record.
   const KEY = 'bahriaStudioNews';
   const RELEASES = Object.freeze([
+    Object.freeze({ version: '1.3.0', date: '19 November 2026', items: Object.freeze([
+      'Marks overview on the Quizzes page: one window with your quiz and assignment marks for every course.',
+      'Download all lecture notes as one zip, with a progress ring.',
+      'Add the open deadlines of a course to your calendar, with reminders.',
+      'Your next class on the CMS and LMS dashboards, from the time table you have opened.',
+      'Share your custom theme as a short code, or add one from a friend.',
+      'The faculty sign-in page title is readable, and the Caps Lock warning is clearer.'
+    ]) }),
     Object.freeze({ version: '1.2.2', date: '18 November 2026', items: Object.freeze([
       'Preview works again on the LMS. The university scrambled its download links, so Preview now finds out what a file is when it opens.',
       'Preview for Excel (.xlsx), PowerPoint (.pptx) and zip files, and for old .doc, .xls and .ppt files.',

@@ -4,6 +4,7 @@
   const key = 'bahriaStudioPreferences';
   const guideKey = BahriaGuide.KEY;   // which tips have been shown (a few yes/no facts)
   const newsKey = BahriaWhatsNew.KEY;   // the one-time "what's new" after an update
+  const timetableKey = 'bahriaStudioTimetable';   // the classes behind the dashboards' next-class card (day, time, title, room)
   const remindersKey = 'bahriaStudioReminders';   // the short note behind the assignment reminder (course, title, deadline)
   const isExtension = Boolean(api?.runtime?.id);
   globalThis.StudioStorage = {
@@ -19,12 +20,20 @@
       return settings;
     },
     async clear() {
-      if (isExtension) await api.storage.local.remove([key, remindersKey, guideKey, newsKey]);
-      else { localStorage.removeItem(key); localStorage.removeItem(remindersKey); localStorage.removeItem(guideKey); localStorage.removeItem(newsKey); }
+      if (isExtension) await api.storage.local.remove([key, remindersKey, guideKey, newsKey, timetableKey]);
+      else { localStorage.removeItem(key); localStorage.removeItem(remindersKey); localStorage.removeItem(guideKey); localStorage.removeItem(newsKey); localStorage.removeItem(timetableKey); }
     },
     async remembered() {
       const raw = isExtension ? (await api.storage.local.get(remindersKey))[remindersKey] : JSON.parse(localStorage.getItem(remindersKey) || 'null');
       return globalThis.BahriaDeadlines ? BahriaDeadlines.count(raw) : { courses: 0, items: 0 };
+    },
+    async timetable() {
+      const raw = isExtension ? (await api.storage.local.get(timetableKey))[timetableKey] : JSON.parse(localStorage.getItem(timetableKey) || 'null');
+      return globalThis.BahriaNextClass ? BahriaNextClass.sanitize(raw) : { events: [] };
+    },
+    async forgetTimetable() {
+      if (isExtension) await api.storage.local.remove(timetableKey);
+      else localStorage.removeItem(timetableKey);
     },
     async forgetReminders() {
       if (isExtension) await api.storage.local.remove(remindersKey);

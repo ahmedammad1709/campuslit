@@ -28,7 +28,7 @@ test('what is shown: the versions after the one you had, up to the new one, newe
   assert.deepEqual(plain(W.since('1.1.3', '1.2.2').map(r => r.version)), ['1.2.2', '1.2.1', '1.2.0']);
   assert.deepEqual(plain(W.since('1.2.2', '1.2.2')), [], 'nothing new');
   const s = W.summary(W.since('1.1.3', '1.2.2'), 4);
-  assert.equal(s.items.length, 4); assert.ok(s.more > 0); assert.equal(s.items[0], W.RELEASES[0].items[0], 'the newest version comes first');
+  assert.equal(s.items.length, 4); assert.ok(s.more > 0); assert.equal(s.items[0], W.RELEASES.find(r => r.version === '1.2.2').items[0], 'the newest version in the range comes first');
   assert.deepEqual(plain(W.summary([], 4)), { items: [], more: 0 });
 });
 
@@ -48,6 +48,6 @@ test('the pieces are wired together: the scripts load before they are used, in b
   for (const f of ['popup.html', 'options.html']) { const h = read('extension/' + f); assert.ok(h.indexOf('whatsnew.js') > 0 && h.indexOf('whatsnew.js') < h.indexOf('storage.js'), f + ': whatsnew.js before storage.js'); }
   assert.match(read('extension/background.js'), /importScripts\([^)]*'whatsnew\.js'/, 'the Chrome worker imports it');
   assert.match(read('scripts/build.mjs'), /'notify-core\.js', 'whatsnew\.js', 'background\.js'/, 'the Firefox background scripts list it');
-  const storage = read('extension/storage.js'); assert.match(storage, /remove\(\[key, remindersKey, guideKey, newsKey\]\)/, 'Reset all settings removes the note');
+  const storage = read('extension/storage.js'); assert.match(storage, /remove\(\[key, remindersKey, guideKey, newsKey, timetableKey\]\)/, 'Reset all settings removes the note');
   assert.ok(!('permissions' in manifest) || !manifest.permissions.some(p => /tabs|management|downloads/.test(p)), 'no new permission was needed');
 });

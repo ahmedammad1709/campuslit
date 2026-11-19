@@ -110,6 +110,15 @@ test('audit: anything that could send data or run remote or generated code is ca
   assert.ok(mentions(await run(build('chrome', c => c.files.set('previewer.js', B("fetch(url, { credentials: 'include' });")))), 'fetch'), 'nor fetch without the check or with other credentials');
   assert.ok(mentions(await run(build('chrome', c => c.files.set('previewer.js', B("fetch(safe, { credentials: 'same-origin' });")))), 'address check'), 'nor skip the address check');
   assert.ok(mentions(await run(build('chrome', c => c.files.set('lms.js', B(good)))), 'fetch()'), 'no other page script may fetch, even in the same words');
+  // Download all (bulkdl.js) may fetch the same checked address; the marks overview (marks.js) may fetch only the LMS pages it checks with its own pageUrl()
+  assert.deepEqual(await run(build('chrome', c => c.files.set('bulkdl.js', B(good)))), [], 'download all may fetch the checked file address');
+  assert.ok(mentions(await run(build('chrome', c => c.files.set('bulkdl.js', B("fetch('https://x.example/a', { credentials: 'same-origin' });")))), 'fetch'), 'download all may not fetch another address');
+  assert.ok(mentions(await run(build('chrome', c => c.files.set('bulkdl.js', B("fetch(safe, { credentials: 'same-origin' });")))), 'address check'), 'nor skip the check');
+  const pages = "const safe = pageUrl(u, location.href); const res = await fetch(safe, { credentials: 'same-origin', signal: s });";
+  assert.deepEqual(await run(build('chrome', c => c.files.set('marks.js', B(pages)))), [], 'the marks overview may fetch a checked LMS page');
+  assert.ok(mentions(await run(build('chrome', c => c.files.set('marks.js', B(good)))), 'address check'), 'its check is its own: the file check does not count for it');
+  assert.ok(mentions(await run(build('chrome', c => c.files.set('marks.js', B("const safe = pageUrl(u); fetch(url, { credentials: 'include' });")))), 'fetch'), 'nor other credentials');
+  assert.ok(mentions(await run(build('chrome', c => c.files.set('nextclass.js', B(pages)))), 'fetch()'), 'no other script may fetch');
   assert.deepEqual(await run(build('chrome', c => c.files.set('popup.js', B("const s = prefetch(); el.retrieval = 1; evaluate(2); obj.fetch(1);")))), [], 'similar-looking names are not flagged');
 });
 

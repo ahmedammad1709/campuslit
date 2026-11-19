@@ -9,7 +9,9 @@ const PORTALS = ['*://cms.bahria.edu.pk/*', '*://lms.bahria.edu.pk/*'];
 const PERMISSIONS = ['alarms', 'notifications', 'storage'];                 // notifications are opt-in; the alarm wakes the checker; storage keeps the settings
 const HOSTS = ['https://cms.bahria.edu.pk/*', 'https://lms.bahria.edu.pk/*'];    // the only places the background worker may read
 const CONNECT = ['https://cms.bahria.edu.pk', 'https://lms.bahria.edu.pk'];
-const PREVIEWER = 'previewer.js';                                           // the one page script that may fetch: only the LMS's own Download.php, only through the BahriaPreview.fileUrl() check, only with the student's own sign-in
+// The page scripts that may fetch, each only through its own address check and only with the student's own sign-in (credentials: 'same-origin'):
+//   previewer.js and bulkdl.js: the LMS's own Download.php, through BahriaPreview.fileUrl(); marks.js: the LMS's Assignments and Quizzes pages, through its own pageUrl().
+const FETCHERS = new Map([['previewer.js', { check: /const safe = P\.fileUrl\(/, words: 'the BahriaPreview.fileUrl()' }], ['bulkdl.js', { check: /const safe = P\.fileUrl\(/, words: 'the BahriaPreview.fileUrl()' }], ['marks.js', { check: /const safe = pageUrl\(/, words: 'the pageUrl()' }]]);
 const WORKER = 'background.js';                                              // the one script that may make requests (and only to those two sites)
 
 // Things the extension must never do. Only the background worker may make requests (to the two portals) and load its helper scripts; every other script is checked against all of these.
@@ -94,10 +96,10 @@ export function audit(files, opts) {
     const body = text(data), vendor = name.startsWith('preview/vendor/');
     if (type === '.js') {
       const runsOnPortals = scripts.some(block => (block.js || []).includes(name));
-      for (const [pattern, label] of FORBIDDEN_CODE) if (pattern.test(body) && !(name === WORKER && /^(?:fetch|importScripts)\(/.test(label)) && !(name === PREVIEWER && /^fetch\(/.test(label))) add(name + ': uses ' + label + '.');
-      if (name === PREVIEWER) {   // its fetch is allowed on one condition: it is always fetch(safe, { credentials: 'same-origin', ... }) where safe came out of the address check
+      for (const [pattern, label] of FORBIDDEN_CODE) if (pattern.test(body) && !(name === WORKER && /^(?:fetch|importScripts)\(/.test(label)) && !(FETCHERS.has(name) && /^fetch\(/.test(label))) add(name + ': uses ' + label + '.');
+      if (FETCHERS.has(name)) {   // its fetch is allowed on one condition: it is always fetch(safe, { credentials: 'same-origin', ... }) where safe came out of the address check
         for (const [, args] of body.matchAll(/(?<![\w$.])fetch\s*\(([^)]*)/g)) if (!/^safe\s*,\s*\{\s*credentials:\s*'same-origin'/.test(args.trim())) add(name + ': a fetch() that is not fetch(safe, { credentials: \'same-origin\', ... }).');
-        if (/(?<![\w$.])fetch\s*\(/.test(body) && !/const safe = P\.fileUrl\(/.test(body)) add(name + ': fetch() is used without the BahriaPreview.fileUrl() address check.');
+        if (/(?<![\w$.])fetch\s*\(/.test(body) && !FETCHERS.get(name).check.test(body)) add(name + ': fetch() is used without ' + FETCHERS.get(name).words + ' address check.');
       }
       if (runsOnPortals) for (const [pattern, label] of HTML_INJECTION) if (pattern.test(body)) add(name + ': a script that runs on the portals uses ' + label + '.');
     }

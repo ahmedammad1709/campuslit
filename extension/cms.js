@@ -267,6 +267,17 @@
   // "Add to calendar": the classes on this page as a downloadable calendar file. Built here from the schedule the page already holds
   // and handed straight to the browser as a download. Nothing is uploaded. The only values read are the three choices in this panel.
   const CAL = () => globalThis.BahriaCalendar || null;
+  // "Next class" on the dashboard, from the time table you have opened before (see nextclass.js). Switched off by the setting, which also forgets the note.
+  const NC = () => globalThis.BahriaNextClass || null;
+  const TIMETABLE_URL = 'https://cms.bahria.edu.pk/Sys/Student/CourseRegistration/TimeTable.aspx';
+  let nextOn = true;
+  function dashboardNext() {
+    const lib = NC(); if (!lib) return;
+    lib.mount(document, {
+      on: nextOn, suggest: { href: TIMETABLE_URL },
+      place(node) { const panel = document.querySelector('#pageContent .notification-container'), row = panel && panel.closest('.row'); if (!row) return false; row.before(node); return true; }
+    });
+  }
   const longDate = ymd => { const m = /^(\d{4})(\d{2})(\d{2})$/.exec(ymd || ''); return m ? +m[3] + ' ' + ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][+m[2] - 1] + ' ' + m[1] : ''; };
   function download(text, name) {
     const url = URL.createObjectURL(new Blob([text], { type: 'text/calendar;charset=utf-8' }));
@@ -330,6 +341,7 @@
     if (!host || host.querySelector('.bs-tt')) return;
     const schedule = readSchedule();
     if (!schedule) return;   // leave the original grid in place
+    if (nextOn && NC()) NC().remember(schedule).catch(() => { /* the card just will not know this time table */ });
     const { events, step } = schedule;
     const used = DAY_ORDER.filter(d => events.some(e => e.day === d) || (d >= 1 && d <= 5));
     const from = Math.floor(Math.min(...events.map(e => e.start)) / 60) * 60;
@@ -441,15 +453,17 @@
     const root = document.documentElement;
     if (!document.body) return;
     if (settings && Number.isFinite(settings.semesterWeeks)) weeks = settings.semesterWeeks;
+    nextOn = !(settings && settings.nextClass === false);
     if (shownWeeks !== null && shownWeeks !== weeks) { document.querySelectorAll('.bs-att, .bs-plan').forEach(n => { n.remove(); owned.delete(n); }); shownWeeks = null; }
     // Each feature runs on its own: if one fails on an unexpected page, the others (and the page itself) carry on untouched.
     [markCurrent,
       () => document.querySelectorAll('#pageAlerts_up .alert').forEach(a => mark(a, 'role', 'alert')),
-      mountResizer, dashboardAttendance, attendancePage, statuses, timetable, landing, emblem
+      mountResizer, dashboardAttendance, dashboardNext, attendancePage, statuses, timetable, landing, emblem
     ].forEach(step => { try { step(); } catch (e) { /* ignore */ } });
     void root;
   }
   function disable() {
+    if (NC()) NC().unmount();
     opened.splice(0).forEach(({ group, toggle }) => { group.classList.remove('in'); group.removeAttribute('aria-expanded'); group.removeAttribute('data-bs-opened'); if (toggle) { toggle.classList.add('collapsed'); toggle.setAttribute('aria-expanded', 'false'); } });
     owned.forEach(node => node.remove()); owned.clear();
     attrs.forEach((names, node) => names.forEach(name => node.removeAttribute(name))); attrs.clear();

@@ -149,7 +149,7 @@ Download `campuslit-chrome.zip` or `campuslit-firefox.zip` from the latest GitHu
 
 ## Privacy
 
-No analytics, no accounts, no remote code or fonts, nothing sent anywhere (with notifications off the extension makes no requests; with them on it only opens pages on the two portals, with your own session), no access to passwords or to the portals' own form values. Only appearance preferences are stored, in the browser's extension storage, plus the optional assignment-reminder note described above, a few yes/no flags for the tips you have seen, and, after an update, the version you updated from so What’s new shows only once. To redraw a few screens it reads figures the page already shows (greeting name, LMS course list, CMS attendance hours and time table) in memory only; nothing is saved or sent. Full text: `extension/privacy.html`.
+No analytics, no accounts, no remote code or fonts, nothing sent anywhere (with notifications off the extension makes no requests; with them on it only opens pages on the two portals, with your own session), no access to passwords or to the portals' own form values. Only appearance preferences are stored, in the browser's extension storage, plus the optional assignment-reminder note described above, a few yes/no flags for the tips you have seen, a short note of your classes (day, time, title and room, so the dashboards can show your next class; it can be switched off and forgotten in Settings), and, after an update, the version you updated from so What’s new shows only once. To redraw a few screens it reads figures the page already shows (greeting name, LMS course list, CMS attendance hours and time table) in memory only; nothing is saved or sent. Full text: `extension/privacy.html`.
 
 ## Repository layout
 
