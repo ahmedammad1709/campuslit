@@ -124,6 +124,20 @@ test('next class: overlapping classes, back-to-back classes and the clock zone o
   assert.deepEqual(answers, Array(4).fill('0:' + 9 * HOUR), 'the answer does not depend on the device time zone: ' + answers);
 });
 
+test('next class: "now" is what the device clock shows, so a wrong time zone setting with the right clock face still gives the right class', () => {
+  // A reported bug: Windows showed Monday 10:38 pm but the zone was set to US Pacific, so the real time was 13 hours later in Pakistan and a class of Tuesday 11:30 was shown as live.
+  const file = path.join(__dirname, '..', 'extension', 'nextclass.js'), want = pkt(2026, 11, 23, 22, 38);
+  const answers = ['UTC', 'America/Los_Angeles', 'Pacific/Honolulu', 'Asia/Karachi', 'Asia/Kolkata', 'Pacific/Kiritimati'].map(zone => {
+    const code = "const vm = require('node:vm'), fs = require('node:fs'); const c = vm.createContext({ Object, Array, String, Number, Math, JSON, Date, Map, Set, Error, Promise, console }); c.globalThis = c; vm.runInContext(fs.readFileSync(process.argv[1], 'utf8'), c); console.log(c.BahriaNextClass.clockNow(new Date(2026, 10, 23, 22, 38)));";
+    return Number(require('node:child_process').execFileSync(process.execPath, ['-e', code, file], { env: { ...process.env, TZ: zone } }).toString().trim());
+  });
+  assert.deepEqual(answers, Array(6).fill(want), 'the clock face decides, in every zone: ' + answers);
+  // and with that "now", Monday 22:38 shows tomorrow's first class as tomorrow, not Tuesday's late-morning class as live
+  const week = note([cls(1, 8.5, 10.5, 'AP'), cls(2, 8.5, 11.5, 'Lab'), cls(2, 11.5, 13, 'CP')], want - 2 * DAY);
+  const n = NC.next(week, want), d = NC.describe(n, want);
+  assert.equal(n.event.title, 'Lab'); assert.equal(n.live, false); assert.equal(d.badge, 'Tomorrow'); assert.equal(d.when, 'Starts at 8:30 am');
+});
+
 test('next class: notes that cannot be trusted are not used, and nothing crashes', () => {
   assert.equal(NC.next(null, MON), null); assert.equal(NC.next(note([]), MON), null); assert.equal(NC.next('x', MON), null); assert.equal(NC.next(note(WEEK), NaN), null);
   assert.equal(NC.next(note(WEEK, 0), MON), null, 'no save date');

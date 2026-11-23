@@ -7,7 +7,8 @@
   // The settings page can turn the card off (which forgets the note) or forget it on demand.
   //
   // This file has the logic (what is next, how to say it), the check that anything read back from storage is sane, and the card itself,
-  // drawn with createElement and textContent only. Times are Pakistan time, as the time table is, whatever the device clock's zone.
+  // drawn with createElement and textContent only. The time table is in Pakistan time, and "now" is what the clock on this device shows (see clockNow), so a device
+  // whose time zone setting is wrong but whose clock face is right (common when the time was set by hand) still gets the right class.
   const KEY = 'bahriaStudioTimetable';
   const MINUTE = 60000, HOUR = 3600000, DAY = 86400000, PKT = 5 * HOUR;
   const MAX_EVENTS = 80, TEXT = 80, KEEP = 150 * DAY, STALE_NOTE = 7 * DAY;
@@ -49,6 +50,9 @@
   const usable = (record, now) => { const r = sanitize(record); return r.events.length && r.savedAt && now - r.savedAt < KEEP && r.savedAt <= now + DAY ? r : null; };
 
   // ---- what is next ----------------------------------------------------------------------------------------------------------------------
+  // The epoch at which Pakistan's clock would show what this device's clock shows. For a device set to Pakistan it is simply Date.now();
+  // for a device whose zone is wrong but whose clock face is right (say Windows set to US Pacific, clock typed in by hand) it still follows the clock face.
+  const clockNow = (d = new Date()) => d.getTime() - d.getTimezoneOffset() * MINUTE - PKT;
   const midnight = ms => Math.floor((ms + PKT) / DAY) * DAY - PKT;                 // the start of that day in Pakistan, as an epoch
   const weekday = ms => new Date(ms + PKT).getUTCDay();
   // record: a sanitized note. Returns null when there is nothing to show, else
@@ -148,7 +152,7 @@
     if (!force && sig === state.sig && state.node.childNodes.length) return;
     state.sig = sig;
     const suggest = state.suggest ? { href: state.suggest.href, onHide: () => { io.update(r => ({ ...r, hint: true })).catch(() => {}); } } : null;
-    fill(state.doc, state.node, state.record, Date.now(), suggest);
+    fill(state.doc, state.node, state.record, clockNow(), suggest);
   }
   function unmount() {
     clearInterval(state.timer); state.timer = 0;
@@ -174,8 +178,8 @@
   // Called when the time table page has been read: keep a note of the classes (and nothing else about you).
   function remember(schedule) {
     if (!io.available()) return Promise.resolve(null);
-    return io.update(previous => fromSchedule(schedule, Date.now(), previous) || previous);
+    return io.update(previous => fromSchedule(schedule, clockNow(), previous) || previous);
   }
 
-  root.BahriaNextClass = { mount, unmount, remember, KEY, empty, sanitize, fromSchedule, usable, next, describe, wait, clock, range, fill, savedAgo, io, KEEP };
+  root.BahriaNextClass = { mount, unmount, remember, KEY, empty, sanitize, fromSchedule, usable, next, describe, wait, clock, clockNow, range, fill, savedAgo, io, KEEP };
 })(globalThis);

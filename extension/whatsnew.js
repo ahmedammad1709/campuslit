@@ -4,6 +4,14 @@
   // One small record is kept in this browser when an update arrives ({ from, to }); the popup shows the news once, and closing it removes the record.
   const KEY = 'bahriaStudioNews';
   const RELEASES = Object.freeze([
+    Object.freeze({ version: '1.3.2', date: '23 November 2026', items: Object.freeze([
+      'The Due soon card on the Assignments page can be folded away with the arrow in its corner, and opened again. It stays open by default.',
+      'The Open Assignments button in the reminder now opens the course the reminder is about, not an empty page.',
+      'Next class on the dashboards now follows the clock on your computer, like the one above the Time Table, so it no longer shows tomorrow’s class as on now when the computer’s time zone setting is wrong.'
+    ]) }),
+    Object.freeze({ version: '1.3.1', date: '20 November 2026', items: Object.freeze([
+      'The Submit Assignment window and other pop-ups are readable in dark themes: the title, labels and file chooser no longer turn white on white.'
+    ]) }),
     Object.freeze({ version: '1.3.0', date: '19 November 2026', items: Object.freeze([
       'Marks overview on the Quizzes page: one window with your quiz and assignment marks for every course.',
       'Download all lecture notes as one zip, with a progress ring.',

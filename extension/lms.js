@@ -113,7 +113,31 @@
   // The portal shows one course at a time, so this covers the course selected on the page.
   const DL = () => globalThis.BahriaDeadlines || null;
   let due = null;   // { sig, rows: [{ tr, chip, info }], card, nodes, trs, timer }
+  // The Due soon card is open by default; the chevron in its header folds it away (and opens it again). The choice is remembered on this device (one true/false).
+  const DUE_OPEN_KEY = 'bahriaStudioDueCollapsed';
+  let dueCollapsed = false;
+  function dueApplyFold(card) {
+    const toggle = card.querySelector('.bs-due-toggle'), inner = card.querySelector('.bs-due-inner'); if (!toggle || !inner) return;
+    card.setAttribute('data-collapsed', dueCollapsed ? 'true' : 'false');
+    toggle.setAttribute('aria-expanded', dueCollapsed ? 'false' : 'true');
+    toggle.setAttribute('aria-label', dueCollapsed ? 'Show Due soon details' : 'Hide Due soon details'); toggle.title = dueCollapsed ? 'Show details' : 'Hide details';
+    inner.inert = dueCollapsed;   // folded away means out of the tab order and invisible to screen readers
+  }
   const flat = node => { const copy = node.cloneNode(true); copy.querySelectorAll('.bs-due-chip').forEach(n => n.remove()); return copy.textContent.replace(/\s+/g, ' ').trim(); };
+  // The reminder's button opens Assignments.php#course=<name>. The portal shows nothing until a course is chosen, so when no course is chosen yet and the name matches exactly one
+  // course in the dropdown, choose it the way you would: set the dropdown and let the portal's own page react to the change. Only the name is used, and only once.
+  let courseAsked = false;
+  function dueAutoCourse() {
+    if (courseAsked) return;
+    const m = /^#course=(.{1,200})$/.exec(location.hash); if (!m) return;
+    let want = ''; try { want = decodeURIComponent(m[1]); } catch (e) { return; }
+    const norm = t => t.replace(/\s+/g, ' ').trim().toLowerCase().slice(0, 80), select = document.querySelector('#courseId'); if (!select || !norm(want)) return;
+    const hits = [...select.options].filter(o => o.value && norm(o.textContent) === norm(want));
+    courseAsked = true;
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* the address just keeps its tail */ }
+    if (hits.length !== 1) return;                                   // no match, or two with the same name: leave the choice to the person
+    select.value = hits[0].value; select.dispatchEvent(new Event('change', { bubbles: true }));
+  }
   function dueScan() {
     const content = document.querySelector('.content-wrapper section.content') || document;
     for (const table of content.querySelectorAll('table')) {
@@ -228,13 +252,23 @@
     const found = dueScan();
     if (!found) { dueClear(); return; }
     const noCourse = !!document.querySelector('#courseId') && !chosen('#courseId');   // the portal says "Please select a course": there is nothing to count yet
+    if (noCourse) dueAutoCourse();
     const sig = [noCourse, ...found.rows.map(r => [r.title, r.texts.map(t => t.text).join('~'), r.portalClosed, r.submitted, r.control].join('|'))].join('#');
     if (due && due.sig === sig && due.card.isConnected) return;
     dueClear();
     const card = make('section', 'bs-due'); card.setAttribute('role', 'region'); card.setAttribute('aria-label', 'Assignments at a glance');
-    const head = make('div', 'bs-due-head'); head.append(make('h3', '', 'Due soon'), make('span', '', noCourse ? 'No course chosen' : 'This course only'));
+    const toggle = make('button', 'bs-due-toggle'); toggle.type = 'button'; toggle.setAttribute('aria-controls', 'bs-due-inner'); toggle.append(make('i', 'bs-due-chev'));
+    const head = make('div', 'bs-due-head'); head.append(make('h3', '', 'Due soon'), make('span', '', noCourse ? 'No course chosen' : 'This course only'), toggle);
     const cal = calendarButton(), actions = make('div', 'bs-due-actions'); actions.append(cal.button, cal.note);
-    card.append(head, make('p', 'bs-due-main'), make('ul', 'bs-due-counts'), actions, make('p', 'bs-due-sub'), make('ul', 'bs-due-others'), make('p', 'bs-due-hint', noCourse ? 'The portal shows one course at a time.' : 'This is the course selected below. Choose another course to see its assignments.'));
+    const inner = make('div', 'bs-due-inner'); inner.id = 'bs-due-inner';
+    inner.append(make('p', 'bs-due-main'), make('ul', 'bs-due-counts'), actions, make('p', 'bs-due-sub'), make('ul', 'bs-due-others'), make('p', 'bs-due-hint', noCourse ? 'The portal shows one course at a time.' : 'This is the course selected below. Choose another course to see its assignments.'));
+    const body = make('div', 'bs-due-body'); body.append(inner);
+    card.append(head, body);
+    dueApplyFold(card);
+    head.addEventListener('click', () => {   // the whole header folds the card; the button inside it is the keyboard and screen reader way in
+      dueCollapsed = !dueCollapsed; dueApplyFold(card);
+      if (store && store.local) { try { store.local.set({ [DUE_OPEN_KEY]: dueCollapsed }); } catch (e) { /* just not remembered */ } }
+    });
     const nodes = [card], trs = [];
     const rows = found.rows.map(r => {
       const eff = D.effectiveDeadline(r.texts);
@@ -250,6 +284,7 @@
   }
   const SIDE_KEY = 'bahriaStudioSidebarWidth';
   const store = (globalThis.browser || globalThis.chrome || {}).storage;
+  if (store && store.local) { try { store.local.get(DUE_OPEN_KEY).then(d => { if (d && typeof d[DUE_OPEN_KEY] === 'boolean') { dueCollapsed = d[DUE_OPEN_KEY]; if (due && due.card) dueApplyFold(due.card); } }).catch(() => {}); } catch (e) { /* default: open */ } }
   // ---------- Reminder: the next assignment you have not submitted, as a popup you can cross away ----------
   // The portal shows one course at a time, so to remind you on another page this keeps a short note on this device only:
   // course, assignment title and deadline of assignments that are open and not submitted. It is never sent anywhere.
@@ -295,7 +330,7 @@
       remHide();
       const node = make('aside', 'bs-remind'); node.setAttribute('role', 'status'); node.setAttribute('aria-live', 'polite'); node.setAttribute('aria-label', 'Assignment reminder');
       const link = [...document.querySelectorAll('.sidebar-menu a')].find(a => /^\s*assignments\s*$/i.test(a.textContent));
-      const go = make('a', 'bs-remind-go', 'Open Assignments'); go.setAttribute('href', (link && link.getAttribute('href')) || 'Assignments.php');
+      const go = make('a', 'bs-remind-go', 'Open Assignments'); go.setAttribute('href', ((link && link.getAttribute('href')) || 'Assignments.php').split('#')[0] + (top.course ? '#course=' + encodeURIComponent(top.course) : ''));   // the Assignments page then picks that course in its dropdown
       const x = make('button', 'bs-remind-x'); x.type = 'button'; x.append(cross()); x.setAttribute('aria-label', 'Dismiss reminder'); x.title = 'Dismiss for a few hours';
       x.addEventListener('click', () => remWrite(data => D.dismiss(data, top.id, Date.now())));
       const body = make('div', 'bs-remind-body');
