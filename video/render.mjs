@@ -12,7 +12,7 @@ import path from 'node:path';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = Object.fromEntries(process.argv.slice(2).reduce((acc, a, i, all) => { if (a.startsWith('--')) acc.push([a.slice(2), all[i + 1] && !all[i + 1].startsWith('--') ? all[i + 1] : true]); return acc; }, []));
 const scene = args.scene || 'look', fps = Number(args.fps || 30);
-const land = args.layout === 'land' || Boolean(args.page);   // a --page scene (glow) is always 1920x1080                   // --layout land: 1920x1080 for LinkedIn (default is the 1080x1920 portrait)
+const land = args.layout === 'land' || (Boolean(args.page) && !args.portrait);   // a --page scene (glow) is always 1920x1080                   // --layout land: 1920x1080 for LinkedIn (default is the 1080x1920 portrait)
 const [W, H] = land ? [1920, 1080] : [1080, 1920];
 const tools = process.env.VIDEO_TOOLS || path.join(os.homedir(), 'campuslit-video');
 const ffmpeg = path.join(tools, 'ffmpeg', 'bin', 'ffmpeg.exe');
@@ -22,7 +22,7 @@ const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 
 const server = createServer(async (req, res) => {
   try {
     const p = decodeURIComponent(new URL(req.url, 'http://x').pathname);
-    const area = p.startsWith('/__video/') ? [path.join(root, 'video', 'scenes'), 9] : p.startsWith('/__out/') ? [path.join(root, 'video', 'out'), 7] : [path.join(root, 'extension'), 0];
+    const area = p.startsWith('/__shots/') ? [path.join(root, 'video', 'shots'), 9] : p.startsWith('/__video/') ? [path.join(root, 'video', 'scenes'), 9] : p.startsWith('/__out/') ? [path.join(root, 'video', 'out'), 7] : [path.join(root, 'extension'), 0];
     const file = path.join(area[0], p.slice(area[1])), allowed = area[0];
     if (!path.resolve(file).startsWith(allowed + path.sep)) { res.statusCode = 403; return res.end(); }
     res.setHeader('content-type', types[path.extname(file)] || 'application/octet-stream'); res.setHeader('cache-control', 'no-store');

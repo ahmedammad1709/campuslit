@@ -20,7 +20,7 @@
       31.05,
       34.35
     ],
-    "fade": 39.0,
+    "fade": 39,
     "level": -17
   },
   "full": {
@@ -889,12 +889,12 @@
       {
         "id": "n6",
         "text": "You choose what you get.",
-        "at": 56.0
+        "at": 56
       },
       {
         "id": "n7",
         "text": "And it asks first.",
-        "at": 58.0
+        "at": 58
       },
       {
         "id": "c5",
@@ -1350,5 +1350,249 @@
         "text": "Free. No sign-up. Nothing leaves your browser."
       }
     }
+  },
+  "update": {
+    "duration": 47.5,
+    "music": {
+      "bpm": 120,
+      "drop": 3.3,
+      "breakdown": [
+        [
+          37,
+          38.2
+        ]
+      ],
+      "fade": 45.5,
+      "level": -17,
+      "pump": 0.55
+    },
+    "lines": [
+      {
+        "id": "hook",
+        "text": "Bahria University portal just got a big update.",
+        "at": 0.4,
+        "bot": true
+      },
+      {
+        "id": "h2",
+        "text": "Five new features.",
+        "at": 3.1
+      },
+      {
+        "id": "p1",
+        "text": "One. Preview any file, without downloading it.",
+        "at": 5
+      },
+      {
+        "id": "p2",
+        "text": "PDFs, Word files, slides. Right on the page.",
+        "at": 8
+      },
+      {
+        "id": "d1",
+        "text": "Two. Download all. One click, one zip.",
+        "at": 12.9
+      },
+      {
+        "id": "m1",
+        "text": "Three. See every quiz and assignment mark in one table.",
+        "at": 17
+      },
+      {
+        "id": "m2",
+        "text": "Quizzes and assignments. Not marked, means not graded yet.",
+        "at": 21.2
+      },
+      {
+        "id": "t1",
+        "text": "Four. Made a custom theme? Share it with just a code.",
+        "at": 25.3
+      },
+      {
+        "id": "t2",
+        "text": "Your friends paste it, and get your exact look.",
+        "at": 29
+      },
+      {
+        "id": "n1",
+        "text": "Five. Your next class, right on the dashboard.",
+        "at": 33.1
+      },
+      {
+        "id": "n2",
+        "text": "What's on now, and what's next.",
+        "at": 35.6
+      },
+      {
+        "id": "c1",
+        "text": "Campuslit just crossed 850+ installs. Thank you!",
+        "at": 38.3
+      },
+      {
+        "id": "c2",
+        "text": "Update it now, or add it free. Link in bio.",
+        "at": 42.4
+      }
+    ],
+    "sfx": [
+      {
+        "id": "riser",
+        "kind": "riser",
+        "at": 1.5
+      },
+      {
+        "id": "hit0",
+        "kind": "hit",
+        "at": 0.35
+      },
+      {
+        "id": "hit1",
+        "kind": "hit",
+        "at": 3.3
+      },
+      {
+        "id": "chip0",
+        "kind": "pop",
+        "at": 1.2
+      },
+      {
+        "id": "chip1",
+        "kind": "pop",
+        "at": 1.58
+      },
+      {
+        "id": "chip2",
+        "kind": "pop",
+        "at": 1.96
+      },
+      {
+        "id": "chip3",
+        "kind": "pop",
+        "at": 2.34
+      },
+      {
+        "id": "chip4",
+        "kind": "pop",
+        "at": 2.72
+      },
+      {
+        "id": "sc0",
+        "kind": "swish",
+        "at": 4.7
+      },
+      {
+        "id": "sc1",
+        "kind": "swish",
+        "at": 16.8
+      },
+      {
+        "id": "sc2",
+        "kind": "swish",
+        "at": 25.2
+      },
+      {
+        "id": "sc3",
+        "kind": "swish",
+        "at": 33
+      },
+      {
+        "id": "sc4",
+        "kind": "whoosh",
+        "at": 38.1
+      },
+      {
+        "id": "clk0",
+        "kind": "tick",
+        "at": 6.3,
+        "gain": 2
+      },
+      {
+        "id": "clk1",
+        "kind": "tick",
+        "at": 8.75,
+        "gain": 2
+      },
+      {
+        "id": "clk2",
+        "kind": "tick",
+        "at": 10.95,
+        "gain": 2
+      },
+      {
+        "id": "clk3",
+        "kind": "tick",
+        "at": 14,
+        "gain": 2
+      },
+      {
+        "id": "clk4",
+        "kind": "tick",
+        "at": 18.9,
+        "gain": 2
+      },
+      {
+        "id": "clk5",
+        "kind": "tick",
+        "at": 23.6,
+        "gain": 2
+      },
+      {
+        "id": "clk6",
+        "kind": "tick",
+        "at": 26.7,
+        "gain": 2
+      },
+      {
+        "id": "clk7",
+        "kind": "tick",
+        "at": 31.15,
+        "gain": 2
+      },
+      {
+        "id": "fx0",
+        "kind": "ding",
+        "at": 6.9
+      },
+      {
+        "id": "fx1",
+        "kind": "ding",
+        "at": 16.7
+      },
+      {
+        "id": "fx2",
+        "kind": "pop",
+        "at": 21.2
+      },
+      {
+        "id": "fx3",
+        "kind": "pop",
+        "at": 28.3
+      },
+      {
+        "id": "fx4",
+        "kind": "pop",
+        "at": 28.85
+      },
+      {
+        "id": "fx5",
+        "kind": "whoosh",
+        "at": 31.3
+      },
+      {
+        "id": "fx6",
+        "kind": "riser",
+        "at": 38.6
+      },
+      {
+        "id": "fx7",
+        "kind": "hit",
+        "at": 40.4
+      },
+      {
+        "id": "fx8",
+        "kind": "ding",
+        "at": 39
+      }
+    ]
   }
 }

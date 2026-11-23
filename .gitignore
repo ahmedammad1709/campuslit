@@ -23,3 +23,6 @@ skills/
 Thumbs.db
 video/out/
 __pycache__/
+
+# real screenshots of a signed-in portal, used only for the update video
+video/shots/

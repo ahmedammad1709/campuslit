@@ -1,0 +1,75 @@
+@font-face { font-family: "Jakarta"; src: url("/fonts/jakarta-latin.woff2") format("woff2"); font-weight: 200 800; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #0b1d40; font-family: "Jakarta", "Plus Jakarta Sans", system-ui, sans-serif; color: #0b1d40; font-synthesis: none; -webkit-font-smoothing: antialiased; }
+#frame { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: radial-gradient(1300px 900px at 6% -12%, #1f4cb8, transparent 60%), radial-gradient(1100px 800px at 100% 110%, #4a2a8c66, transparent 62%), #0b1d40; }
+#glow { position: absolute; left: 260px; right: 260px; top: 120px; height: 700px; border-radius: 80px; background: radial-gradient(closest-side, rgba(70, 120, 255, .4), transparent); filter: blur(70px); }
+#grid { position: absolute; inset: 0; opacity: .3; background-image: linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px); background-size: 80px 80px; -webkit-mask-image: radial-gradient(ellipse at 50% 45%, #000 0, transparent 75%); mask-image: radial-gradient(ellipse at 50% 45%, #000 0, transparent 75%); }
+
+#steps { position: absolute; left: 80px; width: 1760px; top: 862px; display: flex; gap: 12px; opacity: 0; }
+#steps b { flex: 1; padding: 9px 0; text-align: center; border-radius: 999px; font-size: 24px; font-weight: 800; color: #9fb3e0; background: rgba(255,255,255,.08); border: 2px solid rgba(255,255,255,.12); white-space: nowrap; }
+#steps b.on { color: #0b1d40; background: #f2b84b; border-color: #f2b84b; }
+#steps b.done { color: #fff; background: rgba(255,255,255,.18); }
+
+#win { position: absolute; left: 0; top: 0; width: 1920px; height: 846px; overflow: hidden; background: #f3f5fa; box-shadow: 0 10px 40px rgba(0,0,0,.5); }
+.bar { display: none; position: relative; z-index: 5; height: 52px; display: flex; align-items: center; gap: 10px; padding: 0 22px; background: #eef2fa; border-bottom: 2px solid #dde5f4; }
+.bar i { width: 13px; height: 13px; border-radius: 50%; background: #cbd5ea; }
+.bar span { position: absolute; left: 50%; transform: translateX(-50%); padding: 5px 26px; border-radius: 99px; background: #fff; font-size: 19px; font-weight: 600; color: #566683; }
+#view { position: absolute; left: 0; top: 0; width: 1920px; height: 846px; overflow: hidden; background: #0b1d40; }
+.shot { position: absolute; left: 0; top: 0; transform-origin: 0 0; opacity: 0; will-change: transform, opacity; }
+.shot img { display: block; }
+.shotbg { position: absolute; left: 0; top: 0; width: 1920px; height: 846px; opacity: 0; }
+.hl { position: absolute; border: 6px solid #f2b84b; border-radius: 14px; box-shadow: 0 0 36px rgba(242,184,75,.7); opacity: 0; pointer-events: none; }
+#label { position: absolute; left: 50%; top: 746px; transform: translateX(-50%); padding: 12px 30px; border-radius: 99px; background: #f2b84b; color: #0b1d40; font-size: 30px; font-weight: 800; opacity: 0; z-index: 20; white-space: nowrap; box-shadow: 0 14px 30px -10px rgba(0,0,0,.5); }
+
+#hook { position: absolute; left: 0; right: 0; top: 0; height: 900px; display: grid; grid-template-columns: 1fr 720px; align-content: center; column-gap: 70px; padding: 0 170px; opacity: 0; z-index: 30; }
+#hk-kicker { grid-column: 1; grid-row: 1; justify-self: start; align-self: end; padding: 14px 34px; border-radius: 99px; background: rgba(242,184,75,.16); border: 2px solid #f2b84b; color: #f2b84b; font-size: 30px; font-weight: 800; letter-spacing: .12em; }
+#hk-big { grid-column: 1; grid-row: 2; align-self: start; margin-top: 22px; font-size: 230px; line-height: .94; font-weight: 800; letter-spacing: -.04em; background: linear-gradient(100deg, #fff, #ffe9bd 60%, #f2b84b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+#hk-list { grid-column: 2; grid-row: 1 / span 2; align-self: center; display: flex; flex-direction: column; gap: 16px; }
+#hk-list div { display: flex; align-items: center; gap: 24px; padding: 18px 28px; border-radius: 22px; background: rgba(255,255,255,.1); border: 2px solid rgba(255,255,255,.18); color: #fff; font-size: 40px; font-weight: 800; letter-spacing: -.02em; opacity: 0; }
+#hk-list div b { flex: none; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: #f2b84b; color: #0b1d40; font-size: 30px; }
+
+#caps { position: absolute; left: 100px; right: 100px; top: 922px; height: 130px; display: flex; align-items: center; justify-content: center; z-index: 40; }
+.cap { position: absolute; left: 0; right: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 0 18px; font-size: 60px; line-height: 1.1; font-weight: 800; letter-spacing: -.04em; text-align: center; text-shadow: 0 6px 24px rgba(0,0,0,.55); }
+.cap .w { color: #fff; }
+.cap .w.on { color: #f2b84b; }
+
+#cursor { position: absolute; width: 58px; height: 58px; left: 0; top: 0; opacity: 0; pointer-events: none; z-index: 60; }
+#cursor svg { width: 58px; height: 58px; filter: drop-shadow(0 8px 12px rgba(0,0,0,.5)); }
+#ripple { position: absolute; width: 110px; height: 110px; margin: -55px 0 0 -55px; left: 0; top: 0; border-radius: 50%; border: 7px solid #f2b84b; opacity: 0; z-index: 59; pointer-events: none; }
+#flash { display: none; }
+
+#end { position: absolute; inset: 0; opacity: 0; display: grid; grid-template-columns: 1fr 1fr; align-items: center; padding: 0 150px; z-index: 50; background: radial-gradient(1000px 800px at 28% 50%, #2a4fb8, transparent 65%), #0b1d40; overflow: hidden; }
+#en-l { text-align: center; }
+#en-kicker { font-size: 38px; font-weight: 800; letter-spacing: .24em; color: #f2b84b; }
+#en-num { margin-top: 6px; font-size: 330px; line-height: 1; font-weight: 800; letter-spacing: -.045em; font-variant-numeric: tabular-nums; background: linear-gradient(100deg, #ffd88a, #f2b84b 45%, #ffe9bd); -webkit-background-clip: text; background-clip: text; color: transparent; }
+#en-num sup { font-size: .5em; vertical-align: top; margin-left: .03em; }
+#en-sub { margin-top: -20px; font-size: 84px; font-weight: 800; letter-spacing: -.03em; color: #fff; }
+#en-r { display: flex; flex-direction: column; align-items: center; }
+#en-brand { display: flex; align-items: center; gap: 26px; }
+#en-brand b { font-size: 100px; letter-spacing: -.05em; color: #fff; }
+#en-brand b span { color: #f2b84b; }
+#en-chips { display: flex; gap: 16px; margin-top: 46px; }
+#en-chips span { padding: 14px 32px; border-radius: 99px; background: rgba(255,255,255,.12); border: 2px solid rgba(255,255,255,.25); font-size: 32px; font-weight: 800; color: #fff; }
+#en-site { margin-top: 40px; padding: 20px 52px; border-radius: 99px; background: #f2b84b; color: #0b1d40; font-size: 42px; font-weight: 800; }
+#en-fine { position: absolute; left: 0; right: 0; bottom: 34px; text-align: center; font-size: 22px; color: #8ea2d4; font-weight: 600; }
+#confetti { position: absolute; inset: 0; pointer-events: none; }
+#confetti i { position: absolute; left: 0; top: 0; width: 20px; height: 30px; border-radius: 4px; }
+#bar { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; z-index: 70; background: rgba(255,255,255,.08); }
+#bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #2f5bea, #f2b84b); }
+
+.bar { display: none !important; }
+#win { box-shadow: none; }
+
+/* full-screen screenshot with a frosted-glass panel for the steps and captions */
+#win { left: 0; top: 0; width: 1920px; height: 1080px; }
+#view { width: 1920px; height: 1080px; }
+.shotbg { width: 1920px; height: 1080px; }
+#glass { position: absolute; left: 56px; right: 56px; bottom: 40px; height: 176px; border-radius: 30px; z-index: 25; opacity: 0; background: linear-gradient(180deg, rgba(255,255,255,.20), rgba(255,255,255,.08)), rgba(9, 20, 52, .62); -webkit-backdrop-filter: blur(26px) saturate(1.5); backdrop-filter: blur(26px) saturate(1.5); border: 1.5px solid rgba(255,255,255,.34); box-shadow: 0 24px 60px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.45); }
+#steps { left: 96px; width: 1728px; top: 904px; z-index: 30; }
+#steps b { padding: 7px 0; font-size: 22px; color: #e4ebfb; background: rgba(255,255,255,.14); border: 1.5px solid rgba(255,255,255,.26); }
+#steps b.on { color: #0b1d40; background: #f2b84b; border-color: #f2b84b; }
+#steps b.done { color: #fff; background: rgba(255,255,255,.22); }
+#caps { left: 96px; right: 96px; top: 956px; height: 90px; z-index: 30; }
+.cap { font-size: 54px; text-shadow: 0 3px 14px rgba(0,0,0,.45); }
+#hook { height: 1000px; }
+#bar { z-index: 70; }
