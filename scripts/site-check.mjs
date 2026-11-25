@@ -81,7 +81,7 @@ assert.equal(await ev("document.querySelector('.site-header').classList.contains
 
 // mobile menu
 await open('/', 390, 844);
-assert.ok(await ev("document.documentElement.scrollHeight") < 12400, 'phone page height: ' + await ev("document.documentElement.scrollHeight"));
+assert.ok(await ev("document.documentElement.scrollHeight") < 12700, 'phone page height: ' + await ev("document.documentElement.scrollHeight"));
 assert.equal(await ev("getComputedStyle(document.querySelector('.nav-links')).display"), 'none', 'menu hidden on a phone');
 await ev("document.querySelector('.menu-btn').click(); 0");
 assert.equal(await ev("getComputedStyle(document.querySelector('.nav-links')).display"), 'flex');
@@ -94,21 +94,32 @@ assert.equal(await ev("document.documentElement.scrollWidth <= innerWidth"), tru
 for (const url of ['/privacy', '/license']) { await open(url, 390, 844); assert.equal(await ev("document.documentElement.scrollWidth <= innerWidth"), true, url + ' no sideways scroll'); }
 // tablet width
 for (const url of ['/', '/privacy', '/license']) { await open(url, 820, 1000); assert.equal(await ev("document.documentElement.scrollWidth <= innerWidth"), true, url + ' fits a tablet'); }
-// the 800+ installs milestone: counts up once when it scrolls into view with a short burst of confetti, and is simply static with reduced motion
+// the 1,000+ installs milestone: a mosaic of 1,000 dots lights up as the number counts to 1,000, then confetti; simply finished with reduced motion
+const gold = "(() => { const c = document.querySelector('.mosaic'), t = document.createElement('canvas'); t.width = c.width; t.height = c.height; const x = t.getContext('2d', {willReadFrequently: true}); x.drawImage(c, 0, 0); const d = x.getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 0; i < d.length; i += 4) if (d[i] > 220 && d[i + 1] > 150 && d[i + 1] < 215 && d[i + 2] < 120 && d[i + 3] > 200) n++; return n; })()";
 await open('/');
-assert.equal(await ev("document.querySelector('.nav-stat').textContent"), '800+ installs'); assert.equal(await ev("document.querySelector('.nav-stat').getAttribute('href')"), '#milestone');
+assert.equal(await ev("document.querySelector('.nav-stat').textContent"), '1,000+ installs'); assert.equal(await ev("document.querySelector('.nav-stat').getAttribute('href')"), '#milestone');
 assert.equal(await ev("document.querySelector('[data-count]').textContent"), '0', 'before it is seen the number waits at zero');
 await ev("document.querySelector('#milestone').scrollIntoView({block: 'center'}); 0");
 const until = async (expr, ok, ms) => { const end = Date.now() + ms; let v; while (Date.now() < end) { v = await ev(expr); if (ok(v)) return v; await sleep(100); } return v; };   // the page scrolls smoothly, so give it time
-assert.ok(await until("document.querySelectorAll('.confetti span').length", n => n > 20, 5000) > 20, 'confetti falls when it is seen');
-assert.equal(await until("document.querySelector('[data-count]').textContent", t => t === '800', 5000), '800', 'the number counts up to 800');
+const mid = await until("document.querySelector('[data-count]').textContent", t => { const n = Number(t.replace(/,/g, '')); return n > 150 && n < 900; }, 4000);
+assert.ok(Number(String(mid).replace(/,/g, '')) > 150, 'the number is counting: ' + mid);
+const partial = await ev(gold); assert.ok(partial > 20, 'dots are lighting up while it counts: ' + partial);
+assert.equal(await until("document.querySelector('[data-count]').textContent", t => t === '1,000', 6000), '1,000', 'the number counts up to 1,000');
+assert.ok(await until("document.querySelectorAll('.confetti span').length", n => n > 20, 3000) > 20, 'confetti falls when it arrives');
+await sleep(1500); const full = await ev(gold); assert.ok(full > partial, 'all the dots are lit at the end: ' + partial + ' then ' + full);
+assert.ok(await ev("document.querySelector('.mosaic').getBoundingClientRect().height") > 40, 'the mosaic has height');
 assert.equal(await ev("getComputedStyle(document.querySelector('.confetti')).pointerEvents"), 'none', 'confetti never blocks a click');
 assert.equal(await until("document.querySelectorAll('.confetti span').length", n => n === 0, 9000), 0, 'and it cleans up after itself');
 await ev("document.querySelector('.nav-stat').click(); 0"); await sleep(400); assert.ok((await ev("location.hash")) === '#milestone', 'the navbar pill goes to the milestone');
+await open('/', 390, 844);
+await ev("document.querySelector('#milestone').scrollIntoView({block: 'center'}); 0");
+assert.equal(await until("document.querySelector('[data-count]').textContent", t => t === '1,000', 8000), '1,000', 'it works at phone width too');
+assert.ok(await ev("document.documentElement.scrollWidth") <= 391, 'and does not scroll sideways: ' + await ev("document.documentElement.scrollWidth"));
 await call('Emulation.setEmulatedMedia', {features: [{name: 'prefers-reduced-motion', value: 'reduce'}]});
 await open('/');
-assert.equal(await ev("document.querySelector('[data-count]').textContent"), '800', 'with reduced motion the number is just there');
-await ev("document.querySelector('#milestone').scrollIntoView({block: 'center'}); 0"); await sleep(600);
+assert.equal(await ev("document.querySelector('[data-count]').textContent"), '1,000', 'with reduced motion the number is just there');
+await ev("document.querySelector('#milestone').scrollIntoView({block: 'center'}); 0"); await sleep(700);
+assert.ok(await ev(gold) > 300, 'and the dots are all lit at once: ' + await ev(gold));
 assert.equal(await ev("document.querySelectorAll('.confetti span').length"), 0, 'and nothing falls'); assert.equal(await ev("getComputedStyle(document.querySelector('.confetti')).display"), 'none');
 await call('Emulation.setEmulatedMedia', {features: []});
 await open('/');
