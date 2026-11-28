@@ -244,16 +244,16 @@ test('the praise section: real comments, each opening the post; LinkedIn is cont
   assert.match(pages.find(p => p.route === 'privacy').html, /only when you scroll down to it/, 'the privacy policy says when LinkedIn is contacted');
 });
 
-test('the 1,000+ installs milestone: an honest number, shown in the navbar, the hero and its own section, a mosaic with one dot per install, and quiet for visitors who prefer less motion', () => {
+test('the 1,200+ installs milestone: an honest number, shown in the navbar, the hero and its own section, a mosaic with one dot per install, and quiet for visitors who prefer less motion', () => {
   const html = pages[0].html, css = fs.readFileSync(path.resolve(__dirname, '..', 'site', 'styles.css'), 'utf8'), js = fs.readFileSync(path.resolve(__dirname, '..', 'site', 'script.js'), 'utf8');
-  assert.match(html, /<a class="nav-stat" href="#milestone"><i aria-hidden="true"><\/i>1,000\+ installs<\/a>/, 'the navbar pill links to the milestone');
+  assert.match(html, /<a class="nav-stat" href="#milestone"><i aria-hidden="true"><\/i>1,200\+ installs<\/a>/, 'the navbar pill links to the milestone');
   assert.match(html, /<section class="milestone" id="milestone" aria-labelledby="milestone-title">/);
-  assert.match(html, /<h2 id="milestone-title"><span class="sr">1,000\+ <\/span>installs, and counting<\/h2>/, 'the heading says the whole thing to a screen reader, while the big number above it is the visible start');
-  assert.match(html, /<p class="milestone-number" aria-hidden="true"><span data-count="1000">1,000<\/span><sup>\+<\/sup><\/p>/, 'the final number is in the page, hidden from screen readers (the heading says it)');
+  assert.match(html, /<h2 id="milestone-title"><span class="sr">1,200\+ <\/span>installs, and counting<\/h2>/, 'the heading says the whole thing to a screen reader, while the big number above it is the visible start');
+  assert.match(html, /<p class="milestone-number" aria-hidden="true"><span data-count="1200">1,200<\/span><sup>\+<\/sup><\/p>/, 'the final number is in the page, hidden from screen readers (the heading says it)');
   assert.match(html, /<canvas class="mosaic" aria-hidden="true"><\/canvas>/, 'the dots are decoration: the heading and the number carry the meaning');
-  assert.match(html, /Chrome Web Store installs: about 1,090 as of 25 November 2026\. Firefox is counted separately\./, 'the number says where it comes from, the real figure and when');
+  assert.match(html, /Chrome Web Store installs: about 1,230 as of 26 November 2026\. Firefox is counted separately\./, 'the number says where it comes from, the real figure and when');
   assert.ok(html.indexOf('id="milestone"') > html.indexOf('id="themes"') && html.indexOf('id="milestone"') < html.indexOf('id="praise"'), 'between the themes and the comments');
-  assert.ok(!/\b(?:1,?[1-9]\d\d\+|2,?000|users|thousands)\b/i.test(html.match(/<section class="milestone"[\s\S]*?<\/section>/)[0]), 'no bigger or different claim than the dashboard supports (about 1,090)');
+  assert.ok(!/\b(?:1,?[3-9]\d\d\+|[2-9],?\d{3}\+|users|thousands)\b/i.test(html.match(/<section class="milestone"[\s\S]*?<\/section>/)[0]), 'no bigger or different claim than the dashboard supports (about 1,230)');
   assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{ \.confetti \{ display: none; \} \}/, 'no confetti with reduced motion');
   assert.match(js, /if \(reduced \|\| !\('IntersectionObserver' in window\)\) \{ still\(\); return; \}/, 'no animation with reduced motion or without the observer: the finished picture stays');
   assert.match(js, /layer\.replaceChildren\(\)/, 'the confetti removes itself');

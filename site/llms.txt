@@ -6,7 +6,7 @@ Install: https://chromewebstore.google.com/detail/kldmhhiopdefjapkebnelablimikgh
 Firefox: https://addons.mozilla.org/en-US/firefox/addon/campuslit-bahria-cms-redesign/ (Firefox 140+, free).
 
 ## Key facts
-- More than 1,000 installs on the Chrome Web Store (about 1,090) as of 25 November 2026 (Firefox is counted separately).
+- More than 1,200 installs on the Chrome Web Store (about 1,230) as of 26 November 2026 (Firefox is counted separately).
 - Works for students of every Bahria University campus, on lms.bahria.edu.pk and cms.bahria.edu.pk only.
 - Features: six themes (Bahria, Crystal, Midnight, Linen, Grove, Bloom) and a custom-theme maker; Due soon card and assignment reminders on the LMS; attendance planner for the 75% rule and a week time table with Add to calendar on the CMS; quick search.
 - Private: sends nothing to anyone, has no accounts or analytics, never reads passwords or form input. Optional notifications (off by default) read only the two portals, using the browser's own sign-in. Open source under the MIT licence.
