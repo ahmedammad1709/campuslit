@@ -4,6 +4,10 @@
   // One small record is kept in this browser when an update arrives ({ from, to }); the popup shows the news once, and closing it removes the record.
   const KEY = 'bahriaStudioNews';
   const RELEASES = Object.freeze([
+    Object.freeze({ version: '1.3.3', date: '28 November 2026', items: Object.freeze([
+      'Download part of a course: two dropdowns above the Lecture Notes table let you choose the first and last lecture, and the button counts the files.',
+      'The CMS sidebar now folds to a slim icon rail, like the LMS, instead of disappearing. Pointing at an icon (on the CMS and the LMS) shows its name.'
+    ]) }),
     Object.freeze({ version: '1.3.2', date: '23 November 2026', items: Object.freeze([
       'The Due soon card on the Assignments page can be folded away with the arrow in its corner, and opened again. It stays open by default.',
       'The Open Assignments button in the reminder now opens the course the reminder is about, not an empty page.',

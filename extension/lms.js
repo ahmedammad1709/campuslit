@@ -396,6 +396,28 @@
     return w;
   }
   function currentSide() { return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--bs-side'), 10) || 250; }
+  // ---------- The folded sidebar (icon rail): the name of the item you point at or focus, in a label beside it ----------
+  let railTipNode = null, railTipOn = false;
+  const railFolded = () => document.documentElement.dataset.bahriaStudio === 'lms' && !!document.body && document.body.classList.contains('sidebar-collapse') && window.innerWidth >= 768;
+  function railHide() { if (railTipNode) railTipNode.dataset.on = 'false'; }
+  function railShow(a) {
+    const text = (a.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 60);
+    if (!text || !railFolded()) return railHide();
+    if (!railTipNode || !railTipNode.isConnected) { railTipNode = make('div', 'bs-rail-tip'); railTipNode.setAttribute('role', 'tooltip'); document.body.append(railTipNode); owned.add(railTipNode); }
+    railTipNode.textContent = text; const r = a.getBoundingClientRect();
+    railTipNode.style.left = Math.round(r.right + 10) + 'px'; railTipNode.style.top = Math.round(r.top + r.height / 2 - 16) + 'px'; railTipNode.dataset.on = 'true';
+  }
+  function railTip() {
+    const side = document.querySelector('.main-sidebar'); if (!side || railTipOn) return; railTipOn = true;
+    const item = e => (e.target && e.target.closest ? e.target.closest('.sidebar-menu > li > a') : null);
+    side.addEventListener('mouseover', e => { const a = item(e); if (a) railShow(a); });
+    side.addEventListener('mouseout', e => { if (item(e)) railHide(); });
+    side.addEventListener('focusin', e => { const a = item(e); if (a) railShow(a); });
+    side.addEventListener('focusout', railHide);
+    side.addEventListener('click', railHide, true);
+    side.addEventListener('scroll', railHide, { passive: true });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') railHide(); }, true);
+  }
   function mountResizer() {
     const side = document.querySelector('.main-sidebar');
     if (!side || resizer) return;
@@ -445,7 +467,7 @@
       if (/^hover to view/i.test(label.textContent.trim()) && /assignments?|quiz/i.test(location.pathname)) showComment(label, text);
     });
     if (!listening) { listening = true; document.addEventListener('click', onClick); document.addEventListener('keydown', onKey); addEventListener('scroll', hidePop, true); }
-    mountResizer();
+    mountResizer(); try { railTip(); } catch (e) { /* no labels, nothing else affected */ }
     if (route === 'dashboard') { dashboard(); try { nextCard(); } catch (e) { /* no next-class card */ } }
     if (route === 'assignments') { try { assignmentsPage(); } catch (e) { /* the original table stays as it was */ } }
     try { remMount(); } catch (e) { /* no reminder, nothing else affected */ }
@@ -456,7 +478,7 @@
     owned.forEach(node => node.remove()); owned.clear();
     titles.forEach((text, node) => node.setAttribute('title', text)); titles.clear();
     attrs.forEach((names, node) => names.forEach(name => node.removeAttribute(name))); attrs.clear();
-    resizer = null; document.documentElement.style.removeProperty('--bs-side');
+    resizer = null; railTipNode = null; document.documentElement.style.removeProperty('--bs-side');
     delete document.documentElement.dataset.bsRoute;
   }
   globalThis.BahriaLms = { mount, disable };

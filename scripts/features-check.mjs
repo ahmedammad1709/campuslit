@@ -48,7 +48,9 @@ const FILES = {
   'LECTOK-0010-jjjjjjjjjjjjjjjjjjjjjjjjjjjj': file('Slow-1.pdf', Buffer.concat([Buffer.from('%PDF-1.4 '), textBody('slow one', 30)]), { type: 'application/pdf', delay: 1800 }),
   'LECTOK-0011-kkkkkkkkkkkkkkkkkkkkkkkkkkkk': file('Slow-2.pdf', Buffer.concat([Buffer.from('%PDF-1.4 '), textBody('slow two', 30)]), { type: 'application/pdf', delay: 1800 }),
   'LECTOK-0012-llllllllllllllllllllllllllll': file('Slow-3.pdf', Buffer.concat([Buffer.from('%PDF-1.4 '), textBody('slow three', 30)]), { type: 'application/pdf', delay: 1800 }),
-  'LECTOK-0013-mmmmmmmmmmmmmmmmmmmmmmmmmmmm': { html: true, name: 'Signed-out.pdf' }
+  'LECTOK-0013-mmmmmmmmmmmmmmmmmmmmmmmmmmmm': { html: true, name: 'Signed-out.pdf' },
+  'LECTOK-0014-nnnnnnnnnnnnnnnnnnnnnnnnnnnn': file('Trees.pdf', Buffer.concat([Buffer.from('%PDF-1.4 '), textBody('trees', 30)]), { type: 'application/pdf' }),
+  'LECTOK-0015-oooooooooooooooooooooooooooo': file('Graphs.pdf', Buffer.concat([Buffer.from('%PDF-1.4 '), textBody('graphs', 30)]), { type: 'application/pdf' })
 };
 const lectureSets = {
   main: ['LECTOK-0001-aaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'LECTOK-0002-bbbbbbbbbbbbbbbbbbbbbbbbbbbb', 'LECTOK-0003-cccccccccccccccccccccccccccc', 'LECTOK-0004-dddddddddddddddddddddddddddd', 'LECTOK-0005-eeeeeeeeeeeeeeeeeeeeeeeeeeee', 'LECTOK-0006-ffffffffffffffffffffffffffff', 'LECTOK-0007-gggggggggggggggggggggggggggg', 'LECTOK-0008-hhhhhhhhhhhhhhhhhhhhhhhhhhhh', 'LECTOK-0009-iiiiiiiiiiiiiiiiiiiiiiiiiiii'],
@@ -81,7 +83,18 @@ function workMarksHtml(courseTok) {
   const rows = course ? course.work.map((w, i) => `<tr><td>${i + 1} </td><td>${w[0]} </td><td></td><td></td><td> ${w[1]} </td><td>---</td><td></td><td><small class="label label-info" title="Actual">${pktText(BASE + 30 * DAY)}</small></td></tr>`).join('') : '';
   return shell('Assignments', selects(courseTok) + (rows ? `<div class="box"><table class="table table-hover"><tbody>${head}${rows}</tbody></table></div>` : '<p>Please select a course to display the respective assignments.</p>'));
 }
+// pages for the lecture range: [week cell, title, files]. Out of order, a lecture with two files, a skipped number, a row with no number
+const T = n => `LECTOK-00${n}-` + String.fromCharCode(96 + (n % 26 || 26)).repeat(28);
+const rangeSets = {
+  range: [['7', 'Trees', [T(14)]], ['5', 'Week 5: Graphs', [T(15)]], ['Mid', 'Midterm revision', [T('09')]], ['3', 'Lecture 03 - Lists', [T('03'), T('04')]], ['2', 'Lecture 2: Arrays', [T('02')]], ['1', 'Intro', [T('01')]]],
+  loose: [['', 'Notes', [T('01')]]],
+  one: [['4', 'Lecture 4', [T('01'), T('02')]]]
+};
 const lectureHtml = (courseTok, set) => {
+  if (rangeSets[set]) {
+    const body = rangeSets[set].map(([w, title, toks]) => `<tr><td>${w} </td><td>${title} </td><td>${toks.map((tok, i) => `<small>${i + 1}.</small> <a href="Download.php?k=${tok}" target="_blank" class="label label-info">Download Lecture</a><br/>`).join('')}</td><td> </td><td> </td><td> </td></tr>`).join('');
+    return shell('Lecture Notes', selects(courseTok) + `<div class="box"><table class="table table-hover"><tbody><tr><th>Week #</th><th>Lecture Title</th><th>Lecture File(s)</th><th>Video Link(s)</th><th>Video Link</th><th>Remarks</th></tr>${body}</tbody></table></div>`);
+  }
   const rows = (lectureSets[set] || []).map((tok, i) => `<tr><td>${i + 1} </td><td>Lecture ${i + 1}: ${FILES[tok].name.replace(/\.[a-z]+$/i, '')} </td><td><small>1.</small> <a href="Download.php?k=${tok}" target="_blank" class="label label-info">Download Lecture</a><br/></td><td> </td><td> </td><td> </td></tr>`).join('');
   return shell('Lecture Notes', selects(courseTok) + (rows ? `<div class="box"><table class="table table-hover"><tbody><tr><th>Week #</th><th>Lecture Title</th><th>Lecture File(s)</th><th>Video Link(s)</th><th>Video Link</th><th>Remarks</th></tr>${rows}</tbody></table></div>` : '<p>No lectures are listed for this course.</p>'));
 };
@@ -253,6 +266,58 @@ try {
   // no files at all: no bar
   const none = await open(`http://lms.bahria.edu.pk/Student/LectureNotes.php?s=${SEM}&oc=${C1.tok}&v=none`); await sleep(800);
   assert.equal(await none.evaluate("document.querySelectorAll('.bs-bulk').length"), 0, 'a course with no files has no Download all');
+  // ---- a range of lectures: two dropdowns, the button counts the files
+  const rng = await open(`http://lms.bahria.edu.pk/Student/LectureNotes.php?s=${SEM}&oc=${C1.tok}&v=range`);
+  await rng.waitFor("!!document.querySelector('.bs-bulk-go') && !!document.querySelector('#bs-bulk-from')", 'the bar with two dropdowns appears');
+  const opts = id => rng.evaluate(`[...document.querySelectorAll('#${id} option')].map(o => o.textContent)`);
+  const bar = () => rng.evaluate("({ go: document.querySelector('.bs-bulk-go').textContent, head: document.querySelector('.bs-bulk-text b').textContent, line: document.querySelector('.bs-bulk-text span').textContent, hint: document.querySelector('.bs-bulk-hint').hidden ? '' : document.querySelector('.bs-bulk-hint').textContent, from: document.querySelector('#bs-bulk-from').value, to: document.querySelector('#bs-bulk-to').value, bars: document.querySelectorAll('.bs-bulk').length })");
+  const choose = (id, value) => rng.evaluate(`(() => { const s = document.querySelector('#${id}'); s.value = '${value}'; s.dispatchEvent(new Event('change', { bubbles: true })); })()`);
+  const ALL = ['Lecture 1 \u00b7 Intro', 'Lecture 2 \u00b7 Arrays', 'Lecture 3 \u00b7 Lists', 'Lecture 5 \u00b7 Graphs', 'Lecture 7 \u00b7 Trees'];
+  assert.deepEqual(await opts('bs-bulk-from'), ALL, 'From lists every lecture number of the course, in order, whatever order the page has');
+  assert.deepEqual(await opts('bs-bulk-to'), ALL, 'To starts with all of them too');
+  let b = await bar();
+  assert.deepEqual([b.go, b.head, b.line, b.hint, b.from, b.to], ['Download all (7)', 'Download all lecture notes', '7 files in this course, saved as one zip.', '', '1', '7'], 'by default the whole course, counting the file with no lecture number');
+  await choose('bs-bulk-from', '3');
+  assert.deepEqual(await opts('bs-bulk-to'), ['Lecture 3 \u00b7 Lists', 'Lecture 5 \u00b7 Graphs', 'Lecture 7 \u00b7 Trees'], 'To only offers the chosen lecture and the ones after it');
+  b = await bar(); assert.deepEqual([b.go, b.head, b.line, b.to], ['Download (4)', 'Download selected lecture notes', '4 files from lectures 3 to 7, saved as one zip.', '7'], 'lecture 3 holds two files, so 3 to 7 is four files');
+  assert.match(b.hint, /^1 file has no lecture number and only comes with the full download\.$/);
+  await choose('bs-bulk-to', '3');
+  b = await bar(); assert.deepEqual([b.go, b.line], ['Download (2)', '2 files from lecture 3, saved as one zip.'], 'the same lecture twice is one lecture');
+  await choose('bs-bulk-from', '5');
+  b = await bar(); assert.equal(b.to, '7', 'a To that falls before the new From moves to the last lecture'); assert.deepEqual(await opts('bs-bulk-to'), ['Lecture 5 \u00b7 Graphs', 'Lecture 7 \u00b7 Trees']); assert.equal(b.go, 'Download (2)');
+  await choose('bs-bulk-from', '2'); await choose('bs-bulk-to', '5');
+  b = await bar(); assert.deepEqual([b.go, b.line], ['Download (4)', '4 files from lectures 2 to 5, saved as one zip.']);
+  await rng.evaluate("document.body.appendChild(document.createElement('div')); 0"); await sleep(700);
+  b = await bar(); assert.deepEqual([b.from, b.to, b.go, b.bars], ['2', '5', 'Download (4)', 1], 'the page redrawing does not undo the choice or add a second bar');
+  // at a modest width (the real content area beside the sidebar) the dropdowns and the button share one row, and nothing sticks out sideways
+  for (const w of [1160, 1000]) {
+    await rng.call('Emulation.setDeviceMetricsOverride', { width: w, height: 800, deviceScaleFactor: 1, mobile: false }); await sleep(400);
+    const lay = await rng.evaluate("(() => { const r = n => document.querySelector(n).getBoundingClientRect(), bar = r('.bs-bulk'), go = r('.bs-bulk-go'), from = r('#bs-bulk-from'), to = r('#bs-bulk-to'); return { sameRow: Math.abs((go.top + go.height / 2) - (from.top + from.height / 2)) < 30 && Math.abs(to.top - from.top) < 4, fits: go.right <= bar.right + 1 && to.right <= bar.right + 1, from: Math.round(from.width), gap: Math.round(to.left - from.right), barH: Math.round(bar.height), scroll: document.documentElement.scrollWidth <= innerWidth + 1 }; })()");
+    assert.ok(lay.sameRow && lay.fits && lay.scroll && lay.gap <= 24 && (w > 1100 ? lay.barH < 120 : lay.barH < 170), 'one compact row at ' + w + ' px: ' + JSON.stringify(lay));
+  }
+  await rng.call('Emulation.setDeviceMetricsOverride', { width: 520, height: 800, deviceScaleFactor: 1, mobile: false }); await sleep(400);
+  assert.ok(await rng.evaluate("document.documentElement.scrollWidth <= innerWidth + 1 && document.querySelector('.bs-bulk-go').getBoundingClientRect().right <= document.querySelector('.bs-bulk').getBoundingClientRect().right + 1"), 'a narrow window stacks the bar without sideways scrolling');
+  await rng.call('Emulation.clearDeviceMetricsOverride'); await sleep(300);
+  await shot(rng, '3b-lecture-range');
+  downloadsAsked.length = 0;
+  const rangeDl = await expectDownload(rng, async () => { await rng.evaluate("document.querySelector('.bs-bulk-go').click(); 0"); await rng.waitFor("!!document.querySelector('.bs-pv .bs-pv-ring')", 'the progress popup opens'); }, /\.zip$/, 40000);
+  assert.equal(rangeDl.name, 'Computer Networks - lectures 2-5.zip', 'the zip says which lectures it holds');
+  assert.deepEqual([...readZip(rangeDl.bytes).keys()].sort(), ['Dup.pdf', 'Graphs.pdf', 'Lecture-2-Slides.pptx', 'dup (2).PDF'].sort(), 'lectures 2, 3 (two files) and 5, nothing else');
+  assert.deepEqual([...new Set(downloadsAsked.map(d => d.k.slice(0, 12)))].sort(), ['LECTOK-0002-', 'LECTOK-0003-', 'LECTOK-0004-', 'LECTOK-0015-'], 'only those files were asked for: ' + downloadsAsked.map(d => d.k.slice(0, 12)));
+  await rng.waitFor("/Saved 4 of 4 files/.test(document.querySelector('.bs-bulk-title') ? document.querySelector('.bs-bulk-title').textContent : '')", 'the result says four of four');
+  await rng.evaluate("document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); 0");
+  await choose('bs-bulk-from', '1'); await choose('bs-bulk-to', '7');
+  b = await bar(); assert.deepEqual([b.go, b.head], ['Download all (7)', 'Download all lecture notes'], 'the full range is the full download again');
+  const solo = await open(`http://lms.bahria.edu.pk/Student/LectureNotes.php?s=${SEM}&oc=${C1.tok}&v=one`);
+  await solo.waitFor("!!document.querySelector('.bs-bulk-go')", 'bar for one lecture');
+  assert.equal(await solo.evaluate("document.querySelectorAll('.bs-bulk-range, .bs-bulk-select').length"), 0, 'one lecture number: nothing to choose between');
+  assert.equal(await solo.evaluate("document.querySelector('.bs-bulk-go').textContent"), 'Download all (2)');
+  const loose = await open(`http://lms.bahria.edu.pk/Student/LectureNotes.php?s=${SEM}&oc=${C1.tok}&v=loose`);
+  await loose.waitFor("!!document.querySelector('.bs-bulk-go')", 'bar for rows without numbers');
+  assert.equal(await loose.evaluate("document.querySelectorAll('.bs-bulk-range').length"), 0, 'no lecture numbers: no range, the full download still works');
+  assert.equal(await loose.evaluate("document.querySelector('.bs-bulk-go').textContent"), 'Download all (1)');
+  assert.equal(await lec.evaluate("document.querySelectorAll('.bs-bulk-range').length"), 1, 'the nine numbered lectures of the main page get the dropdowns');
+  console.log('3b. lecture range: From lists all, To starts at From, counts, same lecture twice, To reset, zip name and contents, redraw keeps the choice, one lecture or none: no dropdowns');
   console.log('3. download all: bar, ring, names (duplicates, hostile, missing), compression, errors named, retry only for server errors, cancel keeps work, session end, no files');
 
   // ============================================================ 4. marks overview

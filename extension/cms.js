@@ -93,6 +93,39 @@
       try { path = new URL(a.href, location.href).pathname.toLowerCase().replace(/\/$/, ''); } catch (e) { return; }
       if (path && path === here && !a.getAttribute('href').startsWith('#')) { mark(a, 'data-bs-current'); openGroup(a); }
     });
+    // the main menu that holds the current page (shown as a lit tile when the sidebar is folded to its icon rail)
+    document.querySelectorAll('aside#sideBar div.list-group-subMenu > a[data-bs-current]').forEach(a => {
+      const group = a.closest('div.list-group-subMenu'), toggle = group && group.id ? document.querySelector('aside#sideBar a[data-toggle="collapse"][href="#' + group.id + '"]') : null;
+      if (toggle) mark(toggle, 'data-bs-has-current');
+    });
+  }
+  // ---------- The folded sidebar (icon rail): a label on hover or focus, and a menu with sub-pages opens the full sidebar ----------
+  let tip = null, railOn = false;
+  const folded = () => { const box = document.getElementById('pageContainer'); return document.documentElement.dataset.bahriaStudio === 'cms' && !!box && box.classList.contains('HideSideBar') && window.innerWidth >= 768; };
+  function railLabel(a) { return (a.getAttribute('data-bs-label') || '').trim(); }
+  function showTip(a) {
+    const text = railLabel(a); if (!text || !folded()) return hideTip();
+    if (!tip) { tip = make('div', 'bs-rail-tip'); tip.setAttribute('role', 'tooltip'); document.body.append(tip); owned.add(tip); }
+    tip.textContent = text; const r = a.getBoundingClientRect();
+    tip.style.left = Math.round(r.right + 10) + 'px'; tip.style.top = Math.round(r.top + r.height / 2 - 16) + 'px'; tip.dataset.on = 'true';
+  }
+  function hideTip() { if (tip) tip.dataset.on = 'false'; }
+  function rail() {
+    const side = document.querySelector('body > form > div#pageContainer > aside#sideBar'); if (!side) return;
+    side.querySelectorAll('a.list-group-item').forEach(a => { if (!a.hasAttribute('data-bs-label')) { const text = (a.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 60); if (text) mark(a, 'data-bs-label', text); } });
+    if (railOn) return; railOn = true;
+    const item = e => (e.target && e.target.closest ? e.target.closest('aside#sideBar div#sideMenuList > a.list-group-item') : null);
+    side.addEventListener('mouseover', e => { const a = item(e); if (a) showTip(a); });
+    side.addEventListener('mouseout', e => { if (item(e)) hideTip(); });
+    side.addEventListener('focusin', e => { const a = item(e); if (a) showTip(a); });
+    side.addEventListener('focusout', hideTip);
+    side.addEventListener('scroll', hideTip, { passive: true });
+    side.addEventListener('click', e => {   // a menu with sub-pages can not open inside the narrow rail: open the full sidebar with the portal's own button, and its sub-pages open with it
+      const a = item(e); hideTip();
+      if (!a || !folded() || a.getAttribute('data-toggle') !== 'collapse') return;
+      const button = document.getElementById('aSideBar'); if (button) setTimeout(() => button.click(), 0);
+    }, true);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') hideTip(); }, true);
   }
   // ---------- Attendance: per-course rows with a plain "how many hours can I miss" line ----------
   const AT = () => globalThis.BahriaAttendance || null;
@@ -458,7 +491,7 @@
     // Each feature runs on its own: if one fails on an unexpected page, the others (and the page itself) carry on untouched.
     [markCurrent,
       () => document.querySelectorAll('#pageAlerts_up .alert').forEach(a => mark(a, 'role', 'alert')),
-      mountResizer, dashboardAttendance, dashboardNext, attendancePage, statuses, timetable, landing, emblem
+      rail, mountResizer, dashboardAttendance, dashboardNext, attendancePage, statuses, timetable, landing, emblem
     ].forEach(step => { try { step(); } catch (e) { /* ignore */ } });
     void root;
   }
@@ -467,7 +500,7 @@
     opened.splice(0).forEach(({ group, toggle }) => { group.classList.remove('in'); group.removeAttribute('aria-expanded'); group.removeAttribute('data-bs-opened'); if (toggle) { toggle.classList.add('collapsed'); toggle.setAttribute('aria-expanded', 'false'); } });
     owned.forEach(node => node.remove()); owned.clear();
     attrs.forEach((names, node) => names.forEach(name => node.removeAttribute(name))); attrs.clear();
-    resizer = null; document.documentElement.style.removeProperty('--bs-side');
+    resizer = null; tip = null; document.documentElement.style.removeProperty('--bs-side');
   }
   globalThis.BahriaCms = { mount, disable };
 })();

@@ -1,5 +1,5 @@
 // "Download all" on the LMS Lecture Notes page: every file listed for the course on screen, fetched one at a time with the student's own sign-in and handed to the
-// browser as one zip. A popup shows a progress ring and which file is being fetched. Nothing is requested until the button is pressed, nothing is sent anywhere,
+// browser as one zip (all of them, or a range of lectures chosen with two dropdowns). A popup shows a progress ring and which file is being fetched. Nothing is requested until the button is pressed, nothing is sent anywhere,
 // and the files only live in memory until the zip is saved (or the popup is closed).
 (function () {
   'use strict';
@@ -7,7 +7,7 @@
   if (!P || !ZW) return;
   const LIMITS = { files: 150, total: 400 * 1024 * 1024, file: 150 * 1024 * 1024, perFile: 120000, gap: 120 };
   const owned = new Set();
-  let overlay = null, run = 0, abort = null, urls = [], opener = null, keyHandler = null, bar = null;
+  let overlay = null, run = 0, abort = null, urls = [], opener = null, keyHandler = null, bar = null, chosenRange = null;
 
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
   const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -41,10 +41,34 @@
       seen.add(safe);
       const row = a.closest('tr'), cells = row ? [...row.querySelectorAll(':scope > td')] : [];
       const week = cells[0] ? clean(cells[0].textContent) : '', title = cells[1] ? clean(cells[1].textContent) : '';
-      found.push({ href: a.getAttribute('href'), label: (title || clean(a.textContent) || 'Lecture').slice(0, 90), week: /^\d{1,3}$/.test(week) ? week : '', table: a.closest('table') });
+      const numbered = /^\d{1,3}$/.test(week);
+      found.push({ href: a.getAttribute('href'), label: (title || clean(a.textContent) || 'Lecture').slice(0, 90), week: numbered ? week : '', weekNum: numbered ? Number(week) : null, heading: title, table: a.closest('table') });
     }
     return found;
   }
+
+  // ---------------------------------------------------------------- choosing a range of lectures
+  // The Week # column numbers the lectures. "From" lists every lecture number of the course, "To" lists the chosen one and the ones after it. A lecture can hold several files,
+  // and the same number can sit on more than one row: all of them count. Files whose row has no lecture number only come with the full download.
+  function weeksOf(items) {
+    const seen = new Map();
+    for (const it of items) if (Number.isInteger(it.weekNum) && !seen.has(it.weekNum)) seen.set(it.weekNum, it.heading || '');
+    return [...seen.entries()].sort((a, b) => a[0] - b[0]).map(([n, title]) => ({ n, title }));
+  }
+  const looseCount = items => items.filter(it => !Number.isInteger(it.weekNum)).length;
+  function labelFor(w) {   // "Lecture 7 · Title", without saying the number twice when the title already starts with it
+    const rest = clean(w.title).replace(new RegExp('^(?:lecture|lec|week)\\s*0*' + w.n + '\\b[\\s:.\\-\\u2013\\u2014]*', 'i'), '');
+    const t = rest.length > 46 ? rest.slice(0, 45).trimEnd() + '\u2026' : rest;
+    return 'Lecture ' + w.n + (t ? ' \u00b7 ' + t : '');
+  }
+  const isFull = (weeks, from, to) => !weeks.length || (from === weeks[0].n && to === weeks[weeks.length - 1].n);
+  const pick = (items, weeks, from, to) => isFull(weeks, from, to) ? items : items.filter(it => Number.isInteger(it.weekNum) && it.weekNum >= from && it.weekNum <= to);
+  const plural = (n, one, many) => n + ' ' + (n === 1 ? one : many);
+  function summary(count, total, weeks, from, to) {
+    if (isFull(weeks, from, to)) return plural(count, 'file', 'files') + (total > count ? ' (the first ' + count + ' of ' + total + ')' : '') + ' in this course, saved as one zip.';
+    return plural(count, 'file', 'files') + (total > count ? ' (the first ' + count + ' of ' + total + ')' : '') + ' from ' + (from === to ? 'lecture ' + from : 'lectures ' + from + ' to ' + to) + ', saved as one zip.';
+  }
+  const rangeTag = (weeks, from, to) => isFull(weeks, from, to) ? '' : (from === to ? 'lecture ' + from : 'lectures ' + from + '-' + to);   // goes into the zip's name
 
   // ---------------------------------------------------------------- one file
   // Returns { name, bytes }. Throws an Error whose message is meant for the student. `external` is the "stop everything" signal.
@@ -102,7 +126,7 @@
     opener = null;
   }
   function dialog(course, count) {
-    const box = el('div', 'bs-pv'); box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true'); box.setAttribute('aria-label', 'Download all lecture notes');
+    const box = el('div', 'bs-pv'); box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true'); box.setAttribute('aria-label', 'Download lecture notes');
     const card = el('div', 'bs-pv-card bs-bulk-card'), top = el('div', 'bs-pv-bar'), head = el('div', 'bs-pv-head');
     const badge = el('span', 'bs-pv-badge k-zip', 'ZIP'); badge.setAttribute('aria-hidden', 'true');
     const lines = el('div', 'bs-pv-lines'); lines.append(el('b', 'bs-pv-title', 'Lecture notes' + (course ? ' - ' + course : '')), el('span', 'bs-pv-meta', count + (count === 1 ? ' file' : ' files')));
@@ -133,7 +157,7 @@
     return url;
   }
 
-  async function start(items, course, from) {
+  async function start(items, course, from, tag) {
     closeDialog(); opener = from;
     const mine = run, n = items.length, view = dialog(course, n);
     abort = new AbortController(); const external = abort.signal;
@@ -169,7 +193,7 @@
     view.actions.replaceChildren(); view.body.replaceChildren();
 
     // ---- the result
-    const name = ZW.safeName((course || 'Lecture notes') + ' - lecture notes') + '.zip';
+    const name = ZW.safeName((course || 'Lecture notes') + ' - ' + (tag || 'lecture notes')) + '.zip';
     const result = el('div', 'bs-pv-msg bs-bulk-result');
     const mark = el('span', done ? 'bs-bulk-ok' : 'bs-pv-bad', done ? '✓' : '!'); mark.setAttribute('aria-hidden', 'true');
     const title = el('b', 'bs-bulk-title');
@@ -202,20 +226,49 @@
     if (window !== window.top || location.hostname !== 'lms.bahria.edu.pk' || !document.body || !/\/lecturenotes\.php$/i.test(location.pathname)) return;
     const found = collect();
     if (!found.length) { unmountBar(); return; }
-    const items = found.slice(0, LIMITS.files), count = items.length, course = chosen('#courseId');
-    const signature = count + '|' + course + '|' + items.map(i => i.href.slice(-24)).join(',');
+    const weeks = weeksOf(found), loose = looseCount(found), course = chosen('#courseId'), canRange = weeks.length >= 2;
+    const signature = found.length + '|' + course + '|' + found.map(i => i.href.slice(-24)).join(',');
     if (bar && bar.isConnected && bar.dataset.sig === signature) return;
     unmountBar();
-    bar = el('section', 'bs-bulk'); bar.dataset.sig = signature; bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Download all lecture notes');
-    const text = el('div', 'bs-bulk-text');
-    text.append(el('b', '', 'Download all lecture notes'), el('span', '', count + (count === 1 ? ' file' : ' files') + (found.length > count ? ' (the first ' + count + ' of ' + found.length + ')' : '') + ' in this course, saved as one zip.'));
-    const go = el('button', 'bs-bulk-go', 'Download all (' + count + ')'); go.type = 'button';
-    go.addEventListener('click', () => { if (!overlay) start(items, course, go); });
-    bar.append(text, go); owned.add(bar);
-    const table = items[0].table, anchor = table.closest('.box') || table.closest('.table-responsive') || table;
+    let from = weeks.length ? weeks[0].n : 0, to = weeks.length ? weeks[weeks.length - 1].n : 0;
+    if (canRange && chosenRange && chosenRange.sig === signature) {   // the page was redrawn: keep what was chosen
+      if (weeks.some(w => w.n === chosenRange.from)) from = chosenRange.from;
+      if (weeks.some(w => w.n === chosenRange.to) && chosenRange.to >= from) to = chosenRange.to;
+    }
+    bar = el('section', 'bs-bulk'); bar.dataset.sig = signature; bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Download lecture notes');
+    const text = el('div', 'bs-bulk-text'), head = el('b', '', 'Download all lecture notes'), line = el('span', ''), hint = el('span', 'bs-bulk-hint');
+    line.setAttribute('role', 'status'); line.setAttribute('aria-live', 'polite');
+    text.append(head, line, hint);
+    const go = el('button', 'bs-bulk-go', ''); go.type = 'button';
+    let current = { items: [], tag: '' };
+    const refresh = () => {
+      const full = !canRange || isFull(weeks, from, to), chosenItems = pick(found, weeks, from, to), items = chosenItems.slice(0, LIMITS.files);
+      current = { items, tag: canRange ? rangeTag(weeks, from, to) : '' };
+      head.textContent = full ? 'Download all lecture notes' : 'Download selected lecture notes';
+      line.textContent = summary(items.length, chosenItems.length, canRange ? weeks : [], from, to);
+      go.textContent = (full ? 'Download all (' : 'Download (') + items.length + ')';
+      hint.textContent = !full && loose ? (loose === 1 ? '1 file has no lecture number and only comes' : loose + ' files have no lecture number and only come') + ' with the full download.' : ''; hint.hidden = !hint.textContent;
+      if (canRange) chosenRange = { sig: signature, from, to };
+    };
+    go.addEventListener('click', () => { if (!overlay && current.items.length) start(current.items, course, go, current.tag); });
+    const actions = el('div', 'bs-bulk-actions');
+    bar.append(text, actions);
+    if (canRange) {
+      const range = el('div', 'bs-bulk-range'), field = (id, label, select) => { const f = el('div', 'bs-bulk-field'), l = el('label', '', label); l.setAttribute('for', id); select.id = id; f.append(l, select); return f; };
+      const fromSel = el('select', 'bs-bulk-select'), toSel = el('select', 'bs-bulk-select');
+      for (const w of weeks) { const o = el('option', '', labelFor(w)); o.value = String(w.n); if (w.n === from) o.selected = true; fromSel.append(o); }
+      const fillTo = () => { toSel.replaceChildren(); for (const w of weeks.filter(x => x.n >= from)) { const o = el('option', '', labelFor(w)); o.value = String(w.n); if (w.n === to) o.selected = true; toSel.append(o); } };
+      fillTo();
+      fromSel.addEventListener('change', () => { from = Number(fromSel.value); if (to < from) to = weeks[weeks.length - 1].n; fillTo(); refresh(); });
+      toSel.addEventListener('change', () => { to = Number(toSel.value); refresh(); });
+      range.append(field('bs-bulk-from', 'From', fromSel), field('bs-bulk-to', 'To', toSel)); actions.append(range);
+    }
+    refresh();
+    actions.append(go); owned.add(bar);
+    const table = found[0].table, anchor = table.closest('.box') || table.closest('.table-responsive') || table;
     anchor.parentNode.insertBefore(bar, anchor);
   }
   function unmountBar() { if (bar) { bar.remove(); owned.delete(bar); bar = null; } }
   function disable() { closeDialog(); unmountBar(); }
-  globalThis.BahriaBulk = { mount, disable };
+  globalThis.BahriaBulk = { mount, disable, weeksOf, labelFor, pick, summary, rangeTag, isFull };
 })();
